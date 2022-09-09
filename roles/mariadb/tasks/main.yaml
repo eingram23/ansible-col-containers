@@ -8,6 +8,8 @@
       MYSQL_DATABASE: "{{ db_name }}"
       MYSQL_USER: "{{ db_user }}"
       MYSQL_PASSWORD: "{{ db_user_pw }}"
+      MYSQL_TCP_PORT: "{{ mysql_port }}"
+      MYSQL_UNIX_PORT: "{{ mysql_port }}"
     volume:
       - "{{ dbsrv_name }}-data:/var/lib/mysql"
     state: started
