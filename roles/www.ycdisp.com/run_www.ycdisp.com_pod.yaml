@@ -1,0 +1,48 @@
+---
+- name: Run www.ycdisp.com pod
+  hosts: podhost3
+  gather_facts: no
+  # remote_user: eingram
+  become_user: poduser
+  become_method: sudo
+
+  vars:
+    app: "www.ycdisp.com"
+    root: '/home/poduser/code/'
+    # repo: 'git@github.com:eingram23/'
+    mysql_root: "{{ lookup('hashi_vault','secret=secret/data/ycprod/mysql:root') }}"
+    mysql_yandcprod: "{{ lookup('hashi_vault','secret=secret/data/ycprod/mysql:yandcprod') }}"
+    nginx_port: "8080"
+
+  tasks:
+
+    - name: Create www.ycdisp.com pod
+      containers.podman.podman_pod:
+        name: "{{app}}"
+        state: started
+        publish: "{{nginx_port}}:{{nginx_port}}"
+
+    - name: Run www.ycdisp.com-web container
+      containers.podman.podman_container:
+        name: "{{app}}-web"
+        image: localhost/{{app}}-web
+        volume: 
+          - "{{root}}{{app}}/public_html:/var/www/html:z"
+        state: started
+        restart_policy: always
+        pod: "{{app}}"
+
+    - name: Run www.ycdisp.com-db container
+      containers.podman.podman_container:
+        name: "{{app}}-db"
+        image: localhost/{{app}}-db
+        env:
+          MYSQL_ROOT_PASSWORD: "{{mysql_root}}"
+          MYSQL_DATABASE: yandcprod
+          MYSQL_USER: yandcprod
+          MYSQL_PASSWORD: "{{mysql_yandcprod}}"
+        volume: 
+          - yandcprod-data:/var/lib/mysql
+        state: started
+        restart_policy: always
+        pod: "{{app}}"

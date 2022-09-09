@@ -1,0 +1,30 @@
+---
+- name: Create unifi pod
+  containers.podman.podman_pod:
+    name: "{{app}}"
+    state: started
+    publish: 
+      - 8443:8443
+      - 3478:3478/udp
+      - 10001:10001/udp
+      - 8080:8080
+      - 1900:1900/udp #optional
+      - 8843:8843 #optional
+      - 8880:8880 #optional
+      - 6789:6789 #optional
+      - 5514:5514/udp #optional
+
+- name: Create and run unifi container
+  containers.podman.podman_container:
+    name: "{{app}}-controller"
+    image: linuxserver/unifi-controller:7.1.66
+    state: started
+    restart_policy: always
+    pod: "{{app}}"
+    env:
+      PUID=1000
+      PGID=1000
+      MEM_LIMIT=1024
+      MEM_STARTUP=1024
+    volume:
+      - unifi-data:/config

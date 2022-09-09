@@ -1,0 +1,8 @@
+- name: Create pod
+  containers.podman.podman_pod:
+    name: "{{ pod_name }}"
+    state: started
+    publish: "{{ publish_port_item }}"
+  loop: "{{ publish_port }}"
+  loop_control:
+    loop_var: publish_port_item

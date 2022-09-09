@@ -1,0 +1,36 @@
+---
+- name: Copy repair_settings.php to web root
+  ansible.builtin.copy:
+    src: repair_settings.php
+    dest: "{{root}}{{app}}/public_html/"
+
+- name: Allow write perms to Settings.php
+  ansible.builtin.file:
+    path: "{{root}}{{app}}/public_html/Settings.php"
+    mode: '0766'
+
+- name: Restart www.diversionforum.net pod
+  containers.podman.podman_pod:
+    name: "{{app}}"
+    state: restarted
+  
+- name: Pause playbook until web files are uploaded to host
+  pause:
+    prompt: "Hit enter when done with repair_settings"
+    
+- name: Remove repair_settings.php
+  ansible.builtin.file: 
+    path: "{{root}}{{app}}/public_html/repair_settings.php"
+    state: absent
+
+- name: Reset perms on Settings.php
+  ansible.builtin.file:
+    path: "{{root}}{{app}}/public_html/Settings.php"
+    mode: '0644'
+
+
+- name: Restart www.diversionforum.net pod
+  containers.podman.podman_pod:
+    name: "{{app}}"
+    state: restarted
+

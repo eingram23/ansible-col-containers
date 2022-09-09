@@ -1,0 +1,23 @@
+---
+- name: Deploy test.diversionforum.net
+  hosts: "{{ hostvar|default([]) }}"
+  gather_facts: no
+  
+  vars:
+    app: "test.diversionforum.net"
+    container: "test.diversionforum.net"
+    root: '/home/poduser/code/'
+    repo: 'git@github.com:eingram23/'
+    mysql_root: "{{ lookup('hashi_vault','secret=secret/data/dftest/mysql:root') }}"
+    mysql_smfprod: "{{ lookup('hashi_vault','secret=secret/data/dftest/mysql:smfprod') }}"
+    nginx_port: "8082"
+
+  roles:
+    - role: common
+      become_user: poduser
+      become_method: sudo
+    - role: set_perms
+      become: true
+      become_method: sudo
+
+  

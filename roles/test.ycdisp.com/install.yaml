@@ -1,0 +1,21 @@
+---
+- name: Deploy test.ycdisp.com
+  hosts: "{{ hostvar|default([]) }}"
+  gather_facts: no
+  become_user: poduser
+  become_method: sudo
+
+  vars:
+    app: "test.ycdisp.com"
+    container: "test.ycdisp.com"
+    root: '/home/poduser/code/'
+    repo: 'git@github.com:eingram23/'
+    smtp_pw: "{{ lookup('hashi_vault','secret=secret/data/google/smtp:password') }}"
+    mysql_root: "{{ lookup('hashi_vault','secret=secret/data/yctest/mysql:root') }}"
+    mysql_yandcprod: "{{ lookup('hashi_vault','secret=secret/data/yctest/mysql:yandcprod') }}"
+    nginx_port: "8083"
+
+  roles:
+    - common
+
+  

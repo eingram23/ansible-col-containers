@@ -1,0 +1,14 @@
+---
+- name: Pull and start mariadb container
+  containers.podman.podman_container:
+    name: "{{ dbsrv_name }}"
+    image: docker.io/mariadb:10.9.2
+    env:
+      MYSQL_ROOT_PASSWORD: "{{ db_root_pw }}"
+      MYSQL_DATABASE: "{{ db_name }}"
+      MYSQL_USER: "{{ db_user }}"
+      MYSQL_PASSWORD: "{{ db_user_pw }}"
+    volume:
+      - "{{ dbsrv_name }}-data:/var/lib/mysql"
+    state: started
+    restart_policy: always

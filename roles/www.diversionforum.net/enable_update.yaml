@@ -1,0 +1,16 @@
+---
+- name: Enable updates
+  hosts: "{{ hostvar|default([]) }}"
+  gather_facts: no
+  become: true
+  become_method: sudo
+  
+  vars:
+    app: 'www.diversionforum.net'
+    root: '/home/poduser/code/'
+
+  roles:
+    - update
+    - set_perms
+...
+  

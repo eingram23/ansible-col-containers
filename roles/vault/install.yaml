@@ -1,0 +1,33 @@
+---
+- name: Run admin tasks
+  hosts: "{{ hostvar|default([]) }}"
+  gather_facts: false
+  become: true
+
+  tasks:
+
+    - name: Allow port 8200/tcp through firewall
+      ansible.posix.firewalld:
+        port: 8200/tcp
+        zone: public
+        permanent: true
+        state: enabled
+      notify:
+        - Reload firewalld
+
+  handlers:
+    - name: Reload firewalld
+      ansible.builtin.systemd:
+        name: firewalld
+        state: reloaded
+
+- name: Build and run vault server container
+  hosts: "{{ hostvar|default([]) }}"
+  gather_facts: false
+  become: true
+  become_user: poduser
+  become_method: sudo
+
+  roles:
+    - vault-dev-server
+
