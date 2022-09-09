@@ -1,7 +1,7 @@
 ---
 - name: Pull mariadb image and start container
   containers.podman.podman_container:
-    name: mariadb
+    name: "{{ mariadb_container }}"
     image: docker.io/mariadb:10.9.2
     env:
       MYSQL_ROOT_PASSWORD: "{{ lookup('hashi_vault', 'secret=secret/data/ssh/eingram:ssh_password') }}"
