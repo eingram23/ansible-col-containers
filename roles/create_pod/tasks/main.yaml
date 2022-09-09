@@ -2,10 +2,10 @@
   containers.podman.podman_pod:
     name: "{{ pod_name }}"
     state: started
-    publish: "{{ publish_port_item }}"
+    publish: "{{ publish_ports_item }}"
     generate_systemd:
       path: /home/poduser/systemd
       restart_policy: always
-  loop: "{{ publish_port }}"
+  loop: "{{ publish_ports }}"
   loop_control:
-    loop_var: publish_port_item
+    loop_var: publish_ports_item

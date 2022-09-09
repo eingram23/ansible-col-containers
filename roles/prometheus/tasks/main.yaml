@@ -1,0 +1,11 @@
+---
+- name: Create and run prometheus container
+  containers.podman.podman_container:
+    name: prometheus
+    image: prom/prometheus:v2.36.2
+    state: started
+    restart_policy: always
+    pod: graf_prom_vm
+    volume:
+      - prometheus_data:/prometheus
+      - /opt/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml

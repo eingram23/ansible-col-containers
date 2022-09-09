@@ -1,0 +1,11 @@
+---
+- name: Create and run grafana container
+  containers.podman.podman_container:
+    name: grafana
+    image: grafana/grafana:9.0.1
+    state: started
+    restart_policy: always
+    pod: graf_prom_vm
+    volume:
+      - grafana_config:/etc/grafana
+      - grafana_data:/var/lib/grafana

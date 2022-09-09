@@ -1,0 +1,2 @@
+---
+vsphere_pass: "{{ lookup('hashi_vault','secret=secret/data/vsphere/vcsa:vsphere_password') }}"
