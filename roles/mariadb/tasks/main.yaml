@@ -1,18 +1,15 @@
 ---
-- name: Pull mariadb image and start mariadb container
+- name: Pull mariadb image and start container
   containers.podman.podman_container:
-    name: "{{ dbsrv_name }}"
+    name: "{{ container_name }}"
     image: docker.io/mariadb:10.9.2
     env:
       MYSQL_ROOT_PASSWORD: "{{ db_root_pw }}"
-      MYSQL_DATABASE: "{{ db_name }}"
-      MYSQL_USER: "{{ db_user }}"
-      MYSQL_PASSWORD: "{{ db_user_pw }}"
-      MYSQL_TCP_PORT: "{{ mysql_port }}"
-      MYSQL_UNIX_PORT: "{{ mysql_port }}"
-    publish:
-      - "{{ mysql_port }}:{{ mysql_port }}"
+      # MYSQL_DATABASE: "{{ db_name }}"
+      # MYSQL_USER: "{{ db_user }}"
+      # MYSQL_PASSWORD: "{{ db_user_pw }}"
+    pod: "{{ pod_name }}"
     volume:
-      - "{{ dbsrv_name }}-data:/var/lib/mysql"
+      - "{{ container_name }}-data:/var/lib/mysql"
     state: started
     restart_policy: always
