@@ -10,6 +10,8 @@
       MYSQL_PASSWORD: "{{ db_user_pw }}"
       MYSQL_TCP_PORT: "{{ mysql_port }}"
       MYSQL_UNIX_PORT: "{{ mysql_port }}"
+    publish:
+      - "{{ mysql_port }}:{{ mysql_port }}"
     volume:
       - "{{ dbsrv_name }}-data:/var/lib/mysql"
     state: started
