@@ -4,7 +4,7 @@
     name: phpmyadmin
     image: docker.io/phpmyadmin:5.2.0-apache
     env:
-      PMA_HOST: "127.0.0.1"
+      PMA_HOST: "localhost"
     pod: "{{ pod_name }}"
     state: started
     restart_policy: always
