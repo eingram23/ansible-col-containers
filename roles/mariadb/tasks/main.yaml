@@ -1,5 +1,5 @@
 ---
-- name: Pull and start mariadb container
+- name: Pull mariadb image and start mariadb container
   containers.podman.podman_container:
     name: "{{ dbsrv_name }}"
     image: docker.io/mariadb:10.9.2
