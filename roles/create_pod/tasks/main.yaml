@@ -3,6 +3,9 @@
     name: "{{ pod_name }}"
     state: started
     publish: "{{ publish_port_item }}"
+    generate_systemd:
+      path: /home/poduser/systemd
+      restart_policy: always
   loop: "{{ publish_port }}"
   loop_control:
     loop_var: publish_port_item
