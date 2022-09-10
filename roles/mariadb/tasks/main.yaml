@@ -5,11 +5,8 @@
     image: docker.io/mariadb:10.9.2
     env:
       MYSQL_ROOT_PASSWORD: "{{ lookup('hashi_vault', 'secret=secret/data/ssh/eingram:ssh_password') }}"
-      # MYSQL_DATABASE: "{{ db_name }}"
-      # MYSQL_USER: "{{ db_user }}"
-      # MYSQL_PASSWORD: "{{ db_user_pw }}"
     pod: "{{ pod_name }}"
     volume:
-      - "mariadb-data:/var/lib/mysql"
+      - "{{ mariadb_container }}-data:/var/lib/mysql"
     state: started
     restart_policy: always
