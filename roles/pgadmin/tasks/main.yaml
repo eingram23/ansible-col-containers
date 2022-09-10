@@ -6,7 +6,6 @@
     env:
       PGADMIN_DEFAULT_EMAIL: "edward.ingram23@gmail.com"
       PGADMIN_DEFAULT_PASSWORD: "{{ lookup('hashi_vault', 'secret=secret/data/ssh/eingram:ssh_password') }}"
-      PGADMIN_LIST_PORT: "8081"
     pod: "{{ pod_name }}"
     volume:
       - "{{ pgadmin_container }}:/var/lib/pgadmin"
