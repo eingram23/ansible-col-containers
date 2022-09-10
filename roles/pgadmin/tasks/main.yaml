@@ -1,4 +1,10 @@
 ---
+- name: Copy servers.json to host
+  ansible.builtin.copy:
+    src: servers.json
+    dest: /home/poduser/pgadmin4/servers.json
+    mode: '0644'
+
 - name: Pull pgadmin image and start container
   containers.podman.podman_container:
     name: "{{ pgadmin_container }}"
@@ -9,5 +15,6 @@
     pod: "{{ pod_name }}"
     volume:
       - "{{ pgadmin_container }}-data:/var/lib/pgadmin"
+      - "/home/poduser/pgadmin4/servers.json:/pgadmin4/servers.json"
     state: started
     restart_policy: always
