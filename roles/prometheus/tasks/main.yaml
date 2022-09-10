@@ -1,7 +1,7 @@
 ---
 - name: Copy prometheus.yml to remote server
   ansible.builtin.copy:
-    src: ./roles/prometheus/files/prometheus.yml
+    src: prometheus.yml
     dest: /opt/prometheus/prometheus.yml
     mode: '0644'
     owner: poduser
