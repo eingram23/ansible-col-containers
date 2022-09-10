@@ -8,6 +8,6 @@
       PGADMIN_DEFAULT_PASSWORD: "{{ lookup('hashi_vault', 'secret=secret/data/ssh/eingram:ssh_password') }}"
     pod: "{{ pod_name }}"
     volume:
-      - "{{ pgadmin_container }}:/var/lib/pgadmin"
+      - "{{ pgadmin_container }}-data:/var/lib/pgadmin"
     state: started
     restart_policy: always
