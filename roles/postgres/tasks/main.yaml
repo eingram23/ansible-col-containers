@@ -1,15 +1,11 @@
 ---
 - name: Pull postgres image and start postgres container
   containers.podman.podman_container:
-    name: "{{ dbsrv_name }}"
+    name: "{{ postgres_container }}"
     image: docker.io/postgres:14.5
     env:
-      POSTGRES_PASSWORD: "{{ db_root_pw }}"
-      POSTGRES_USER: "{{ db_user }}"
-      POSTGRES_DB: "{{ db_name }}"
-    publish:
-      - "5432:{{ db_tcp_port }}"
+      POSTGRES_PASSWORD: "{{ lookup('hashi_vault', 'secret=secret/data/ssh/eingram:ssh_password') }}"
     volume:
-      - "{{ dbsrv_name }}-data:/var/lib/postgresql/data"
+      - "{{ postgres_container }}-data:/var/lib/postgresql/data"
     state: started
     restart_policy: always
