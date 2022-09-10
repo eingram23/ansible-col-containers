@@ -1,4 +1,10 @@
 ---
+- name: Create pgadmin4 directory
+  ansible.builtin.file:
+    path: /home/poduser/pgadmin4
+    state: directory
+    mode: '0755'
+    
 - name: Copy servers.json to host
   ansible.builtin.copy:
     src: servers.json
