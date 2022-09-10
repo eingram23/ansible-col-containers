@@ -2,7 +2,7 @@
 - name: Pull pgadmin image and start container
   containers.podman.podman_container:
     name: "{{ pgadmin_container }}"
-    image: docker.io/pgadmin4:6.13
+    image: docker.io/dpage/pgadmin4:6.13
     env:
       PGADMIN_DEFAULT_EMAIL: "edward.ingram23@gmail.com"
       PGADMIN_DEFAULT_PASSWORD: "{{ lookup('hashi_vault', 'secret=secret/data/ssh/eingram:ssh_password') }}"
