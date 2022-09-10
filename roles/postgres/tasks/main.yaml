@@ -5,6 +5,7 @@
     image: docker.io/postgres:14.5
     env:
       POSTGRES_PASSWORD: "{{ lookup('hashi_vault', 'secret=secret/data/ssh/eingram:ssh_password') }}"
+    pod: "{{ pod_name }}"
     volume:
       - "{{ postgres_container }}-data:/var/lib/postgresql/data"
     state: started
