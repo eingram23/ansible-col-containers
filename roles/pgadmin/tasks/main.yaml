@@ -1,26 +1,30 @@
 ---
 - name: Create pgadmin4 directory
   ansible.builtin.file:
-    path: /home/poduser/pgadmin4
+    path: /opt/pgadmin4
     state: directory
     mode: '0755'
-    
+    owner: poduser
+    group: poduser
+
 - name: Copy servers.json to host
   ansible.builtin.copy:
     src: servers.json
-    dest: /home/poduser/pgadmin4/servers.json
+    dest: /opt/pgadmin4/servers.json
     mode: '0644'
+    owner: poduser
+    group: poduser
 
 - name: Pull pgadmin image and start container
   containers.podman.podman_container:
-    name: "{{ pgadmin_container }}"
-    image: docker.io/dpage/pgadmin4:6.13
+    name: "{{ container_name }}"
+    image: docker.io/dpage/pgadmin4:{{ ver }}
     env:
       PGADMIN_DEFAULT_EMAIL: "edward.ingram23@gmail.com"
       PGADMIN_DEFAULT_PASSWORD: "{{ lookup('hashi_vault', 'secret=secret/data/ssh/eingram:ssh_password') }}"
     pod: "{{ pod_name }}"
     volume:
-      - "{{ pgadmin_container }}-data:/var/lib/pgadmin"
-      - "/home/poduser/pgadmin4/servers.json:/pgadmin4/servers.json"
+      - "pgadmin4-data:/var/lib/pgadmin"
+      - "/opt/pgadmin4/servers.json:/pgadmin4/servers.json"
     state: started
     restart_policy: always

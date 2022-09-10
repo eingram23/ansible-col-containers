@@ -1,12 +1,12 @@
 ---
 - name: Pull mariadb image and start container
   containers.podman.podman_container:
-    name: "{{ mariadb_container }}"
-    image: docker.io/mariadb:10.9.2
+    name: "{{ container_name }}"
+    image: docker.io/mariadb:{{ ver }}
     env:
       MYSQL_ROOT_PASSWORD: "{{ lookup('hashi_vault', 'secret=secret/data/ssh/eingram:ssh_password') }}"
     pod: "{{ pod_name }}"
     volume:
-      - "{{ mariadb_container }}-data:/var/lib/mysql"
+      - "{{ container_name }}-data:/var/lib/mysql"
     state: started
     restart_policy: always

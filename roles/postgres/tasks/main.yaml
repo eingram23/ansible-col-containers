@@ -1,12 +1,12 @@
 ---
 - name: Pull postgres image and start postgres container
   containers.podman.podman_container:
-    name: "{{ postgres_container }}"
-    image: docker.io/postgres:14.5
+    name: "{{ container_name }}"
+    image: docker.io/postgres:{{ ver }}
     env:
       POSTGRES_PASSWORD: "{{ lookup('hashi_vault', 'secret=secret/data/ssh/eingram:ssh_password') }}"
     pod: "{{ pod_name }}"
     volume:
-      - "{{ postgres_container }}-data:/var/lib/postgresql/data"
+      - "{{ container_name }}-data:/var/lib/postgresql/data"
     state: started
     restart_policy: always

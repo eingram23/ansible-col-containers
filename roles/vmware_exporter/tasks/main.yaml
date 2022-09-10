@@ -1,12 +1,12 @@
 - name: Create and run vmware_exporter container
   containers.podman.podman_container:
-    name: vmware_exporter
-    image: pryorda/vmware_exporter:v0.18.3
+    name: "{{ container_name }}"
+    image: pryorda/vmware_exporter:{{ ver }}
     state: started
     restart_policy: always
-    pod: graf_prom_vm
+    pod: "{{ pod_name }}"
     env:
       VSPHERE_HOST: vcsa.local.lan
       VSPHERE_IGNORE_SSL: True
-      VSPHERE_USER: administrator@vsphere.local
-      VSPHERE_PASSWORD: "{{ vsphere_pass }}"
+      VSPHERE_USER: "{{ lookup('hashi_vault','secret=secret/data/vsphere/vcsa:vsphere_username') }}"
+      VSPHERE_PASSWORD: "{{ lookup('hashi_vault','secret=secret/data/vsphere/vcsa:vsphere_password') }}"

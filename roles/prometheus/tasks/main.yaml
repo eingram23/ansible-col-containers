@@ -1,11 +1,27 @@
 ---
+- name: Create prometheus folder
+  ansible.builtin.file:
+    path: /opt/prometheus
+    state: directory
+    mode: '0755'
+    owner: poduser
+    group: poduser
+
+- name: Copy prometheus.yml to remote server
+  ansible.builtin.copy:
+    src: ./roles/prometheus/files/prometheus.yml
+    dest: /opt/prometheus/prometheus.yml
+    mode: '0644'
+    owner: poduser
+    group: poduser
+
 - name: Create and run prometheus container
   containers.podman.podman_container:
-    name: prometheus
-    image: prom/prometheus:v2.36.2
+    name: "{{ container_name }}"
+    image: prom/prometheus:{{ ver }}
     state: started
     restart_policy: always
-    pod: graf_prom_vm
+    pod: "{{ pod_name }}"
     volume:
-      - prometheus_data:/prometheus
+      - "{{ container_name }}-data:/prometheus"
       - /opt/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml

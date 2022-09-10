@@ -1,10 +1,10 @@
 ---
 - name: Pull phpmyadmin image and start container
   containers.podman.podman_container:
-    name: "{{ phpmyadmin_container }}"
-    image: docker.io/phpmyadmin:5.2.0-apache
+    name: "{{ container_name }}"
+    image: docker.io/phpmyadmin:{{ ver }}
     env:
-      PMA_HOST: "mariadb"
+      PMA_HOST: "localhost"
     pod: "{{ pod_name }}"
     state: started
     restart_policy: always

@@ -15,10 +15,6 @@ scrape_configs:
     scrape_interval: 30s
     static_configs:
       - targets: ['localhost:9100']
-      - targets: ['yc-appsrv1-dev.local.lan:9100']
-      - targets: ['hl-dc1.homelab.local:9182']
-      - targets: ['hl-srv1.homelab.local:9182']
-      - targets: ['tower.local.lan:9100']
   - job_name: 'vmware_vcenter'
     metrics_path: '/metrics'
     scrape_timeout: 15s
