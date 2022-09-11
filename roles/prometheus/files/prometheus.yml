@@ -15,9 +15,19 @@ scrape_configs:
     scrape_interval: 30s
     static_configs:
       - targets: ['localhost:9100']
+      - targets: ['dbsrv1.local.lan:9100']
+      - targets: ['k3s3.local.lan:9100']
+      - targets: ['k3s2.local.lan:9100']
+      - targets: ['k3s1.local.lan:9100']
+      - targets: ['wincore1.local.lan:9182']
+      - targets: ['HL-DC1.homelab.local:9182']
+      - targets: ['podhost1.local.lan:9100']
+      - targets: ['yc-appsrv1-dev.local.lan:9100']
+      - targets: ['tower.local.lan:9100']
   - job_name: 'vmware_vcenter'
     metrics_path: '/metrics'
     scrape_timeout: 15s
     static_configs:
       - targets:
         - 'localhost:9272'
+        - 'podhost1.local.lan:9272'
