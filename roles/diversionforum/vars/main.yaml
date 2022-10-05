@@ -1,0 +1,6 @@
+app: "{{ env }}.diversionforum.net"
+root: '/home/poduser/code/'
+repo: 'git@github.com:eingram23/'
+mysql_root: "{{ lookup('hashi_vault','secret=secret/data/dftest/mysql:root') }}"
+mysql_smfprod: "{{ lookup('hashi_vault','secret=secret/data/dftest/mysql:smfprod') }}"
+privkey: "{{ lookup('hashi_vault', 'secret=secret/data/git/ssh:key') }}"
