@@ -22,23 +22,23 @@
 
 - name: Check if dfsitebackup.tar.gz exists
   ansible.builtin.stat:
-    path: /home/poduser/dbsitebackup.tar.gz
-    register: dbsitebackup
+    path: /home/poduser/dfsitebackup.tar.gz
+    register: dfsitebackup
 
 - name: Stop playbook if dfsitebackup.tar.gz doesn't exist
   ansible.builtin.fail:
-    msg: "dbsitebackup.tar.gz not found"
-  when: not dbsitebackup.stat.exists
+    msg: "dfsitebackup.tar.gz not found"
+  when: not dfsitebackup.stat.exists
 
 - name: Check if dfsqlbackup.bak.gz exists
   ansible.builtin.stat:
-    path: /home/poduser/dbsqlbackup.bak.gz
-    register: dbsqlbackup
+    path: /home/poduser/dfsqlbackup.bak.gz
+    register: dfsqlbackup
 
 - name: Stop playbook if dfsqlbackup.bak.gz doesn't exist
   ansible.builtin.fail:
-    msg: "dbsqlbackup.bak.gz not found"
-  when: not dbsqlbackup.stat.exists
+    msg: "dfsqlbackup.bak.gz not found"
+  when: not dfsqlbackup.stat.exists
 
 - name: Create github key
   ansible.builtin.template:
