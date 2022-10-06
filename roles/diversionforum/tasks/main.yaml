@@ -158,7 +158,7 @@
   vars:
     pod_name: "{{ app }}"
     publish_ports:
-      - "8080:80"
+      # - "8080:80"
     pod_network: "{{ podman_network }}"
 
 - name: Run diversionforum.net-web container
