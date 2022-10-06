@@ -40,11 +40,11 @@
     msg: "dfsqlbackup.bak.gz not found"
   when: not dfsqlbackup.stat.exists
 
-- name: Create github key
-  ansible.builtin.template:
-    src: ssh-key-git.key.j2
-    dest: /home/poduser/.ssh/ssh-key-git.key
-    mode: '0400'
+# - name: Create github key
+#   ansible.builtin.template:
+#     src: ssh-key-git.key.j2
+#     dest: /home/poduser/.ssh/ssh-key-git.key
+#     mode: '0400'
 
 - name: Create site root folder
   ansible.builtin.file:
