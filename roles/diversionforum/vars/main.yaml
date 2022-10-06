@@ -2,7 +2,7 @@ app: "{{ env }}-df"
 root: '/home/poduser/code/'
 builddir: '/home/poduser/build/'
 repo: 'git@github.com:eingram23/'
-network: "webapps"
+podman_network: "webapps"
 mysql_root: "{{ lookup('hashi_vault', 'secret=secret/data/mysql/dfprod:root') }}"
 mysql_smfprod: "{{ lookup('hashi_vault', 'secret=secret/data/mysql/dfprod:smfprod') }}"
 privkey: "{{ lookup('hashi_vault', 'secret=secret/data/git/ssh:key') }}"
