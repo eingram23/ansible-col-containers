@@ -92,11 +92,17 @@
     clone: true
     update: true
 
-- name: Copy out specific container build files
-  ansible.builtin.shell:
-    cmd: |
-      mkdir {{ builddir }}
-      mv {{ root }}temp-containers/diversionforum.net {{ builddir }}{{ env }}.diversionforum.net
+# - name: Copy out specific container build files
+#   ansible.builtin.shell:
+#     cmd: |
+#       mkdir {{ builddir }}
+#       mv {{ root }}temp-containers/diversionforum.net {{ builddir }}{{ env }}.diversionforum.net
+
+- name: Move diversionforum.net container out to build dir
+  ansible.builtin.copy:
+    src: "{{ root }}temp-containers/diversionforum.net"
+    dest: "{{ builddir }}{{ env }}.diversionforum.net"
+    remote_src: true
 
 - name: Remove container clone
   ansible.builtin.file:
