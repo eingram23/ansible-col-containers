@@ -83,10 +83,10 @@
       find {{ root }}{{ app }}/public_html -type f -exec chmod 0644 {} \;
       podman unshare chown -R 33:33 {{ root }}{{ app }}/public_html/
 
-- name: Clone Containers repo from github
+- name: Clone containers repo from github
   ansible.builtin.git:
-    repo: "{{ repo }}Containers.git"
-    dest: "{{ root }}Containers"
+    repo: "{{ repo }}containers.git"
+    dest: "{{ root }}containers"
     key_file: /home/poduser/.ssh/ssh-key-git.key
     accept_hostkey: true
     clone: true
@@ -95,22 +95,22 @@
 - name: Build diversionforum.net-web image
   containers.podman.podman_image:
     name: "{{ app }}-nginx"
-    path: "{{ root }}Containers/{{ app }}/nginx"
+    path: "{{ root }}containers/{{ app }}/nginx"
     force: true
 
 - name: Build diversionforum.net-php image
   containers.podman.podman_image:
     name: "{{ app }}-php"
-    path: "{{ root }}Containers/{{ app }}/php"
+    path: "{{ root }}containers/{{ app }}/php"
     force: true
 
 - name: Extract df sql backup
-  ansible.builtin.shell: gunzip -c /home/poduser/dfsqlbackup.bak.gz > {{ root }}Containers/{{ app }}/mariadb/smfprod.sql
+  ansible.builtin.shell: gunzip -c /home/poduser/dfsqlbackup.bak.gz > {{ root }}containers/{{ app }}/mariadb/smfprod.sql
 
 - name: Build diversionforum.net-mariadb image
   containers.podman.podman_image:
     name: "{{ app }}-mariadb"
-    path: "{{ root }}Containers/{{ app }}/mariadb"
+    path: "{{ root }}containers/{{ app }}/mariadb"
     force: true
 
 - name: Create diversionforum.net pod
