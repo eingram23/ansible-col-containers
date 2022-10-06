@@ -51,7 +51,11 @@
     path: "{{ root }}{{ app }}"
     state: directory
     mode: '0755'
-  register: siteroot
+
+- name: Check if Settings.php already exists
+  ansible.builtin.stat:
+    path: "{{ root }}{{ app }}/public_html/Settings.php"
+  register: settingsphp
 
 - name: Extract web files to html root
   ansible.builtin.unarchive:
@@ -59,7 +63,7 @@
     dest: "{{ root }}{{ app }}/"
     remote_src: true
     extra_opts: [--strip-components=4]
-  when: not siteroot.stat.exists
+  when: not settingsphp.stat.exists
 
 - name: Add db password to Settings.php
   ansible.builtin.lineinfile:
