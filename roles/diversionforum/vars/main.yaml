@@ -2,6 +2,6 @@ app: "{{ env }}.diversionforum.net"
 root: '/home/poduser/code/'
 builddir: '/home/poduser/build/'
 repo: 'git@github.com:eingram23/'
-mysql_root: "{{ lookup('hashi_vault', 'secret=secret/data/mysql/dftest:root') }}"
-mysql_smfprod: "{{ lookup('hashi_vault', 'secret=secret/data/mysql/dftest:smfprod') }}"
+mysql_root: "{{ lookup('hashi_vault', 'secret=secret/data/mysql/dfprod:root') }}"
+mysql_smfprod: "{{ lookup('hashi_vault', 'secret=secret/data/mysql/dfprod:smfprod') }}"
 privkey: "{{ lookup('hashi_vault', 'secret=secret/data/git/ssh:key') }}"
