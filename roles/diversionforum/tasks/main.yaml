@@ -23,7 +23,7 @@
 - name: Check if dfsitebackup.tar.gz exists
   ansible.builtin.stat:
     path: /home/poduser/dfsitebackup.tar.gz
-    register: dfsitebackup
+  register: dfsitebackup
 
 - name: Stop playbook if dfsitebackup.tar.gz doesn't exist
   ansible.builtin.fail:
@@ -33,7 +33,7 @@
 - name: Check if dfsqlbackup.bak.gz exists
   ansible.builtin.stat:
     path: /home/poduser/dfsqlbackup.bak.gz
-    register: dfsqlbackup
+  register: dfsqlbackup
 
 - name: Stop playbook if dfsqlbackup.bak.gz doesn't exist
   ansible.builtin.fail:
