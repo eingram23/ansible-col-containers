@@ -36,7 +36,7 @@
 
 - name: Pull nginx image and start container
   containers.podman.podman_container:
-    name: proxy
+    name: nginx-proxy
     image: docker.io/nginx:latest
     pod: proxy
     state: started
