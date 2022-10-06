@@ -100,13 +100,13 @@
 
 - name: Create build dir
   ansible.builtin.file:
-    path: "{{ builddir }}"
+    path: "{{ builddir }}{{ app }}"
     state: directory
 
 - name: Copy diversionforum.net container out to build dir
   ansible.builtin.copy:
     src: "{{ root }}temp-containers/diversionforum.net/"
-    dest: "{{ builddir }}{{ env }}.diversionforum.net"
+    dest: "{{ builddir }}{{ app }}"
     remote_src: true
 
 - name: Remove container clone
