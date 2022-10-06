@@ -147,7 +147,7 @@
   ansible.builtin.include_role:
     name: eingram23.containers.create_pod
   vars:
-    podname: "{{ app }}"
+    pod_name: "{{ app }}"
     publish_ports:
       - "8080:8080"
     pod_network: "webapps"
