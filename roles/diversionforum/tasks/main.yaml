@@ -71,6 +71,13 @@
     search_string: '$db_passwd = '
     line: $db_passwd = '{{ mysql_smfprod }}';
 
+- name: Change site URL to test.diversionforum.net (if env = test)
+  ansible.builtin.lineinfile:
+    path: "{{ root }}{{ app }}/public_html/Settings.php"
+    search_string: '$boardurl = '
+    line: $boardurl = 'http://test.diversionforum.net';
+  when: env == "test"
+  
 - name: Copy repair_settings.php
   ansible.builtin.copy:
     src: repair_settings.php
