@@ -143,13 +143,18 @@
 #     network:
 #       - webapps
 
+-name: Create podman network
+  containers.podman.podman_network:
+    name: webapps
+    disable_dns: false
+
 - name: Create app pod
   ansible.builtin.include_role:
     name: eingram23.containers.create_pod
   vars:
     pod_name: "{{ app }}"
     publish_ports:
-      - "8080:8080"
+      - "8080:80"
     pod_network: "{{ podman_network }}"
 
 - name: Run diversionforum.net-web container
