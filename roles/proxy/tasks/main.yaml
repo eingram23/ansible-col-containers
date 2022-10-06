@@ -38,7 +38,7 @@
   containers.podman.podman_container:
     name: nginx-proxy
     image: docker.io/nginx:latest
-    pod: proxy
+    pod: "{{ app }}"
     state: started
     restart_policy: always
     network: "{{ podman_network }}"
