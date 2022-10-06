@@ -29,7 +29,7 @@
   ansible.builtin.include_role:
     name: eingram23.containers.create_pod
   vars:
-    pod_name: "proxy"
+    pod_name: "{{ app }}"
     pod_network: "{{ podman_network }}"
     publish_ports:
       - "8080:80"
