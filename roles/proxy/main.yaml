@@ -1,0 +1,76 @@
+---
+- name: Make sure git is installed
+  package:
+    name: "git"
+    state: present
+
+- name: Make sure podman is installed
+  package:
+    name: "podman"
+    state: present
+
+# - name: Install nginx
+#   ansible.builtin.package:
+#     name: "nginx"
+#     state: present
+
+- name: Create nginx working dir
+  ansible.builtin.file:
+    path: /home/poduser/nginx/conf.d
+    state: directory
+
+- name: Copy proxy.conf to /etc/nginx/conf.d
+  ansible.builtin.copy:
+    src: proxy.conf
+    dest: /home/poduser/nginx/conf.d/proxy.conf
+    mode: '0644'
+
+- name: Create proxy pod
+  ansible.builtin.include_role:
+    name: eingram23.containers.create_pod
+  vars:
+    pod_name: "proxy"
+    pod_network: "{{ podman_network }}"
+    publish_ports:
+      - "8080:80"
+
+- name: Pull nginx image and start container
+  containers.podman.podman_container:
+    name: proxy
+    image: docker.io/nginx:latest
+    pod: proxy
+    state: started
+    restart_policy: always
+    network: "{{ podman_network }}"
+    volume:
+      - "/home/poduser/nginx/conf.d:/etc/nginx/conf.d"
+
+- name: Install firewalld if missing
+  ansible.builtin.package:
+    name: firewalld
+    state: present
+
+- name: Make sure firewalld is enabled and started
+  ansible.builtin.systemd:
+    state: started
+    enabled: true
+    name: firewalld
+
+- name: Make sure required firewall ports are open
+  ansible.builtin.include_role:
+    name: eingram23.homelab.firewall
+  vars:
+    fw_port:
+      - "80/tcp"
+      - "8080/tcp"
+
+# - name: install selinux-related python binaries for Ansible to work
+#   package: name={{ item }} state=present
+#   loop:
+#     - python3-libselinux
+#     - python3-libsemanage
+
+# - name: set "httpd_can_network_connect" flag on
+#   seboolean: name={{ item }} state=yes persistent=yes
+#   loop:
+#     - httpd_can_network_connect
