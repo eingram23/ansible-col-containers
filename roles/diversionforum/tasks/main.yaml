@@ -77,18 +77,11 @@
     search_string: '$boardurl = '
     line: $boardurl = 'http://test.diversionforum.net';
   when: env == "test"
-  
+
 - name: Copy repair_settings.php
   ansible.builtin.copy:
     src: repair_settings.php
     dest: "{{ root }}{{ app }}/public_html/repair_settings.php"
-
-- name: Set perms on webfiles
-  ansible.builtin.shell:
-    cmd: |
-      find {{ root }}{{ app }}/public_html -type d -exec chmod 0755 {} \;
-      find {{ root }}{{ app }}/public_html -type f -exec chmod 0644 {} \;
-      podman unshare chown -R 33:33 {{ root }}{{ app }}/public_html/
 
 - name: Clone containers repo from github
   ansible.builtin.git:
@@ -171,3 +164,10 @@
     state: started
     restart_policy: always
     pod: "{{ app }}"
+
+- name: Set perms on webfiles
+  ansible.builtin.shell:
+    cmd: |
+      find {{ root }}{{ app }}/public_html -type d -exec chmod 0755 {} \;
+      find {{ root }}{{ app }}/public_html -type f -exec chmod 0644 {} \;
+      podman unshare chown -R 33:33 {{ root }}{{ app }}/public_html/
