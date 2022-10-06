@@ -10,15 +10,15 @@
 #     - "{{ root }}{{ app }}"
 #     - /home/poduser/.config/systemd/user
 
-- name: Set nginx port (www)
-  ansible.builtin.set_fact:
-    nginx_port: 8081
-  when: env == "www"
+# - name: Set nginx port (www)
+#   ansible.builtin.set_fact:
+#     nginx_port: 8081
+#   when: env == "www"
 
-- name: Set nginx port (test)
-  ansible.builtin.set_fact:
-    nginx_port: 8082
-  when: env == "test"
+# - name: Set nginx port (test)
+#   ansible.builtin.set_fact:
+#     nginx_port: 8082
+#   when: env == "test"
 
 - name: Check if dfsitebackup.tar.gz exists
   ansible.builtin.stat:
@@ -135,11 +135,22 @@
     path: "{{ builddir }}{{ app }}/mariadb"
     force: true
 
-- name: Create diversionforum.net pod
-  containers.podman.podman_pod:
-    name: "{{ app }}"
-    state: started
-    publish: "{{ nginx_port }}:{{ nginx_port }}"
+# - name: Create diversionforum.net pod
+#   containers.podman.podman_pod:
+#     name: "{{ app }}"
+#     state: started
+#     publish: "{{ nginx_port }}:{{ nginx_port }}"
+#     network:
+#       - webapps
+
+- name: Create app pod
+  ansible.builtin.include_role:
+    name: eingram23.containers.create_pod
+  vars:
+    podname: "{{ app }}"
+    publish_ports:
+      - "8080:8080"
+    pod_network: "webapps"
 
 - name: Run diversionforum.net-web container
   containers.podman.podman_container:
@@ -175,6 +186,15 @@
     state: started
     restart_policy: always
     pod: "{{ app }}"
+
+- name: Create phpmyadmin container
+  ansible.builtin.include_role:
+    name: eingram23.containers.phpmyadmin
+  vars:
+    container_name: "{{ app }}-phpmyadmin"
+    ver: "latest"
+    mariadb_container_name: "{{ app }}-mariadb"
+    pod_name: "{{ app }}"
 
 - name: Set perms on webfiles
   ansible.builtin.shell:
