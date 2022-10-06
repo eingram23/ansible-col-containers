@@ -148,6 +148,10 @@
     name: webapps
     disable_dns: false
 
+- name: Create proxy
+  ansible.builtin.include_role:
+    name: eingram23.containers.proxy
+
 - name: Create app pod
   ansible.builtin.include_role:
     name: eingram23.containers.create_pod
