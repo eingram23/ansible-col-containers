@@ -1,13 +1,13 @@
 ---
-- name: Make sure git is installed
-  package:
-    name: "git"
-    state: present
+# - name: Make sure git is installed
+#   package:
+#     name: "git"
+#     state: present
 
-- name: Make sure podman is installed
-  package:
-    name: "podman"
-    state: present
+# - name: Make sure podman is installed
+#   package:
+#     name: "podman"
+#     state: present
 
 # - name: Install nginx
 #   ansible.builtin.package:
@@ -45,24 +45,24 @@
     volume:
       - "/home/poduser/nginx/conf.d:/etc/nginx/conf.d"
 
-- name: Install firewalld if missing
-  ansible.builtin.package:
-    name: firewalld
-    state: present
+# - name: Install firewalld if missing
+#   ansible.builtin.package:
+#     name: firewalld
+#     state: present
 
-- name: Make sure firewalld is enabled and started
-  ansible.builtin.systemd:
-    state: started
-    enabled: true
-    name: firewalld
+# - name: Make sure firewalld is enabled and started
+#   ansible.builtin.systemd:
+#     state: started
+#     enabled: true
+#     name: firewalld
 
-- name: Make sure required firewall ports are open
-  ansible.builtin.include_role:
-    name: eingram23.homelab.firewall
-  vars:
-    fw_port:
-      - "80/tcp"
-      - "8080/tcp"
+# - name: Make sure required firewall ports are open
+#   ansible.builtin.include_role:
+#     name: eingram23.homelab.firewall
+#   vars:
+#     fw_port:
+#       - "80/tcp"
+#       - "8080/tcp"
 
 # - name: install selinux-related python binaries for Ansible to work
 #   package: name={{ item }} state=present
