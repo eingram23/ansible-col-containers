@@ -95,7 +95,7 @@
 - name: Copy out specific container build files
   ansible.builtin.shell:
     cmd: |
-      mv {{ root }}temp-containers/diversionforum.net /home/poduser/{{ env }}.diversionforum.net
+      mv {{ root }}temp-containers/diversionforum.net {{ builddir }}{{ env }}.diversionforum.net
 
 - name: Remove container clone
   ansible.builtin.file:
@@ -105,22 +105,22 @@
 - name: Build diversionforum.net-web image
   containers.podman.podman_image:
     name: "{{ app }}-nginx"
-    path: "{{ root }}{{ app }}/nginx"
+    path: "{{ builddir }}{{ app }}/nginx"
     force: true
 
 - name: Build diversionforum.net-php image
   containers.podman.podman_image:
     name: "{{ app }}-php"
-    path: "{{ root }}{{ app }}/php"
+    path: "{{ builddir }}{{ app }}/php"
     force: true
 
 - name: Extract df sql backup
-  ansible.builtin.shell: gunzip -c /home/poduser/dfsqlbackup.bak.gz > {{ root }}{{ app }}/mariadb/smfprod.sql
+  ansible.builtin.shell: gunzip -c /home/poduser/dfsqlbackup.bak.gz > {{ builddir }}{{ app }}/mariadb/smfprod.sql
 
 - name: Build diversionforum.net-mariadb image
   containers.podman.podman_image:
     name: "{{ app }}-mariadb"
-    path: "{{ root }}{{ app }}/mariadb"
+    path: "{{ builddir }}{{ app }}/mariadb"
     force: true
 
 - name: Create diversionforum.net pod
