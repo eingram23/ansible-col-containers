@@ -25,14 +25,14 @@
     dest: /home/poduser/nginx/conf.d/proxy.conf
     mode: '0644'
 
-- name: Create proxy pod
-  ansible.builtin.include_role:
-    name: eingram23.containers.create_pod
-  vars:
-    pod_name: "{{ app }}"
-    pod_network: "{{ podman_network }}"
-    publish_ports:
-      - "8080:80"
+# - name: Create proxy pod
+#   ansible.builtin.include_role:
+#     name: eingram23.containers.create_pod
+#   vars:
+#     pod_name: "{{ app }}"
+#     pod_network: "{{ podman_network }}"
+#     publish_ports:
+#       - "8080:80"
 
 - name: Pull nginx image and start container
   containers.podman.podman_container:

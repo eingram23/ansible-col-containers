@@ -148,18 +148,18 @@
     name: webapps
     disable_dns: false
 
-- name: Create proxy
-  ansible.builtin.include_role:
-    name: eingram23.containers.proxy
-
 - name: Create app pod
   ansible.builtin.include_role:
     name: eingram23.containers.create_pod
   vars:
     pod_name: "{{ app }}"
     publish_ports:
-      # - "8080:80"
+      - "8080:80"
     pod_network: "{{ podman_network }}"
+
+- name: Create proxy container
+  ansible.builtin.include_role:
+    name: eingram23.containers.proxy
 
 - name: Run diversionforum.net-web container
   containers.podman.podman_container:
