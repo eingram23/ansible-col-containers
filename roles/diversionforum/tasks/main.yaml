@@ -98,6 +98,11 @@
 #       mkdir {{ builddir }}
 #       mv {{ root }}temp-containers/diversionforum.net {{ builddir }}{{ env }}.diversionforum.net
 
+- name: Create build dir
+  ansible.builtin.file:
+    path: "{{ builddir }}"
+    state: directory
+
 - name: Move diversionforum.net container out to build dir
   ansible.builtin.copy:
     src: "{{ root }}temp-containers/diversionforum.net"
