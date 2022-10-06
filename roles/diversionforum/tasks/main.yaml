@@ -32,12 +32,12 @@
 
 - name: Check if dfsqlbackup.bak.gz exists
   ansible.builtin.stat:
-    path: /home/podusr/dbsqlbackup.bak.gz
+    path: /home/poduser/dbsqlbackup.bak.gz
     register: dbsqlbackup
 
-- name: Stop playbook if dfsqlbackup.tar.gz doesn't exist
+- name: Stop playbook if dfsqlbackup.bak.gz doesn't exist
   ansible.builtin.fail:
-    msg: "dbsqlbackup.tar.gz not found"
+    msg: "dbsqlbackup.bak.gz not found"
   when: not dbsqlbackup.stat.exists
 
 - name: Create github key
