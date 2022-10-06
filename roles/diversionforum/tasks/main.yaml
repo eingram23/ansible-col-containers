@@ -46,6 +46,12 @@
     dest: /home/poduser/.ssh/ssh-key-git.key
     mode: '0400'
 
+- name: Create site root folder
+  ansible.builtin.file:
+    path: "{{ root }}{{ app }}"
+    state: directory
+    mode: '0755'
+
 - name: Extract web files to html root
   ansible.builtin.unarchive:
     src: /home/poduser/dfsitebackup.tar.gz
