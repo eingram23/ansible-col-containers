@@ -103,9 +103,9 @@
     path: "{{ builddir }}"
     state: directory
 
-- name: Move diversionforum.net container out to build dir
+- name: Copy diversionforum.net container out to build dir
   ansible.builtin.copy:
-    src: "{{ root }}temp-containers/diversionforum.net"
+    src: "{{ root }}temp-containers/diversionforum.net/"
     dest: "{{ builddir }}{{ env }}.diversionforum.net"
     remote_src: true
 
