@@ -51,6 +51,7 @@
     path: "{{ root }}{{ app }}"
     state: directory
     mode: '0755'
+  register: siteroot
 
 - name: Extract web files to html root
   ansible.builtin.unarchive:
@@ -58,6 +59,7 @@
     dest: "{{ root }}{{ app }}/"
     remote_src: true
     extra_opts: [--strip-components=4]
+  when: not siteroot.stat.exists
 
 - name: Add db password to Settings.php
   ansible.builtin.lineinfile:
