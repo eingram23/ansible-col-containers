@@ -10,15 +10,15 @@
 #     - "{{ root }}{{ app }}"
 #     - /home/poduser/.config/systemd/user
 
-# - name: Set nginx port (www)
-#   ansible.builtin.set_fact:
-#     nginx_port: 8081
-#   when: env == "www"
+- name: Set nginx port (www)
+  ansible.builtin.set_fact:
+    nginx_port: 8081
+  when: env == "www"
 
-# - name: Set nginx port (test)
-#   ansible.builtin.set_fact:
-#     nginx_port: 8082
-#   when: env == "test"
+- name: Set nginx port (test)
+  ansible.builtin.set_fact:
+    nginx_port: 8082
+  when: env == "test"
 
 - name: Check if dfsitebackup.tar.gz exists
   ansible.builtin.stat:
@@ -145,7 +145,7 @@
 
 - name: Create podman network
   containers.podman.podman_network:
-    name: webapps
+    name: "{{ app }}"
     disable_dns: false
 
 - name: Create app pod
@@ -154,7 +154,7 @@
   vars:
     pod_name: "{{ app }}"
     publish_ports:
-      - "8080:8080"
+      - "{{ nginx_port }}:{{ nginx_port }}"
     pod_network: "{{ podman_network }}"
 
 - name: Create proxy container
@@ -207,6 +207,7 @@
     ver: "latest"
     mariadb_container_name: "{{ app }}-mariadb"
     pod_name: "{{ app }}"
+    myphpadmin_port: "8084"
     network: "{{ podman_network }}"
 
 - name: Set perms on webfiles
