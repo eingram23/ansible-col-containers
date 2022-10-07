@@ -157,10 +157,6 @@
       - "{{ nginx_port }}:{{ nginx_port }}"
     pod_network: "{{ podman_network }}"
 
-- name: Create proxy container
-  ansible.builtin.include_role:
-    name: eingram23.containers.proxy
-
 - name: Run diversionforum.net-web container
   containers.podman.podman_container:
     name: "{{ app }}-nginx"
@@ -207,7 +203,7 @@
     ver: "latest"
     mariadb_container_name: "{{ app }}-mariadb"
     pod_name: "{{ app }}"
-    myphpadmin_port: "8084"
+    phpmyadmin_port: "8084"
     network: "{{ podman_network }}"
 
 - name: Set perms on webfiles
