@@ -3,7 +3,7 @@
     name: "{{ pod_name }}"
     state: started
     publish: "{{ publish_ports }}"
-    network: "{{ podman_network }}"
+    # network: "{{ podman_network }}"
     # generate_systemd:
     #   path: /home/poduser/systemd
     #   restart_policy: always

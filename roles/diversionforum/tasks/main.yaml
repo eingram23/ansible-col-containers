@@ -129,10 +129,10 @@
     path: "{{ builddir }}{{ app }}/mariadb"
     force: true
 
-- name: Create podman network
-  containers.podman.podman_network:
-    name: "{{ podman_network }}"
-    disable_dns: false
+# - name: Create podman network
+#   containers.podman.podman_network:
+#     name: "{{ podman_network }}"
+#     disable_dns: false
 
 - name: Create app pod
   ansible.builtin.include_role:
@@ -142,7 +142,7 @@
     publish_ports:
       - "{{ nginx_port }}:80"
       - "8084:8084"
-    pod_network: "{{ podman_network }}"
+    # pod_network: "{{ podman_network }}"
 
 - name: Run diversionforum.net-web container
   containers.podman.podman_container:
@@ -153,7 +153,7 @@
     state: started
     restart_policy: always
     pod: "{{ app }}"
-    network: "{{ podman_network }}"
+    # network: "{{ podman_network }}"
 
 - name: Run diversionforum.net-php container
   containers.podman.podman_container:
@@ -164,7 +164,7 @@
     state: started
     restart_policy: always
     pod: "{{ app }}"
-    network: "{{ podman_network }}"
+    # network: "{{ podman_network }}"
 
 - name: Run diversionforum.net-mariadb container
   containers.podman.podman_container:
@@ -180,7 +180,7 @@
     state: started
     restart_policy: always
     pod: "{{ app }}"
-    network: "{{ podman_network }}"
+    # network: "{{ podman_network }}"
 
 - name: Create phpmyadmin container
   ansible.builtin.include_role:
@@ -191,7 +191,7 @@
     mariadb_container_name: "{{ app }}-mariadb"
     pod_name: "{{ app }}"
     phpmyadmin_port: "8084"
-    network: "{{ podman_network }}"
+    # network: "{{ podman_network }}"
 
 - name: Set perms on webfiles
   ansible.builtin.shell:
