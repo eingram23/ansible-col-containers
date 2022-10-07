@@ -131,7 +131,7 @@
 
 - name: Create podman network
   containers.podman.podman_network:
-    name: "{{ app }}"
+    name: "{{ podman_network }}"
     disable_dns: false
 
 - name: Create app pod
