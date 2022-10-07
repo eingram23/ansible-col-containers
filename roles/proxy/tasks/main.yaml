@@ -19,7 +19,7 @@
     path: /home/poduser/nginx/conf.d
     state: directory
 
-- name: Copy proxy.conf to /etc/nginx/conf.d
+- name: Copy default.conf to /etc/nginx/conf.d
   ansible.builtin.copy:
     src: default.conf
     dest: /home/poduser/nginx/conf.d/default.conf
