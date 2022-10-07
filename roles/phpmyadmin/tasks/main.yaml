@@ -9,4 +9,4 @@
     pod: "{{ pod_name }}"
     state: started
     restart_policy: always
-    network: "{{ podman_network }}"
+    # network: "{{ podman_network }}"
