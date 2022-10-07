@@ -5,7 +5,7 @@
     image: docker.io/phpmyadmin:{{ ver }}
     env:
       PMA_HOST: "{{ mariadb_container_name }}"
-      APACHE_PORT: "{{ phpmyadmin_port | default('80') }}"
+      APACHE_PORT: "{{ phpmyadmin_port }}"
     pod: "{{ pod_name }}"
     state: started
     restart_policy: always

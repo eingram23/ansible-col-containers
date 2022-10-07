@@ -187,7 +187,6 @@
     name: eingram23.containers.phpmyadmin
   vars:
     container_name: "{{ app }}-phpmyadmin"
-    ver: "latest"
     mariadb_container_name: "{{ app }}-mariadb"
     pod_name: "{{ app }}"
     phpmyadmin_port: "8084"
@@ -203,3 +202,13 @@
 - name: Pause two minutes to let mariadb initialize
   ansible.builtin.pause:
     minutes: 2
+
+- name: Create mariadb superuser
+  become: false
+  ansible.builtin.include_role:
+    name: eingram23.database.mariadb
+    tasks_from: create_new_user
+  vars:
+    mariadb_user: eingram
+    mariadb_user_pw: "{{ lookup('hashi_vault', 'secret=secret/data/ssh/eingram:ssh_password') }}"
+    mariadb_user_priv: '*.*:ALL,GRANT'
