@@ -129,14 +129,6 @@
     path: "{{ builddir }}{{ app }}/mariadb"
     force: true
 
-# - name: Create diversionforum.net pod
-#   containers.podman.podman_pod:
-#     name: "{{ app }}"
-#     state: started
-#     publish: "{{ nginx_port }}:{{ nginx_port }}"
-#     network:
-#       - webapps
-
 - name: Create podman network
   containers.podman.podman_network:
     name: "{{ app }}"
@@ -148,7 +140,8 @@
   vars:
     pod_name: "{{ app }}"
     publish_ports:
-      - "{{ nginx_port }}:{{ nginx_port }}"
+      - "{{ nginx_port }}:80"
+      - "8084:8084"
     pod_network: "{{ podman_network }}"
 
 - name: Run diversionforum.net-web container
