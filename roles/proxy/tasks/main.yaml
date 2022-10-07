@@ -43,7 +43,7 @@
     restart_policy: always
     network: "{{ podman_network }}"
     volume:
-      - "/home/poduser/nginx/conf.d:/etc/nginx/conf.d"
+      - "/home/poduser/nginx/conf.d:/etc/nginx/conf.d:z"
 
 # - name: Install firewalld if missing
 #   ansible.builtin.package:
