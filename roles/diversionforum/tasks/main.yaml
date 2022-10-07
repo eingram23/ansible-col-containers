@@ -154,7 +154,7 @@
   vars:
     pod_name: "{{ app }}"
     publish_ports:
-      - "8080:80"
+      - "8080:8080"
     pod_network: "{{ podman_network }}"
 
 - name: Create proxy container
