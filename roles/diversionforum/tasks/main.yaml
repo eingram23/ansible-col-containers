@@ -92,12 +92,6 @@
     clone: true
     update: true
 
-# - name: Copy out specific container build files
-#   ansible.builtin.shell:
-#     cmd: |
-#       mkdir {{ builddir }}
-#       mv {{ root }}temp-containers/diversionforum.net {{ builddir }}{{ env }}.diversionforum.net
-
 - name: Create build dir
   ansible.builtin.file:
     path: "{{ builddir }}{{ app }}"
