@@ -21,8 +21,8 @@
 
 - name: Copy proxy.conf to /etc/nginx/conf.d
   ansible.builtin.copy:
-    src: proxy.conf
-    dest: /home/poduser/nginx/conf.d/proxy.conf
+    src: default.conf
+    dest: /home/poduser/nginx/conf.d/default.conf
     mode: '0644'
 
 # - name: Create proxy pod
