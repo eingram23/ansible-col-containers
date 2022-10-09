@@ -10,16 +10,6 @@
 #     - "{{ root }}{{ app }}"
 #     - /home/poduser/.config/systemd/user
 
-- name: Set nginx port (www)
-  ansible.builtin.set_fact:
-    nginx_port: 8081
-  when: env == "www"
-
-- name: Set nginx port (test)
-  ansible.builtin.set_fact:
-    nginx_port: 8082
-  when: env == "test"
-
 - name: Check if dfsitebackup.tar.gz exists
   ansible.builtin.stat:
     path: /home/poduser/dfsitebackup.tar.gz
@@ -180,17 +170,6 @@
     state: started
     restart_policy: always
     pod: "{{ app }}"
-    # network: "{{ podman_network }}"
-
-- name: Create phpmyadmin container
-  ansible.builtin.include_role:
-    name: eingram23.containers.phpmyadmin
-  vars:
-    container_name: "{{ app }}-phpmyadmin"
-    mariadb_container_name: "{{ app }}-mariadb"
-    mysql_root_password: "{{ mysql_root }}"
-    pod_name: "{{ app }}"
-    phpmyadmin_port: "8084"
     # network: "{{ podman_network }}"
 
 - name: Set perms on webfiles
