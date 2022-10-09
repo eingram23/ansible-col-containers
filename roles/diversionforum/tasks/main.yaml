@@ -172,6 +172,16 @@
     pod: "{{ app }}"
     # network: "{{ podman_network }}"
 
+- name: Create phpmyadmin container
+  ansible.builtin.include_role:
+    name: eingram23.containers.phpmyadmin
+  vars:
+    container_name: "{{ app }}-phpmyadmin"
+    mariadb_container_name: "{{ app }}-mariadb"
+    mysql_root_password: "{{ mysql_root }}"
+    pod_name: "{{ app }}"
+    # network: "{{ podman_network }}"
+
 - name: Set perms on webfiles
   ansible.builtin.shell:
     cmd: |
