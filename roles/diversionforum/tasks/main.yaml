@@ -131,7 +131,7 @@
     pod_name: "{{ app }}"
     publish_ports:
       - "{{ nginx_port }}:80"
-      - "8084:8084"
+      - "{{ phpmyadmin_port }}:8090"
     # pod_network: "{{ podman_network }}"
 
 - name: Run diversionforum.net-web container
