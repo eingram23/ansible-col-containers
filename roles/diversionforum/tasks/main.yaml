@@ -47,31 +47,32 @@
     path: "{{ root }}{{ app }}/public_html/Settings.php"
   register: settingsphp
 
-- name: Extract web files to html root
-  ansible.builtin.unarchive:
-    src: /home/poduser/dfsitebackup.tar.gz
-    dest: "{{ root }}{{ app }}/"
-    remote_src: true
-    extra_opts: [--strip-components=4]
+- block:
+    - name: Extract web files to html root
+      ansible.builtin.unarchive:
+        src: /home/poduser/dfsitebackup.tar.gz
+        dest: "{{ root }}{{ app }}/"
+        remote_src: true
+        extra_opts: [--strip-components=4]
+      
+    - name: Add db password to Settings.php
+      ansible.builtin.lineinfile:
+        path: "{{ root }}{{ app }}/public_html/Settings.php"
+        search_string: '$db_passwd = '
+        line: $db_passwd = '{{ mysql_smfprod }}';
+
+    - name: Change site URL to test.diversionforum.net (if env = test)
+      ansible.builtin.lineinfile:
+        path: "{{ root }}{{ app }}/public_html/Settings.php"
+        search_string: '$boardurl = '
+        line: $boardurl = 'http://test.diversionforum.net';
+      when: env == "test"
+
+    - name: Copy repair_settings.php
+      ansible.builtin.copy:
+        src: repair_settings.php
+        dest: "{{ root }}{{ app }}/public_html/repair_settings.php"
   when: not settingsphp.stat.exists
-
-- name: Add db password to Settings.php
-  ansible.builtin.lineinfile:
-    path: "{{ root }}{{ app }}/public_html/Settings.php"
-    search_string: '$db_passwd = '
-    line: $db_passwd = '{{ mysql_smfprod }}';
-
-- name: Change site URL to test.diversionforum.net (if env = test)
-  ansible.builtin.lineinfile:
-    path: "{{ root }}{{ app }}/public_html/Settings.php"
-    search_string: '$boardurl = '
-    line: $boardurl = 'http://test.diversionforum.net';
-  when: env == "test"
-
-- name: Copy repair_settings.php
-  ansible.builtin.copy:
-    src: repair_settings.php
-    dest: "{{ root }}{{ app }}/public_html/repair_settings.php"
 
 - name: Clone containers repo from github
   ansible.builtin.git:
@@ -110,14 +111,21 @@
     path: "{{ builddir }}{{ app }}/php"
     force: true
 
-- name: Extract df sql backup
-  ansible.builtin.shell: gunzip -c /home/poduser/dfsqlbackup.bak.gz > {{ builddir }}{{ app }}/mariadb/smfprod.sql
+- name: Check if smfprod.sql already exists
+  ansible.builtin.stat:
+    path: "{{ builddir }}{{ app }}/mariadb/smfprod.sql"
+  register: smfprodsql
 
-- name: Build diversionforum.net-mariadb image
-  containers.podman.podman_image:
-    name: "{{ app }}-mariadb"
-    path: "{{ builddir }}{{ app }}/mariadb"
-    force: true
+- block:
+    - name: Extract df sql backup
+      ansible.builtin.shell: gunzip -c /home/poduser/dfsqlbackup.bak.gz > {{ builddir }}{{ app }}/mariadb/smfprod.sql
+
+    - name: Build diversionforum.net-mariadb image
+      containers.podman.podman_image:
+        name: "{{ app }}-mariadb"
+        path: "{{ builddir }}{{ app }}/mariadb"
+        force: true
+  when: not smfprodsql.stat.exists
 
 # - name: Create podman network
 #   containers.podman.podman_network:
@@ -192,3 +200,4 @@
 - name: Pause two minutes to let mariadb initialize
   ansible.builtin.pause:
     minutes: 2
+  when: not smfprodsql.stat.exists
