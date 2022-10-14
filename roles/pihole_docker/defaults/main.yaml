@@ -1,2 +1,3 @@
 ---
-ver: latest
+ver: 2022.10
+privkey: "{{ lookup('hashi_vault', 'secret=secret/data/git/ssh:key') }}"

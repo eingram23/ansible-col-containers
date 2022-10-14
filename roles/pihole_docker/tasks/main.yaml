@@ -8,6 +8,33 @@
     - /opt/pihole/etc-pihole
     - /opt/pihole/etc-dnsmasq.d
 
+- name: Create github key
+  ansible.builtin.template:
+    src: ssh-key-git.key.j2
+    dest: /var/tmp/ssh-key-git.key
+    mode: '0400'
+  delegate_to: localhost
+
+- name: Pull down custom.list from git
+  ansible.builtin.git:
+    repo: 'git@github.com:eingram23/configs.git'
+    dest: /var/tmp
+    key_file: /var/tmp/ssh-key-git.key
+    accept_hostkey: true
+  delegate_to: localhost
+
+- name: Copy custom.list
+  ansible.builtin.copy:
+    src: /var/tmp/pihole/custom.list
+    dest: /opt/pihole/etc-pihole/custom.list
+    mode: '0644'
+
+- name: Copy 05-custom.conf
+  ansible.builtin.copy:
+    src: 05-custom.conf
+    dest: /opt/pihole/etc-dnsmasq.d/05-custom.conf
+    mode: '0644'
+
 - name: Start docker container
   community.docker.docker_container:
     name: pihole
@@ -23,3 +50,16 @@
       - "53:53/tcp"
       - "53:53/udp"
       - "80:80/tcp"
+    restart_policy: always
+
+- name: Clean up tmp files
+  ansible.builtin.file:
+    path: /var/tmp/pihole
+    state: absent
+  delegate_to: localhost
+
+- name: Clean up key
+  ansible.builtin.file:
+    path: /var/tmp/ssh-key-git.key
+    state: absent
+  delegate_to: localhost
