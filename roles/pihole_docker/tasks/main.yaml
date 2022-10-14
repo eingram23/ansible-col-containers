@@ -18,14 +18,14 @@
 - name: Pull down custom.list from git
   ansible.builtin.git:
     repo: 'git@github.com:eingram23/configs.git'
-    dest: /var/tmp
+    dest: /var/tmp/configs
     key_file: /var/tmp/ssh-key-git.key
     accept_hostkey: true
   delegate_to: localhost
 
 - name: Copy custom.list
   ansible.builtin.copy:
-    src: /var/tmp/pihole/custom.list
+    src: /var/tmp/configs/pihole/custom.list
     dest: /opt/pihole/etc-pihole/custom.list
     mode: '0644'
 
@@ -54,7 +54,7 @@
 
 - name: Clean up tmp files
   ansible.builtin.file:
-    path: /var/tmp/pihole
+    path: /var/tmp/configs
     state: absent
   delegate_to: localhost
 
