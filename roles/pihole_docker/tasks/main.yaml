@@ -14,6 +14,7 @@
     dest: /var/tmp/ssh-key-git.key
     mode: '0400'
   delegate_to: localhost
+  become: false
 
 - name: Pull down custom.list from git
   ansible.builtin.git:
@@ -22,6 +23,7 @@
     key_file: /var/tmp/ssh-key-git.key
     accept_hostkey: true
   delegate_to: localhost
+  become: false
 
 - name: Copy custom.list
   ansible.builtin.copy:
@@ -57,9 +59,11 @@
     path: /var/tmp/configs
     state: absent
   delegate_to: localhost
+  become: false
 
 - name: Clean up key
   ansible.builtin.file:
     path: /var/tmp/ssh-key-git.key
     state: absent
   delegate_to: localhost
+  become: false
