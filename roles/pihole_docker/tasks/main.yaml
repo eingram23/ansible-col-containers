@@ -15,6 +15,7 @@
     env:
       TZ: 'America/Los_Angeles'
       WEBPASSWORD: "{{ lookup('hashi_vault', 'secret=secret/data/ssh/eingram:ssh_password') }}"
+      DNSMASQ_LISTENING: all
     volumes:
       - /opt/pihole/etc-pihole:/etc/pihole
       - /opt/pihole/etc-dnsmasq.d:/etc/dnsmasq.d
