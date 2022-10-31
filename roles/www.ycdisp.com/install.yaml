@@ -10,9 +10,9 @@
     container: "www.ycdisp.com"
     root: '/home/poduser/code/'
     repo: 'git@github.com:eingram23/'
-    smtp_pw: "{{ lookup('hashi_vault','secret=secret/data/google/smtp:password') }}"
-    mysql_root: "{{ lookup('hashi_vault','secret=secret/data/ycprod/mysql:root') }}"
-    mysql_yandcprod: "{{ lookup('hashi_vault','secret=secret/data/ycprod/mysql:yandcprod') }}"
+    smtp_pw: "{{ lookup('hashi_vault','secret=secret/google/smtp:password') }}"
+    mysql_root: "{{ lookup('hashi_vault','secret=secret/ycprod/mysql:root') }}"
+    mysql_yandcprod: "{{ lookup('hashi_vault','secret=secret/ycprod/mysql:yandcprod') }}"
     nginx_port: "8081"
 
   roles:

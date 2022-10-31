@@ -4,7 +4,7 @@
     name: "{{ container_name }}"
     image: docker.io/postgres:{{ ver }}
     env:
-      POSTGRES_PASSWORD: "{{ lookup('hashi_vault', 'secret=secret/data/ssh/eingram:ssh_password') }}"
+      POSTGRES_PASSWORD: "{{ lookup('hashi_vault', 'secret=secret/ssh/eingram:ssh_password') }}"
     pod: "{{ pod_name }}"
     volume:
       - "{{ container_name }}-data:/var/lib/postgresql/data"

@@ -13,7 +13,7 @@
     image: docker.io/dpage/pgadmin4:{{ ver }}
     env:
       PGADMIN_DEFAULT_EMAIL: "edward.ingram23@gmail.com"
-      PGADMIN_DEFAULT_PASSWORD: "{{ lookup('hashi_vault', 'secret=secret/data/ssh/eingram:ssh_password') }}"
+      PGADMIN_DEFAULT_PASSWORD: "{{ lookup('hashi_vault', 'secret=secret/ssh/eingram:ssh_password') }}"
     pod: "{{ pod_name }}"
     volume:
       - "pgadmin4-data:/var/lib/pgadmin"

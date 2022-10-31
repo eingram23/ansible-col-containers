@@ -4,7 +4,7 @@
     name: "{{ container_name }}"
     image: docker.io/mariadb:{{ ver }}
     env:
-      MYSQL_ROOT_PASSWORD: "{{ lookup('hashi_vault', 'secret=secret/data/ssh/eingram:ssh_password') }}"
+      MYSQL_ROOT_PASSWORD: "{{ lookup('hashi_vault', 'secret=secret/ssh/eingram:ssh_password') }}"
     pod: "{{ pod_name }}"
     volume:
       - "{{ container_name }}-data:/var/lib/mysql"

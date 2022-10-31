@@ -7,8 +7,8 @@
   
   vars:
     app: 'unifi'
-    cifs_user: "{{ lookup('hashi_vault','secret=secret/data/homenas/cifs:user') }}"
-    cifs_pwd: "{{ lookup('hashi_vault','secret=secret/data/homenas/cifs:passwd') }}"
+    cifs_user: "{{ lookup('hashi_vault','secret=secret/homenas/cifs:user') }}"
+    cifs_pwd: "{{ lookup('hashi_vault','secret=secret/homenas/cifs:passwd') }}"
 
   vars_prompt: 
     - name: setup_backup

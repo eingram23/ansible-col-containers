@@ -10,8 +10,8 @@
     app: "www.ycdisp.com"
     root: '/home/poduser/code/'
     # repo: 'git@github.com:eingram23/'
-    mysql_root: "{{ lookup('hashi_vault','secret=secret/data/ycprod/mysql:root') }}"
-    mysql_yandcprod: "{{ lookup('hashi_vault','secret=secret/data/ycprod/mysql:yandcprod') }}"
+    mysql_root: "{{ lookup('hashi_vault','secret=secret/ycprod/mysql:root') }}"
+    mysql_yandcprod: "{{ lookup('hashi_vault','secret=secret/ycprod/mysql:yandcprod') }}"
     nginx_port: "8080"
 
   tasks:
