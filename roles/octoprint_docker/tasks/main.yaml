@@ -1,0 +1,17 @@
+---
+- name: Start docker container
+  community.docker.docker_container:
+    name: octoprint
+    image: octoprint/octoprint:{{ ver }}
+    env:
+      CAMERA_DEV: '/dev/video0'
+      MJPG_STREAMER_INPUT: '-y -n -r 640x480'
+      ENABLE_MJPG_STREAMER: 'true'
+    devices:
+      - /dev/ttyACM0:/dev/ttyACM0
+      - /dev/video0:/dev/video0
+    volumes:
+      - octoprint:/octoprint
+    ports:
+      - "80:8000/tcp"
+    restart_policy: always
