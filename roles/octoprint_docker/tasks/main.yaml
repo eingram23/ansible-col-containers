@@ -13,5 +13,5 @@
     volumes:
       - octoprint:/octoprint
     ports:
-      - "80:8000/tcp"
+      - "8080:80/tcp"
     restart_policy: always
