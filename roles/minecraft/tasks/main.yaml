@@ -1,0 +1,29 @@
+---
+- name: Create bind mount folder 
+  ansible.builtin.file:
+    path: /opt/minecraft
+    state: directory
+    mode: '0755'
+
+- name: Create minecraft pod
+  ansible.builtin.include_role:
+    name: eingram23.containers.create_pod
+
+- name: Create and run minecraft container
+  containers.podman.podman_container:
+    name: "minecraft-paper"
+    image: itzg/minecraft-server:{{ minecraft_ver }}
+    state: started
+    restart_policy: unless-stopped
+    pod: minecraft
+    env:
+      EULA=TRUE
+      TYPE=PAPER
+      MOTD="Paper Minecraft Server powered by Podman"
+      SERVER_PORT={{ fw_port }}
+      ENABLE_RCON=TRUE
+      RCON_PASSWORD={{ lookup('hashi_vault', 'secret=secret/ssh/eingram:ssh_password') }}
+    tty: true
+    interactive: true
+    volume:
+      - /opt/minecraft:/data:z
