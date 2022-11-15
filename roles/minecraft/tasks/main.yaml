@@ -1,10 +1,4 @@
 ---
-- name: Create bind mount folder 
-  ansible.builtin.file:
-    path: /opt/minecraft
-    state: directory
-    mode: '0755'
-
 - name: Create minecraft pod
   ansible.builtin.include_role:
     name: eingram23.containers.create_pod
@@ -19,6 +13,7 @@
     env:
       EULA=TRUE
       TYPE=PAPER
+      VERSION={{ minecraft_server_ver }}
       MOTD="Paper Minecraft Server powered by Podman"
       SERVER_PORT={{ mc_port }}
       ENABLE_RCON=TRUE
