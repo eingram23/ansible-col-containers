@@ -3,3 +3,4 @@ minecraft_ver: "latest"
 minecraft_server_ver: "LATEST"
 publish_ports:
    - "25565:25565"
+mc_port: "25565"

@@ -20,7 +20,7 @@
       EULA=TRUE
       TYPE=PAPER
       MOTD="Paper Minecraft Server powered by Podman"
-      SERVER_PORT={{ fw_port }}
+      SERVER_PORT={{ mc_port }}
       ENABLE_RCON=TRUE
       RCON_PASSWORD={{ lookup('hashi_vault', 'secret=secret/ssh/eingram:ssh_password') }}
     tty: true
