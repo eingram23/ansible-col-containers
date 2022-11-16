@@ -1,0 +1,134 @@
+---
+# - name: Check if dfsitebackup.tar.gz exists
+#   ansible.builtin.stat:
+#     path: /home/poduser/dfsitebackup.tar.gz
+#   register: dfsitebackup
+
+# - name: Stop playbook if dfsitebackup.tar.gz doesn't exist
+#   ansible.builtin.fail:
+#     msg: "dfsitebackup.tar.gz not found"
+#   when: not dfsitebackup.stat.exists
+
+# - name: Check if dfsqlbackup.bak.gz exists
+#   ansible.builtin.stat:
+#     path: /home/poduser/dfsqlbackup.bak.gz
+#   register: dfsqlbackup
+
+# - name: Stop playbook if dfsqlbackup.bak.gz doesn't exist
+#   ansible.builtin.fail:
+#     msg: "dfsqlbackup.bak.gz not found"
+#   when: not dfsqlbackup.stat.exists
+
+- name: Create github key
+  ansible.builtin.template:
+    src: ssh-key-git.key.j2
+    dest: /home/poduser/.ssh/ssh-key-git.key
+    mode: '0400'
+
+- name: Create site root folder
+  ansible.builtin.file:
+    path: "{{ root }}{{ app }}"
+    state: directory
+    mode: '0755'
+
+- name: Clone containers repo from github
+  ansible.builtin.git:
+    repo: "{{ repo }}containers.git"
+    dest: "{{ root }}temp-containers"
+    key_file: /home/poduser/.ssh/ssh-key-git.key
+    accept_hostkey: true
+    clone: true
+    update: true
+
+- name: Create build dir
+  ansible.builtin.file:
+    path: "{{ builddir }}{{ app }}"
+    state: directory
+
+- name: Copy wordpress container out to build dir
+  ansible.builtin.copy:
+    src: "{{ root }}temp-containers/wordpress/"
+    dest: "{{ builddir }}{{ app }}"
+    remote_src: true
+
+- name: Remove container clone
+  ansible.builtin.file:
+    path: "{{ root }}temp-containers"
+    state: absent
+
+- name: Build wordpress-web image
+  containers.podman.podman_image:
+    name: "{{ app }}-nginx"
+    path: "{{ builddir }}{{ app }}/web"
+    force: true
+
+# - name: Check if smfprod.sql already exists
+#   ansible.builtin.stat:
+#     path: "{{ builddir }}{{ app }}/mariadb/smfprod.sql"
+#   register: smfprodsql
+
+# - block:
+#     - name: Extract df sql backup
+#       ansible.builtin.shell: gunzip -c /home/poduser/dfsqlbackup.bak.gz > {{ builddir }}{{ app }}/mariadb/smfprod.sql
+
+- name: Build wordpress-db image
+  containers.podman.podman_image:
+    name: "{{ app }}-db"
+    path: "{{ builddir }}{{ app }}/db"
+    force: true
+#   when: not smfprodsql.stat.exists
+
+- name: Create app pod
+  ansible.builtin.include_role:
+    name: eingram23.containers.create_pod
+  vars:
+    pod_name: "{{ app }}"
+    publish_ports:
+      - "{{ nginx_port }}:80"
+      - "{{ phpmyadmin_port }}:8090"
+
+- name: Run wordpress-web container
+  containers.podman.podman_container:
+    name: "{{ app }}-web"
+    image: localhost/{{ app }}-web
+    volume:
+      - "{{ root }}{{ app }}/public_html:/var/www/html:z"
+    state: started
+    restart_policy: always
+    pod: "{{ app }}"
+
+- name: Run wordpress-db container
+  containers.podman.podman_container:
+    name: "{{ app }}-db"
+    image: localhost/{{ app }}-db
+    env:
+      MYSQL_ROOT_PASSWORD: "{{ mysql_wp_root }}"
+      MYSQL_DATABASE: wordpress
+      MYSQL_USER: wordpress
+      MYSQL_PASSWORD: "{{ mysql_wp }}"
+    volume:
+      - wordpress{{ env }}-data:/var/lib/mysql
+    state: started
+    restart_policy: always
+    pod: "{{ app }}"
+
+# - name: Create phpmyadmin container
+#   ansible.builtin.include_role:
+#     name: eingram23.containers.phpmyadmin
+#   vars:
+#     container_name: "{{ app }}-phpmyadmin"
+#     mariadb_container_name: "{{ app }}-mariadb"
+#     mysql_root_password: "{{ mysql_root }}"
+#     pod_name: "{{ app }}"
+
+- name: Set perms on webfiles
+  ansible.builtin.shell:
+    cmd: |
+      find {{ root }}{{ app }}/public_html -type d -exec chmod 0755 {} \;
+      find {{ root }}{{ app }}/public_html -type f -exec chmod 0644 {} \;
+      podman unshare chown -R 33:33 {{ root }}{{ app }}/public_html/
+
+# - name: Pause two minutes to let db initialize
+#   ansible.builtin.pause:
+#     minutes: 2
+#   when: not smfprodsql.stat.exists
