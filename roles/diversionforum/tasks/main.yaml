@@ -179,6 +179,7 @@
     mariadb_container_name: "{{ app }}-mariadb"
     mysql_root_password: "{{ mysql_root }}"
     pod_name: "{{ app }}"
+  tags: update_phpmyadmin
 
 - name: Set perms on webfiles
   ansible.builtin.shell:
