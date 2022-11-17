@@ -1,6 +1,6 @@
 ---
 - name: Download multiverse-core
-  ansible.builtin.url:
+  ansible.builtin.get_url:
     url: https://dev.bukkit.org/projects/multiverse-core/files/3462546/download
     dest: /opt/minecraft/plugins/MultiVerse-Core-4.3.1.jar
     mode: '0644'
