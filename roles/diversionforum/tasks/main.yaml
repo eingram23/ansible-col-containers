@@ -172,7 +172,7 @@
     pod: "{{ app }}"
 
 - name: Create phpmyadmin container
-  ansible.builtin.include_role:
+  ansible.builtin.import_role:
     name: eingram23.containers.phpmyadmin
   vars:
     container_name: "{{ app }}-phpmyadmin"
