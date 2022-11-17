@@ -1,4 +1,10 @@
 ---
+- name: Download multiverse-core
+  ansible.builtin.url:
+    url: https://dev.bukkit.org/projects/multiverse-core/files/3462546/download
+    dest: /opt/minecraft/plugins/MultiVerse-Core-4.3.1.jar
+    mode: '0644'
+
 - name: Create minecraft pod
   ansible.builtin.include_role:
     name: eingram23.containers.create_pod
