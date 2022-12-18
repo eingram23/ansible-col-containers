@@ -6,7 +6,7 @@
     restart_policy: always
     pod: "{{ pod_name }}"
     env:
-      VSPHERE_HOST: vcsa.local.lan
+      VSPHERE_HOST: vcsa-1.local.lan
       VSPHERE_IGNORE_SSL: True
       VSPHERE_USER: "{{ lookup('hashi_vault','secret=secret/vsphere/vcsa:vsphere_username') }}"
       VSPHERE_PASSWORD: "{{ lookup('hashi_vault','secret=secret/vsphere/vcsa:vsphere_password') }}"
