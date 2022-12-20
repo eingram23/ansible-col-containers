@@ -8,28 +8,28 @@
     - /opt/pihole/etc-pihole
     - /opt/pihole/etc-dnsmasq.d
 
-- name: Create github key
-  ansible.builtin.template:
-    src: ssh-key-git.key.j2
-    dest: /var/tmp/ssh-key-git.key
-    mode: '0400'
-  delegate_to: localhost
-  become: false
+# - name: Create github key
+#   ansible.builtin.template:
+#     src: ssh-key-git.key.j2
+#     dest: /var/tmp/ssh-key-git.key
+#     mode: '0400'
+#   delegate_to: localhost
+#   become: false
 
-- name: Pull down custom.list from git
-  ansible.builtin.git:
-    repo: 'git@github.com:eingram23/configs.git'
-    dest: /var/tmp/configs
-    key_file: /var/tmp/ssh-key-git.key
-    accept_hostkey: true
-  delegate_to: localhost
-  become: false
+# - name: Pull down custom.list from git
+#   ansible.builtin.git:
+#     repo: 'git@github.com:eingram23/configs.git'
+#     dest: /var/tmp/configs
+#     key_file: /var/tmp/ssh-key-git.key
+#     accept_hostkey: true
+#   delegate_to: localhost
+#   become: false
 
-- name: Copy custom.list
-  ansible.builtin.copy:
-    src: /var/tmp/configs/pihole/custom.list
-    dest: /opt/pihole/etc-pihole/custom.list
-    mode: '0644'
+# - name: Copy custom.list
+#   ansible.builtin.copy:
+#     src: /var/tmp/configs/pihole/custom.list
+#     dest: /opt/pihole/etc-pihole/custom.list
+#     mode: '0644'
 
 - name: Copy 05-custom.conf
   ansible.builtin.copy:
@@ -54,16 +54,16 @@
       - "80:80/tcp"
     restart_policy: always
 
-- name: Clean up tmp files
-  ansible.builtin.file:
-    path: /var/tmp/configs
-    state: absent
-  delegate_to: localhost
-  become: false
+# - name: Clean up tmp files
+#   ansible.builtin.file:
+#     path: /var/tmp/configs
+#     state: absent
+#   delegate_to: localhost
+#   become: false
 
-- name: Clean up key
-  ansible.builtin.file:
-    path: /var/tmp/ssh-key-git.key
-    state: absent
-  delegate_to: localhost
-  become: false
+# - name: Clean up key
+#   ansible.builtin.file:
+#     path: /var/tmp/ssh-key-git.key
+#     state: absent
+#   delegate_to: localhost
+#   become: false
