@@ -1,0 +1,13 @@
+---
+- name: Start docker container
+  community.docker.docker_container:
+    name: nut-upsd
+    image: instantlinux/nut-upsd:{{ ver }}
+    env:
+      API_PASSWORD: "{{ lookup('hashi_vault', 'secret=secret/ssh/eingram:ssh_password') }}"
+      PORT: '/dev/usb/hiddev0'
+    # volumes:
+    #   - /opt/nut-upsd:/etc/nut/local
+    # ports:
+    #   - "8080:80/tcp"
+    restart_policy: always
