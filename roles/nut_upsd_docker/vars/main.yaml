@@ -3,7 +3,6 @@ homelab_nut_upsd_ver: "latest"
 nut_exporter_ver: "latest"
 nut_exporter_vars:
   - battery.charge
-  - battery.mfr.date
   - battery.runtime
   - battery.voltage
   - battery.voltage.nominalinput.voltage
