@@ -21,7 +21,7 @@
 - name: Start homelab-nut-upsd container
   community.docker.docker_container:
     name: homelab-nut-upsd
-    image: homelab-nut-upsd:{{ homelab-nut-upsd_ver }}
+    image: homelab-nut-upsd:{{ homelab_nut_upsd_ver }}
     env:
       API_PASSWORD: "{{ lookup('hashi_vault', 'secret=secret/ssh/eingram:ssh_password') }}"
       # PORT: '/dev/usb/hiddev0'
