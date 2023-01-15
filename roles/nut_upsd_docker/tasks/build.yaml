@@ -1,0 +1,47 @@
+- name: Create temp folder
+  ansible.builtin.file:
+    path: "{{ root }}temp-containers"
+    state: directory
+
+- name: Clone containers repo from github
+  ansible.builtin.git:
+    repo: "{{ repo }}containers.git"
+    dest: "{{ root }}temp-containers"
+    # key_file: /home/poduser/.ssh/ssh-key-git.key
+    # accept_hostkey: true
+    clone: true
+    update: true
+
+- name: Create build dir
+  ansible.builtin.file:
+    path: "{{ builddir }}{{ app }}"
+    state: directory
+
+- name: Copy nut-upsd container out to build dir
+  ansible.builtin.copy:
+    src: "{{ root }}temp-containers/{{ app }}/"
+    dest: "{{ builddir }}{{ app }}"
+    remote_src: true
+
+- name: Create config files on host
+  ansible.builtin.template:
+    src: "{{ item }}.j2"
+    dest: "{{ builddir }}{{ app }}{{ item }}"
+    mode: '0600'
+  loop:
+    - ssmtp.conf
+    - upsmon.conf
+
+- name: Build nut-upsd image
+  containers.podman.podman_image:
+    name: "{{ app }}"
+    path: "{{ builddir }}{{ app }}"
+    force: true
+
+- name: Remove build dirs
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: absent
+  loop:
+    - "{{ root }}temp-containers"
+    - "{{ builddir }}{{ app }}"

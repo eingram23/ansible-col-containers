@@ -1,13 +1,31 @@
 ---
+- name: Create nut-upsd conf folders
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+  loop:
+    - /opt/nut-upsd
+
+- name: Copy shutdown script to host
+  ansible.builtin.copy:
+    src: shutdown.yaml
+    dest: /etc/nut/shutdown.yaml
+    mode: '0644'
+
+- name: Copy upssched-cmd to host
+  ansible.builtin.copy:
+    src: upssched-cmd
+    dest: /usr/bin/upssched-cmd
+    mode: '0644'
+
 - name: Start docker container
   community.docker.docker_container:
     name: nut-upsd
-    image: instantlinux/nut-upsd:{{ ver }}
+    image: localhost/nut-upsd
     env:
       API_PASSWORD: "{{ lookup('hashi_vault', 'secret=secret/ssh/eingram:ssh_password') }}"
       PORT: '/dev/usb/hiddev0'
-    # volumes:
-    #   - /opt/nut-upsd:/etc/nut/local
-    # ports:
-    #   - "8080:80/tcp"
+    volumes:
+      - /opt/nut-upsd/upssched-cmd:/usr/bin/upssched-cmd
+      - /opt/nut-upsd/ssmtp.conf:/etc/ssmtp/ssmtp.conf
     restart_policy: always

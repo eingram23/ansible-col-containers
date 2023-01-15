@@ -1,0 +1,8 @@
+root=postmaster
+mailhub=smtp.gmail.com:587
+FromLineOverride=YES
+rewriteDomain=ycdisp.net
+AuthUser=edward.ingram@ycdisp.com
+AuthPass={{ lookup('hashi_vault', 'secret=secret/google/smtp:password') }}
+UseSTARTTLS=YES
+hostname=nut.ycdisp.net

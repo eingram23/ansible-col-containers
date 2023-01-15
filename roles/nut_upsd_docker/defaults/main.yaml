@@ -1,2 +1,6 @@
 ---
-ver: "2.8.0-r4"
+app: "nut-upsd"
+root: '/root/'
+builddir: '/root/build/'
+repo: 'https://github.com/eingram23/'
+privkey: "{{ lookup('hashi_vault', 'secret=secret/git/ssh:key') }}"
