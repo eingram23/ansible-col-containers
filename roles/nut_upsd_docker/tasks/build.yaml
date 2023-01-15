@@ -33,10 +33,11 @@
     - upsmon.conf
 
 - name: Build nut-upsd image
-  containers.podman.podman_image:
+  containers.docker.docker_image:
     name: "{{ app }}"
-    path: "{{ builddir }}{{ app }}"
-    force: true
+    build:
+      path: "{{ builddir }}{{ app }}"
+    source: build
 
 - name: Remove build dirs
   ansible.builtin.file:
