@@ -33,7 +33,7 @@
     - upsmon.conf
 
 - name: Build nut-upsd image
-  containers.docker.docker_image:
+  community.docker.docker_image:
     name: "{{ app }}"
     build:
       path: "{{ builddir }}{{ app }}"
