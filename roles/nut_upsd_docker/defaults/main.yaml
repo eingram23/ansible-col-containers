@@ -1,6 +1,6 @@
 ---
 app: "nut-upsd"
-root: '/root/'
-builddir: '/root/build/'
+root: '/home/eingram/'
+builddir: '/home/eingram/build/'
 repo: 'https://github.com/eingram23/'
 privkey: "{{ lookup('hashi_vault', 'secret=secret/git/ssh:key') }}"
