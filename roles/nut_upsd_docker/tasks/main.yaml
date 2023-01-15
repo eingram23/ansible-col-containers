@@ -9,13 +9,13 @@
 - name: Copy shutdown script to host
   ansible.builtin.copy:
     src: shutdown.yaml
-    dest: /etc/nut/shutdown.yaml
+    dest: /opt/nut-upsd/shutdown.yaml
     mode: '0644'
 
 - name: Copy upssched-cmd to host
   ansible.builtin.copy:
     src: upssched-cmd
-    dest: /usr/bin/upssched-cmd
+    dest: /opt/nut-upsd/upssched-cmd
     mode: '0644'
 
 - name: Start docker container

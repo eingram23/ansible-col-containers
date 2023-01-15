@@ -26,7 +26,7 @@
 - name: Create config files on host
   ansible.builtin.template:
     src: "{{ item }}.j2"
-    dest: "{{ builddir }}{{ app }}{{ item }}"
+    dest: "{{ builddir }}{{ app }}/{{ item }}"
     mode: '0600'
   loop:
     - ssmtp.conf
