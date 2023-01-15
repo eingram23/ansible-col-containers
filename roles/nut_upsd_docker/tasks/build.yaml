@@ -24,7 +24,7 @@
     remote_src: true
 
 - name: Copy upsmon.conf to host
-  ansible.builtin.file:
+  ansible.builtin.copy:
     src: upsmon.conf
     dest: /etc/nut/upsmon.conf
     mode: '0640'
