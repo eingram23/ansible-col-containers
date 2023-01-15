@@ -27,6 +27,6 @@
       # PORT: '/dev/usb/hiddev0'
     volumes:
       - /opt/nut-upsd/upssched-cmd:/usr/bin/upssched-cmd
-      - /opt/nut-upsd/ssmtp.conf:/etc/ssmtp/ssmtp.conf
+      - /opt/nut-upsd/shutdown.yaml:/etc/nut/shutdown.yaml
     privileged: true
     restart_policy: always

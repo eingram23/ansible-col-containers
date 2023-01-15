@@ -23,6 +23,12 @@
     dest: "{{ builddir }}{{ app }}"
     remote_src: true
 
+- name: Copy upsmon.conf to host
+  ansible.builtin.file:
+    src: upsmon.conf
+    dest: /etc/nut/upsmon.conf
+    mode: '0640'
+
 - name: Create config files on host
   ansible.builtin.template:
     src: "{{ item }}.j2"
@@ -30,7 +36,6 @@
     mode: '0600'
   loop:
     - ssmtp.conf
-    - upsmon.conf
 
 - name: Build nut-upsd image
   community.docker.docker_image:
