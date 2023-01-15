@@ -25,6 +25,8 @@
     env:
       API_PASSWORD: "{{ lookup('hashi_vault', 'secret=secret/ssh/eingram:ssh_password') }}"
       # PORT: '/dev/usb/hiddev0'
+    ports:
+      - "3493:3493"
     volumes:
       - /opt/nut-upsd/upssched-cmd:/usr/bin/upssched-cmd
       - /opt/nut-upsd/shutdown.yaml:/etc/nut/shutdown.yaml
