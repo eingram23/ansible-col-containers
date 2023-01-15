@@ -24,8 +24,9 @@
     image: localhost/nut-upsd
     env:
       API_PASSWORD: "{{ lookup('hashi_vault', 'secret=secret/ssh/eingram:ssh_password') }}"
-      PORT: '/dev/usb/hiddev0'
+      # PORT: '/dev/usb/hiddev0'
     volumes:
       - /opt/nut-upsd/upssched-cmd:/usr/bin/upssched-cmd
       - /opt/nut-upsd/ssmtp.conf:/etc/ssmtp/ssmtp.conf
+    privileged: true
     restart_policy: always
