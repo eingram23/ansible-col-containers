@@ -18,10 +18,10 @@
     dest: /opt/nut-upsd/upssched-cmd
     mode: '0644'
 
-- name: Start homelab-nut-upsd container
+- name: Start nut-pwsh-upsd container
   community.docker.docker_container:
     name: "{{ app }}"
-    image: "{{ app }}:{{ homelab_nut_upsd_ver }}"
+    image: "{{ app }}:{{ nut_pwsh_upsd_ver }}"
     env:
       API_PASSWORD: "{{ lookup('hashi_vault', 'secret=secret/ssh/eingram:ssh_password') }}"
     ports:

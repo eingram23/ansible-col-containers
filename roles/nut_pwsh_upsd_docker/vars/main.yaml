@@ -1,5 +1,5 @@
 ---
-homelab_nut_upsd_ver: "latest"
+nut_pwsh_upsd_ver: "latest"
 nut_exporter_ver: "latest"
 nut_exporter_vars:
   - battery.charge
