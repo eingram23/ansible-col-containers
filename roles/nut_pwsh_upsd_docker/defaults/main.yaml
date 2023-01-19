@@ -1,5 +1,5 @@
 ---
-app: "homelab-nut-upsd"
+app: "nut-pwsh-upsd"
 root: '/home/eingram/'
 builddir: '/home/eingram/build/'
 repo: 'https://github.com/eingram23/'

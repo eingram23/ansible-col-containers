@@ -20,11 +20,10 @@
 
 - name: Start homelab-nut-upsd container
   community.docker.docker_container:
-    name: homelab-nut-upsd
-    image: homelab-nut-upsd:{{ homelab_nut_upsd_ver }}
+    name: "{{ app }}"
+    image: "{{ app }}:{{ homelab_nut_upsd_ver }}"
     env:
       API_PASSWORD: "{{ lookup('hashi_vault', 'secret=secret/ssh/eingram:ssh_password') }}"
-      # PORT: '/dev/usb/hiddev0'
     ports:
       - "3493:3493/tcp"
     volumes:
@@ -40,7 +39,6 @@
     env:
       NUT_EXPORTER_SERVER: "dietpi1.local.lan"
       NUT_EXPORTER_VARIABLES: "{{ nut_exporter_vars | join(',') }}"
-      # NUT_EXPORTER_USERNAME: "ups"
     ports:
       - "9199:9199/tcp"
     restart_policy: always
