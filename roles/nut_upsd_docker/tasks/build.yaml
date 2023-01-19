@@ -23,12 +23,6 @@
     dest: "{{ builddir }}{{ app }}"
     remote_src: true
 
-- name: Copy upsmon.conf to host
-  ansible.builtin.copy:
-    src: upsmon.conf
-    dest: "{{ builddir }}{{ app }}/upsmon.conf"
-    mode: '0640'
-
 - name: Create config files on host
   ansible.builtin.template:
     src: "{{ item }}.j2"
