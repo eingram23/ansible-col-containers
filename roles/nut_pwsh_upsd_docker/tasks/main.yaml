@@ -1,21 +1,21 @@
 ---
-- name: Create nut-upsd conf folders
+- name: Create nut-pwsh-upsd conf folders
   ansible.builtin.file:
     path: "{{ item }}"
     state: directory
   loop:
-    - /opt/nut-upsd
+    - /opt/{{ app }}
 
-- name: Copy shutdown script to host
-  ansible.builtin.copy:
-    src: shutdown.yaml
-    dest: /opt/nut-upsd/shutdown.yaml
+- name: Create shutdown script on host
+  ansible.builtin.template:
+    src: nut_shutdown.yaml.j2
+    dest: /opt/{{ app }}/nut_shutdown.ps1
     mode: '0644'
 
 - name: Copy upssched-cmd to host
   ansible.builtin.copy:
     src: upssched-cmd
-    dest: /opt/nut-upsd/upssched-cmd
+    dest: /opt/{{ app }}/upssched-cmd
     mode: '0644'
 
 - name: Start nut-pwsh-upsd container
@@ -27,8 +27,8 @@
     ports:
       - "3493:3493/tcp"
     volumes:
-      - /opt/nut-upsd/upssched-cmd:/usr/bin/upssched-cmd
-      - /opt/nut-upsd/shutdown.yaml:/etc/nut/shutdown.yaml
+      - /opt/{{ app }}/upssched-cmd:/usr/bin/upssched-cmd
+      - /opt/{{ app }}/nut_shutdown.ps1:/etc/nut/nut_shutdown.ps1
     privileged: true
     restart_policy: always
 

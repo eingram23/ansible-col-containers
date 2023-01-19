@@ -30,7 +30,7 @@ case $1 in
                         echo
                         echo Shutting down VMs and ESXi hosts
                 }  | ssmtp -v edward.ingram23@gmail.com
-                ansible-playbook /root/shutdown.yaml
+                /powershell/pwsh /etc/nut/nut_shutdown.ps1
                 ;;
         emailonline)
                 {

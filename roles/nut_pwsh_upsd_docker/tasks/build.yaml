@@ -7,8 +7,6 @@
   ansible.builtin.git:
     repo: "{{ repo }}containers.git"
     dest: "{{ root }}temp-containers"
-    # key_file: /home/poduser/.ssh/ssh-key-git.key
-    # accept_hostkey: true
     clone: true
     update: true
 
@@ -17,7 +15,7 @@
     path: "{{ builddir }}{{ app }}"
     state: directory
 
-- name: Copy nut-upsd container out to build dir
+- name: Copy nut-pwsh-upsd container out to build dir
   ansible.builtin.copy:
     src: "{{ root }}temp-containers/{{ app }}/"
     dest: "{{ builddir }}{{ app }}"
@@ -31,7 +29,7 @@
   loop:
     - ssmtp.conf
 
-- name: Build nut-upsd image
+- name: Build nut-pwsh-upsd image
   community.docker.docker_image:
     name: "{{ app }}"
     build:
