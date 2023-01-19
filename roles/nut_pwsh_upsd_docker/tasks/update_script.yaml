@@ -1,0 +1,6 @@
+---
+- name: Create shutdown script on host
+  ansible.builtin.template:
+    src: nut_shutdown.yaml.j2
+    dest: /opt/{{ app }}/nut_shutdown.ps1
+    mode: '0644'
