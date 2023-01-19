@@ -11,6 +11,7 @@
     src: nut_shutdown.yaml.j2
     dest: /opt/{{ app }}/nut_shutdown.ps1
     mode: '0644'
+  tags: update_script
 
 - name: Copy upssched-cmd to host
   ansible.builtin.copy:
