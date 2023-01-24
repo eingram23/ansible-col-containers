@@ -1,0 +1,21 @@
+---
+- name: Create plex pod
+  ansible.builtin.include_role:
+    name: eingram23.containers.create_pod
+
+- name: Create and run minecraft container
+  containers.podman.podman_container:
+    name: "plex-srv"
+    image: linuxserver/docker-plex:{{ plex_ver }}
+    state: started
+    restart_policy: unless-stopped
+    pod: "{{ pod_name }}"
+    env:
+      PUID=1000
+      PGID=1000
+      VERSION=docker
+    network_mode: host
+    volume:
+      - /opt/plex/config:/config:z
+      - /opt/plex/movies:/movies:z
+      - /opt/plex/tv:/tv:z
