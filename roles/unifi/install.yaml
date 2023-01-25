@@ -1,27 +1,27 @@
 ---
 - name: Deploy unifi-controller container
   hosts: podhost1.local.lan
-  gather_facts: no
+  gather_facts: false
   become_user: poduser
   become_method: sudo
-  
+
   vars:
     app: 'unifi'
     cifs_user: "{{ lookup('hashi_vault','secret=secret/homenas/cifs:user') }}"
     cifs_pwd: "{{ lookup('hashi_vault','secret=secret/homenas/cifs:passwd') }}"
 
-  vars_prompt: 
+  vars_prompt:
     - name: setup_backup
       prompt: "Also setup backups? (y/n)"
       default: "n"
-      private: no
+      private: false
     - name: restore
       prompt: "Restore backup? (y/n)"
       default: "n"
-      private: no
+      private: false
     - name: backup_filename
       prompt: "Enter name of backup file to restore (unifi_backup_mo-dd.tar.gz) (Enter to skip)"
-      private: no
+      private: false
       default: ""
 
   pre_tasks:
@@ -30,9 +30,9 @@
       become: true
       become_user: root
       become_method: sudo
-      firewalld:
+      ansible.builtin.firewalld:
         port: "{{ item }}"
-        permanent: yes
+        permanent: true
         state: enabled
         zone: public
       loop:
@@ -46,17 +46,15 @@
         - 6789/tcp
         - 5514/tcp
 
-    - name: Reload firewall
+    - name: Restart firewall
       become: true
       become_user: root
       become_method: sudo
-      systemd:
+      ansible.builtin.systemd:
         name: firewalld
-        state: reloaded
+        state: restarted
 
   roles:
-    - common  
+    - common
     - { role: restore, when: restore == "y" }
     - { role: setup_backup, when: setup_backup == "y" }
-...
-  

@@ -1,4 +1,0 @@
-pod_name: "plex"
-publish_ports:
-   - "25565:25565"
-
