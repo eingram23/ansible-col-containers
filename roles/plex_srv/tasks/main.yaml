@@ -11,10 +11,10 @@
       VERSION=docker
     network_mode: host
     volume:
-      - /mnt/pool0/PlexMedia/config:/config:z
-      - /mnt/pool0/PlexMedia/Movies:/movies:z
-      - /mnt/pool0/PlexMedia/3DMovies:/3dmovies:z
-      - /mnt/pool0/PlexMedia/AnimMovies:/animmovies:z
-      - /mnt/pool0/PlexMedia/TVShows:/tvshows:z
-      - /mnt/pool0/PlexMedia/AnimTVShows:/animtvshows:z
-      - /mnt/pool0/PlexMedia/Videos:/videos:z
+      - /mnt/pool0/PlexMedia/config:/config:Z
+      - /mnt/pool0/PlexMedia/Movies:/movies:Z
+      - /mnt/pool0/PlexMedia/3DMovies:/3dmovies:Z
+      - /mnt/pool0/PlexMedia/AnimMovies:/animmovies:Z
+      - /mnt/pool0/PlexMedia/TVShows:/tvshows:Z
+      - /mnt/pool0/PlexMedia/AnimTVShows:/animtvshows:Z
+      - /mnt/pool0/PlexMedia/Videos:/videos:Z
