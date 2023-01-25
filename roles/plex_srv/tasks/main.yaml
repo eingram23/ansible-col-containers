@@ -10,6 +10,7 @@
       PGID=0
       VERSION=docker
     network_mode: host
+    device: "/dev/dri:/dev/dri"
     volume:
       - /mnt/pool0/PlexMedia/config:/config:Z
       - /mnt/pool0/PlexMedia/Movies:/movies:Z
