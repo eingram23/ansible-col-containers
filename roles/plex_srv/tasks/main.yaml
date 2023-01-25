@@ -6,8 +6,8 @@
     state: started
     restart_policy: unless-stopped
     env:
-      PUID=1000
-      PGID=1000
+      PUID=0
+      PGID=0
       VERSION=docker
     network_mode: host
     volume:
