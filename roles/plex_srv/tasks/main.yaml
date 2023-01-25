@@ -10,8 +10,6 @@
       PGID=1000
       VERSION=docker
     network_mode: host
-    security_opt:
-      - label=disable
     volume:
       - /mnt/pool0/PlexMedia/config:/config:Z
       - /mnt/pool0/PlexMedia/Movies:/movies:Z
