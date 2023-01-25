@@ -2,7 +2,7 @@
 - name: Create and run plex_srv container
   containers.podman.podman_container:
     name: "plex_srv"
-    image: lscr.io/linuxserver/docker-plex:{{ plex_srv_ver }}
+    image: lscr.io/linuxserver/plex:{{ plex_srv_ver }}
     state: started
     restart_policy: unless-stopped
     env:
