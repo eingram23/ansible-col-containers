@@ -10,7 +10,7 @@
 - name: Create and run grafana container
   containers.podman.podman_container:
     name: "{{ container_name }}"
-    image: grafana/grafana:{{ ver }}
+    image: docker.io/grafana/grafana:{{ ver }}
     state: started
     restart_policy: always
     pod: "{{ pod_name }}"
