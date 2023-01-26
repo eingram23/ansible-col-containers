@@ -47,5 +47,5 @@
     group: poduser
   tags:
     - never
-    - update_promjob
+    - update_promjobs
   notify: Restart prometheus container
