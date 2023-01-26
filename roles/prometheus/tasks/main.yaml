@@ -1,19 +1,23 @@
 ---
-- block:
-    - name: Create prometheus folder
-      ansible.builtin.file:
-        path: /opt/prometheus
-        state: directory
-        mode: '0755'
-        owner: poduser
-        group: poduser
-
-    - name: Open firewall ports
-      ansible.builtin.include_role:
-        name: eingram23.homelab.firewall
+- name: Create prometheus folder
+  ansible.builtin.file:
+    path: /opt/prometheus
+    state: directory
+    mode: '0755'
+    owner: poduser
+    group: poduser
   become: true
   become_method: sudo
   become_user: root
+
+- name: Open firewall ports
+  ansible.builtin.include_role:
+    name: eingram23.homelab.firewall
+    apply:
+      become: true
+      become_method: sudo
+      become_user: root
+
 
 - name: Copy prometheus.yml to remote server
   ansible.builtin.copy:

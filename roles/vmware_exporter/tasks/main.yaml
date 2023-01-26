@@ -1,9 +1,10 @@
 - name: Open firewall ports
   ansible.builtin.include_role:
     name: eingram23.homelab.firewall
-  become: true
-  become_method: sudo
-  become_user: root
+    apply:
+      become: true
+      become_method: sudo
+      become_user: root
 
 - name: Create and run vmware_exporter container
   containers.podman.podman_container:
