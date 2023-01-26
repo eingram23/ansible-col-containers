@@ -10,7 +10,7 @@
 - name: Create and run prometheus container
   containers.podman.podman_container:
     name: "{{ prometheus_container_name }}"
-    image: prom/prometheus:{{ prometheus_ver }}
+    image: docker.io/prom/prometheus:{{ prometheus_ver }}
     state: started
     restart_policy: always
     pod: "{{ pod_name }}"
