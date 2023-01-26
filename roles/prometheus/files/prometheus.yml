@@ -18,7 +18,7 @@ scrape_configs:
         labels:
           instance: 'hl-sql1'
   - job_name: 'node-exporter'
-    scrape_interval: 60s
+    scrape_interval: 15s
     static_configs:
       - targets: ['yc-appsrv1-dev.local.lan:9100']
         labels:
