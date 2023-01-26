@@ -9,11 +9,11 @@
 
 - name: Create and run prometheus container
   containers.podman.podman_container:
-    name: "{{ container_name }}"
-    image: prom/prometheus:{{ ver }}
+    name: "{{ prometheus_container_name }}"
+    image: prom/prometheus:{{ prometheus_ver }}
     state: started
     restart_policy: always
     pod: "{{ pod_name }}"
     volume:
-      - "{{ container_name }}-data:/prometheus"
+      - "{{ prometheus_container_name }}-data:/prometheus"
       - /opt/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
