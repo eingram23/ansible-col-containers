@@ -1,4 +1,10 @@
 ---
+- name: Open firewall ports
+  ansible.builtin.include_role:
+    name: eingram23.homelab.firewall
+  become: true
+  become_method: sudo
+  
 - name: Create and run grafana container
   containers.podman.podman_container:
     name: "{{ container_name }}"

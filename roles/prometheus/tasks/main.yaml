@@ -1,4 +1,19 @@
 ---
+- block:
+    - name: Create prometheus folder
+      ansible.builtin.file:
+        path: /opt/prometheus
+        state: directory
+        mode: '0755'
+        owner: poduser
+        group: poduser
+
+    - name: Open firewall ports
+      ansible.builtin.include_role:
+        name: eingram23.homelab.firewall
+  become: true
+  become_method: sudo
+
 - name: Copy prometheus.yml to remote server
   ansible.builtin.copy:
     src: prometheus.yml
@@ -9,11 +24,23 @@
 
 - name: Create and run prometheus container
   containers.podman.podman_container:
-    name: "{{ prometheus_container_name }}"
-    image: docker.io/prom/prometheus:{{ prometheus_ver }}
+    name: "{{ container_name }}"
+    image: docker.io/prom/prometheus:{{ ver }}
     state: started
     restart_policy: always
     pod: "{{ pod_name }}"
     volume:
-      - "{{ prometheus_container_name }}-data:/prometheus"
+      - "{{ container_name }}-data:/prometheus"
       - /opt/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+
+- name: Copy prometheus.yml to remote server (update)
+  ansible.builtin.copy:
+    src: prometheus.yml
+    dest: /opt/prometheus/prometheus.yml
+    mode: '0644'
+    owner: poduser
+    group: poduser
+  tags:
+    - never
+    - update_promjob
+  notify: Restart prometheus container

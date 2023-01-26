@@ -1,0 +1,3 @@
+container_name: "vmware_exporter"
+fw_port:
+  - "9272/tcp"
