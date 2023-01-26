@@ -4,6 +4,7 @@
     name: eingram23.homelab.firewall
   become: true
   become_method: sudo
+  become_user: root
   
 - name: Create and run grafana container
   containers.podman.podman_container:

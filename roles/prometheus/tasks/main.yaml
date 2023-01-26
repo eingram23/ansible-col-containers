@@ -13,6 +13,7 @@
         name: eingram23.homelab.firewall
   become: true
   become_method: sudo
+  become_user: root
 
 - name: Copy prometheus.yml to remote server
   ansible.builtin.copy:
