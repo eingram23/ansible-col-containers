@@ -1,33 +1,47 @@
 global:
-  scrape_interval:     15s
-  evaluation_interval: 15s
 
 rule_files:
   # - "first.rules"
   # - "second.rules"
 
 scrape_configs:
-  - job_name: 'prometheus'
-    scrape_interval: 30s
+  - job_name: 'windows-exporter'
+    scrape_interval: 60s
     static_configs:
-      - targets: ['localhost:9091']
-  - job_name: 'node_exporter'
-    scrape_interval: 30s
-    static_configs:
-      - targets: ['localhost:9100']
-      - targets: ['dbsrv1.local.lan:9100']
-      - targets: ['k3s3.local.lan:9100']
-      - targets: ['k3s2.local.lan:9100']
-      - targets: ['k3s1.local.lan:9100']
-      - targets: ['wincore1.local.lan:9182']
       - targets: ['HL-DC1.homelab.local:9182']
-      - targets: ['podhost1.local.lan:9100']
-      - targets: ['yc-appsrv1-dev.local.lan:9100']
-      - targets: ['tower.local.lan:9100']
-  - job_name: 'vmware_vcenter'
-    metrics_path: '/metrics'
-    scrape_timeout: 15s
+        labels:
+          instance: 'hl-dc1'
+      - targets: ['HL-SRV1.homelab.local:9182']
+        labels:
+          instance: 'hl-sql1'
+      - targets: ['HL-SQL1.homelab.local:9182']
+        labels:
+          instance: 'hl-sql1'
+  - job_name: 'node-exporter'
+    scrape_interval: 60s
     static_configs:
-      - targets:
-        - 'localhost:9272'
-        - 'podhost1.local.lan:9272'
+      - targets: ['yc-appsrv1-dev.local.lan:9100']
+        labels:
+          instance: 'yc-appsrv-dev'
+      - targets: ['podhost1.local.lan:9100']
+        labels:
+          instance: 'podhost1'
+      - targets: ['homenas.local.lan:9100']
+        labels:
+          instance: 'homenas'
+  # - job_name: 'vmware'
+  #   metrics_path: '/metrics'
+  #   scrape_interval: 60s
+  #   # scrape_timeout: 2m
+  #   static_configs:
+  #     - targets:
+  #       - 'vmware-exporter.monitoring.svc.cluster.local:9272'
+  #       labels:
+  #         instance: 'vcsa-1'
+  - job_name: 'nut-primary'
+    metrics_path: /ups_metrics
+    scrape_interval: 60s
+    static_configs:
+      - targets: ['dietpi1.local.lan:9199']
+        labels:
+          instance: 'nut_monitor'
