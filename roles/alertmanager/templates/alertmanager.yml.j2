@@ -1,59 +1,27 @@
 global:
   resolve_timeout: 5m
-inhibit_rules:
-- equal:
-  - namespace
-  - alertname
-  source_matchers:
-  - severity = critical
-  target_matchers:
-  - severity =~ warning|info
-- equal:
-  - namespace
-  - alertname
-  source_matchers:
-  - severity = warning
-  target_matchers:
-  - severity = info
-- equal:
-  - namespace
-  source_matchers:
-  - alertname = InfoInhibitor
-  target_matchers:
-  - severity = info
+  smtp_from: alertmanager@ycdisp.net
+  smtp_smarthost: smtp.gmail.com:587
+  smtp_auth_username: edward.ingram@ycdisp.com
+  smtp_auth_identity: edward.ingram@ycdisp.com
+  smtp_auth_password: "{{ lookup('hashi_vault', 'secret=secret/google/smtp:password') }}"
+route:
+  receiver: email-alert
+  group_wait: 30s
+  group_interval: 5m
+  repeat_interval: 4h
+  group_by: ['alertname','job']
+      routes:
+        - matchers:
+          - severity="critical"
+            receiver: email-alert
+# inhibit_rules:
+#   - equal: [alertname]
+#     source_matchers: [severity = "critical"]
+#     target_matchers: [severity = "warning"]
 receivers:
-- name: Default
-- name: Watchdog
-- name: Critical
-- name: null
-- name: 'email-alert'
-  email_configs:
-  - to: edward.ingram23@gmail.com
-    from: alertmanager@ycdisp.net
-    smarthost: smtp.gmail.com:587
-    auth_username: edward.ingram@ycdisp.com
-    auth_identity: edward.ingram@ycdisp.com
-    auth_password: "{{ lookup('hashi_vault', 'secret=secret/google/smtp:password') }}"
-route:
-  group_by:
-  - namespace
-  group_interval: 5m
-  group_wait: 30s
-  receiver: Default
-  repeat_interval: 12h
-  routes:
-  - matchers:
-    - alertname = Watchdog
-    receiver: Watchdog
-  - matchers:
-    - alertname = InfoInhibitor
-    receiver: null
-  - matchers:
-    - severity = critical
-    receiver: Critical
-route:
-  group_by: ['job']
-  group_wait: 30s
-  group_interval: 5m
-  repeat_interval: 12h
-  receiver: 'email-alert'
+  - name: 'email-alert'
+    email_configs:
+      - to: edward.ingram23@gmail.com   
+
+
