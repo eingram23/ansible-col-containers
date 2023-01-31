@@ -30,7 +30,7 @@ receivers:
   email_configs:
   - to: edward.ingram23@gmail.com
     from: alertmanager@ycdisp.net
-    smarthost: smtp.gmail.com: 587
+    smarthost: smtp.gmail.com:587
     auth_username: edward.ingram@ycdisp.com
     auth_identity: edward.ingram@ycdisp.com
     auth_password: "{{ lookup('hashi_vault', 'secret=secret/google/smtp:password') }}"
