@@ -35,7 +35,7 @@
     pod: "{{ pod_name }}"
     volume:
       - "{{ container_name }}-data:/alertmanager"
-      - /opt/alertmanager/alertmanager.yml:/etc/prometheus/alertmanager.yml
+      - /opt/alertmanager/alertmanager.yml:/etc/alertmanager/alertmanager.yml
 
 - name: Copy alertmanager.yml to remote server (update)
   ansible.builtin.copy:
