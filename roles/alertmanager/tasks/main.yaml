@@ -18,9 +18,9 @@
       become_method: sudo
       become_user: root
 
-- name: Copy alertmanager.yml to remote server
-  ansible.builtin.copy:
-    src: alertmanager.yml
+- name: Create alertmanager.yml on remote server
+  ansible.builtin.template:
+    src: alertmanager.yml.j2
     dest: /opt/alertmanager/alertmanager.yml
     mode: '0644'
     owner: poduser
