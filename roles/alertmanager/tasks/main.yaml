@@ -1,0 +1,50 @@
+---
+- name: Create alertmanager folder
+  ansible.builtin.file:
+    path: /opt/alertmanager
+    state: directory
+    mode: '0755'
+    owner: poduser
+    group: poduser
+  become: true
+  become_method: sudo
+  become_user: root
+
+- name: Open firewall ports
+  ansible.builtin.include_role:
+    name: eingram23.homelab.firewall
+    apply:
+      become: true
+      become_method: sudo
+      become_user: root
+
+- name: Copy alertmanager.yml to remote server
+  ansible.builtin.copy:
+    src: alertmanager.yml
+    dest: /opt/alertmanager/alertmanager.yml
+    mode: '0644'
+    owner: poduser
+    group: poduser
+
+- name: Create and run alertmanager container
+  containers.podman.podman_container:
+    name: "{{ container_name }}"
+    image: docker.io/prom/alertmanager:{{ ver }}
+    state: started
+    restart_policy: always
+    pod: "{{ pod_name }}"
+    volume:
+      - "{{ container_name }}-data:/alertmanager"
+      - /opt/alertmanager/alertmanager.yml:/etc/prometheus/alertmanager.yml
+
+- name: Copy alertmanager.yml to remote server (update)
+  ansible.builtin.copy:
+    src: alertmanager.yml
+    dest: /opt/alertmanager/alertmanager.yml
+    mode: '0644'
+    owner: poduser
+    group: poduser
+  tags:
+    - never
+    - update_alertmanager
+  notify: Restart alertmanager container

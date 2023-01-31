@@ -1,0 +1,7 @@
+---
+- name: Restart alertmanager container
+  containers.podman.podman_container:
+    name: alertmanager
+    image: prom/alertmanager:{{ ver }}
+    state: started
+    restart: true
