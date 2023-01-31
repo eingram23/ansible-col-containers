@@ -19,13 +19,14 @@
       become_user: root
 
 
-- name: Copy prometheus.yml to remote server
+- name: Copy prometheus files to remote server
   ansible.builtin.copy:
-    src: prometheus.yml
-    dest: /opt/prometheus/prometheus.yml
+    src: "{{ item }}"
+    dest: /opt/prometheus/{{ item }}
     mode: '0644'
     owner: poduser
     group: poduser
+  with_fileglob: "*"
 
 - name: Create and run prometheus container
   containers.podman.podman_container:
@@ -36,16 +37,17 @@
     pod: "{{ pod_name }}"
     volume:
       - "{{ container_name }}-data:/prometheus"
-      - /opt/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+      - /opt/prometheus/:/etc/prometheus/
 
-- name: Copy prometheus.yml to remote server (update)
+- name: Copy prometheus files to remote server
   ansible.builtin.copy:
-    src: prometheus.yml
-    dest: /opt/prometheus/prometheus.yml
+    src: "{{ item }}"
+    dest: /opt/prometheus/{{ item }}
     mode: '0644'
     owner: poduser
     group: poduser
+  with_fileglob: "*"
   tags:
     - never
-    - update_promjobs
+    - update_prometheus
   notify: Restart prometheus container

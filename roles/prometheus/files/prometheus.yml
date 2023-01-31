@@ -1,7 +1,7 @@
 global:
 
 rule_files:
-  # - "first.rules"
+  - "node-exporter.rules"
   # - "second.rules"
 
 scrape_configs:
