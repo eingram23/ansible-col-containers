@@ -11,10 +11,10 @@ route:
   group_interval: 5m
   repeat_interval: 4h
   group_by: ['alertname','job']
-      routes:
-        - matchers:
-          - severity="critical"
-            receiver: email-alert
+  routes:
+    - matchers:
+      - severity="critical"
+        receiver: email-alert
 # inhibit_rules:
 #   - equal: [alertname]
 #     source_matchers: [severity = "critical"]
@@ -23,5 +23,3 @@ receivers:
   - name: 'email-alert'
     email_configs:
       - to: edward.ingram23@gmail.com   
-
-
