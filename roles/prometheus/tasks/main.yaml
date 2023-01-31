@@ -22,7 +22,7 @@
 - name: Copy prometheus files to remote server
   ansible.builtin.copy:
     src: "{{ item }}"
-    dest: /opt/prometheus/{{ item }}
+    dest: /opt/prometheus/
     mode: '0644'
     owner: poduser
     group: poduser
@@ -42,7 +42,7 @@
 - name: Copy prometheus files to remote server
   ansible.builtin.copy:
     src: "{{ item }}"
-    dest: /opt/prometheus/{{ item }}
+    dest: /opt/prometheus/
     mode: '0644'
     owner: poduser
     group: poduser
