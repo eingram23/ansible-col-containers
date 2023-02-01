@@ -33,8 +33,10 @@
     state: started
     restart_policy: always
     pod: "{{ pod_name }}"
-    cmd_args:
-      - "['--web.external-url', 'http://{{ inventory_hostname }}:9093']"
+    command: >
+      --config.file=/etc/alertmanager/alertmanager.yml
+      --storage.path=/alertmanager
+      --web.external-url=http://{{ inventory_hostname }}:9093
     volume:
       - "{{ container_name }}-data:/alertmanager"
       - /opt/alertmanager/alertmanager.yml:/etc/alertmanager/alertmanager.yml

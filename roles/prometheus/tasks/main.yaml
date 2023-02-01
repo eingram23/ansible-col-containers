@@ -35,8 +35,12 @@
     state: started
     restart_policy: always
     pod: "{{ pod_name }}"
-    cmd_args:
-      - "['--web.external-url', 'http://{{ inventory_hostname }}:9091']"
+    command: >
+      --config.file=/etc/prometheus/prometheus.yml
+      --storage.tsdb.path=/prometheus
+      --web.console.libraries=/usr/share/prometheus/console_libraries
+      --web.console.templates=/usr/share/prometheus/consoles
+      --web.external-url=http://{{ inventory_hostname }}:9091
     volume:
       - "{{ container_name }}-data:/prometheus"
       - /opt/prometheus/:/etc/prometheus/
