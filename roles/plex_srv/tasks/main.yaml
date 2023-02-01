@@ -9,6 +9,7 @@
       PUID=0
       PGID=0
       VERSION=docker
+      TZ=America/Los_Angeles
     network_mode: host
     # device: "/dev/dri:/dev/dri"
     volume:
