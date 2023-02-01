@@ -31,11 +31,12 @@
 - name: Create and run prometheus container
   containers.podman.podman_container:
     name: "{{ container_name }}"
-    image: docker.io/prom/prometheus:{{ ver }}
+    image: prom/prometheus:{{ ver }}
     state: started
     restart_policy: always
     pod: "{{ pod_name }}"
-    cmd_args: "[--web.external-url=http://{{ inventory_hostname }}:9091]"
+    cmd_args:
+      - "[--web.external-url, http://{{ inventory_hostname }}:9091]"
     volume:
       - "{{ container_name }}-data:/prometheus"
       - /opt/prometheus/:/etc/prometheus/
