@@ -36,7 +36,7 @@
     restart_policy: always
     pod: "{{ pod_name }}"
     cmd_args:
-      - "--web.external-url=http://{{ inventory_hostname }}:9091"
+      - "[--web.external-url, http://{{ inventory_hostname }}:9091]"
     volume:
       - "{{ container_name }}-data:/prometheus"
       - /opt/prometheus/:/etc/prometheus/
