@@ -29,12 +29,11 @@
 - name: Create and run alertmanager container
   containers.podman.podman_container:
     name: "{{ container_name }}"
-    image: prom/alertmanager:{{ ver }}
+    image: docker.io/prom/alertmanager:{{ ver }}
     state: started
     restart_policy: always
     pod: "{{ pod_name }}"
-    # cmd_args:
-    #   - "[--web.external-url, http://{{ inventory_hostname }}:9093]"
+    cmd_args: "--web.external-url=http://{{ inventory_hostname }}:9093"
     volume:
       - "{{ container_name }}-data:/alertmanager"
       - /opt/alertmanager/alertmanager.yml:/etc/alertmanager/alertmanager.yml
