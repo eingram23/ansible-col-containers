@@ -41,7 +41,7 @@
 - name: Build ycdisp.com-web image
   containers.podman.podman_image:
     name: "{{ app }}-web"
-    path: "{{ root }}Containers/{{ app }}/{{ app }}-web"
+    path: "{{ root }}Containers/ycdisp.com/{{ app }}-web"
     force: true
     build:
       extra_args: --build-arg PASSWORD={{ smtp_pw }}
@@ -49,12 +49,12 @@
 - name: Copy sql backup to build Location
   ansible.builtin.copy:
     src: yandcprod.sql
-    dest: "{{ root }}Containers/{{ app }}/{{ app }}-db"
+    dest: "{{ root }}Containers/ycdisp.com/{{ app }}-db"
 
 - name: Build ycdisp.com-db image
   containers.podman.podman_image:
     name: "{{ app }}-db"
-    path: "{{ root }}Containers/{{ app }}/{{ app }}-db"
+    path: "{{ root }}Containers/ycdisp.com/{{ app }}-db"
     force: true
 
 - name: Create ycdisp.com pod
