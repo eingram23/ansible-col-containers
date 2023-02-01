@@ -35,7 +35,7 @@
     state: started
     restart_policy: always
     pod: "{{ pod_name }}"
-    cmd_args: 
+    cmd_args:
       - "--web.external-url=http://{{ inventory_hostname }}:9091"
     volume:
       - "{{ container_name }}-data:/prometheus"
