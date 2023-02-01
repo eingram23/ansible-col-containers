@@ -21,7 +21,7 @@
 
 - name: Clone www.ycdisp.com repo from github
   ansible.builtin.git:
-    repo: "{{ repo }}{{ app }}.git"
+    repo: "{{ repo }}www.ycdisp.com.git"
     dest: "{{ root }}{{ app }}"
     clone: true
     key_file: /home/poduser/.ssh/ssh-key-git.key
@@ -30,7 +30,7 @@
     force: true
 
 - name: Clone Containers repo from github
-  ansible.builtin.git:    
+  ansible.builtin.git:
     repo: "{{ repo }}Containers.git"
     dest: "{{ root }}Containers"
     key_file: /home/poduser/.ssh/ssh-key-git.key
@@ -97,3 +97,10 @@
     - { search: '$database_dbc = "dbname";', replace: '$database_dbc = "yandcprod";' }
     - { search: '$username_dbc = "username";', replace: '$username_dbc = "yandcprod";' }
     - { search: '$password_dbc = "password";', replace: '$password_dbc = "{{ mysql_yandcprod }}";' }
+
+- name: Change site URL to test.ycdisp.com (if env = test)
+  ansible.builtin.lineinfile:
+    path: "{{ root }}{{ app }}/public_html/includes/globals.ini.php"
+    search_string: 'define("siteUrl","http://www.ycdisp.com/");'
+    line: 'define("siteUrl","http://test.ycdisp.com/");'
+  when: env == "test"
