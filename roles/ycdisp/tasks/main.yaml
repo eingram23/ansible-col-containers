@@ -9,11 +9,11 @@
     - /home/poduser/.ssh
     # - /home/poduser/.config/systemd/user
 
-- name: Copy github private key to remote host
-  ansible.builtin.copy:
-    src: ssh-key-ansible.key
-    dest: /home/poduser/.ssh/
-    mode: '0600'
+- name: Create github key
+  ansible.builtin.template:
+    src: ssh-key-git.key.j2
+    dest: /home/poduser/.ssh/ssh-key-git.key
+    mode: '0400'
 
 # - name: Pause playbook until web files are uploaded to host
 #   pause:
@@ -24,7 +24,7 @@
     repo: "{{ repo }}{{ app }}.git"
     dest: "{{ root }}{{ app }}"
     clone: true
-    key_file: /home/poduser/.ssh/ssh-key-ansible.key
+    key_file: /home/poduser/.ssh/ssh-key-git.key
     accept_hostkey: true
     update: true
     force: true
@@ -33,7 +33,7 @@
   ansible.builtin.git:    
     repo: "{{ repo }}Containers.git"
     dest: "{{ root }}Containers"
-    key_file: /home/poduser/.ssh/ssh-key-ansible.key
+    key_file: /home/poduser/.ssh/ssh-key-git.key
     accept_hostkey: true
     clone: true
     update: true
