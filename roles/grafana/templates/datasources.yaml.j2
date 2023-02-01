@@ -1,0 +1,21 @@
+apiVersion: 1
+datasources:
+  - name: Prometheus
+    type: prometheus
+    url: http://prometheus:9090
+    access: proxy
+    isDefault: true
+    uid: prom
+    jsonData:
+      timeInterval: '60s'
+      prometheusType: 'Prometheus'
+  - name: Influxdb
+    type: influxdb
+    url: http://homeassistant.local.lan:8086
+    access: proxy
+    user: grafana
+    secureJsonData:
+      password: {{ lookup('hashi_vault', 'secret=secret/ssh/eingram:ssh_password') }}
+    database: grafana
+    editable: true
+    uid: influx

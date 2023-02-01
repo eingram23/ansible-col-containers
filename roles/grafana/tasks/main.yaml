@@ -1,4 +1,36 @@
 ---
+- name: Create grafana folders
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+    mode: '0755'
+    owner: poduser
+    group: poduser
+  loop:
+    - /opt/grafana
+    - /opt/grafana/dashboards
+    - /opt/grafana/datasources
+  become: true
+  become_method: sudo
+  become_user: root
+
+- name: Copy grafana dashboards to remote server
+  ansible.builtin.copy:
+    src: "{{ item }}"
+    dest: /opt/grafana/dashboards
+    mode: '0644'
+    owner: poduser
+    group: poduser
+  with_fileglob: "*"
+
+- name: Create grafana datasource file on remote server
+  ansible.builtin.template:
+    src: datasources.yaml.j2
+    dest: /opt/grafana/datasources/datasources.yaml
+    mode: '0644'
+    owner: poduser
+    group: poduser
+
 - name: Open firewall ports
   ansible.builtin.include_role:
     name: eingram23.homelab.firewall
@@ -6,7 +38,7 @@
       become: true
       become_method: sudo
       become_user: root
-  
+
 - name: Create and run grafana container
   containers.podman.podman_container:
     name: "{{ container_name }}"
@@ -17,3 +49,5 @@
     volume:
       - "{{ container_name }}_config:/etc/grafana"
       - "{{ container_name }}_data:/var/lib/grafana"
+      - "/opt/grafana/dashboards:/etc/grafana/provisioning/dashboards"
+      - "/opt/grafana/datasources:/etc/grafana/provisioning/datasources"
