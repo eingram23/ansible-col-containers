@@ -9,21 +9,30 @@
   loop:
     - /opt/grafana
     - /opt/grafana/dashboards
+    - /opt/grafana/dashboardfiles
     - /opt/grafana/datasources
   become: true
   become_method: sudo
   become_user: root
 
-- name: Copy grafana dashboards to remote server
+- name: Copy grafana dashboard provisioning file to remote server
   ansible.builtin.copy:
-    src: "{{ item }}"
+    src: dashboards.yaml
     dest: /opt/grafana/dashboards
     mode: '0644'
     owner: poduser
     group: poduser
-  with_fileglob: "*"
 
-- name: Create grafana datasource file on remote server
+- name: Copy grafana dashboards to remote server
+  ansible.builtin.copy:
+    src: "{{ item }}"
+    dest: /opt/grafana/dashboardfiles
+    mode: '0644'
+    owner: poduser
+    group: poduser
+  with_fileglob: "{{ role_path }}/files/dashboards/*"
+
+- name: Create grafana datasource provisioning file on remote server
   ansible.builtin.template:
     src: datasources.yaml.j2
     dest: /opt/grafana/datasources/datasources.yaml
@@ -50,4 +59,5 @@
       - "{{ container_name }}_config:/etc/grafana"
       - "{{ container_name }}_data:/var/lib/grafana"
       - "/opt/grafana/dashboards:/etc/grafana/provisioning/dashboards"
+      - "/opt/grafana/dashboardfiles:/var/lib/grafana/dashboards"
       - "/opt/grafana/datasources:/etc/grafana/provisioning/datasources"
