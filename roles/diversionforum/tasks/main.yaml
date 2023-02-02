@@ -1,15 +1,4 @@
 ---
-# - name: Create supporting folder structure
-#   ansible.builtin.file:
-#     path: "{{ item }}"
-#     state: directory
-#     owner: poduser
-#     group: poduser
-#     mode: 0775
-#   loop:
-#     - "{{ root }}{{ app }}"
-#     - /home/poduser/.config/systemd/user
-
 - name: Check if dfsitebackup.tar.gz exists
   ansible.builtin.stat:
     path: /home/poduser/dfsitebackup.tar.gz
@@ -88,17 +77,6 @@
     update: true
     force: true
 
-# - name: Copy diversionforum.net container out to build dir
-#   ansible.builtin.copy:
-#     src: "{{ root }}temp-containers/diversionforum.net/"
-#     dest: "{{ builddir }}{{ app }}"
-#     remote_src: true
-
-# - name: Remove container clone
-#   ansible.builtin.file:
-#     path: "{{ root }}temp-containers"
-#     state: absent
-
 - name: Build diversionforum.net-web image
   containers.podman.podman_image:
     name: "{{ app }}-nginx"
@@ -111,12 +89,6 @@
     path: "{{ builddir }}diversionforum.net/php"
     force: true
 
-# - name: Check if smfprod.sql already exists
-#   ansible.builtin.stat:
-#     path: "{{ builddir }}diversionforum.net/mariadb/smfprod.sql"
-#   register: smfprodsql
-
-# - block:
 - name: Extract df sql backup
   ansible.builtin.shell: gunzip -c /home/poduser/dfsqlbackup.bak.gz > {{ builddir }}diversionforum.net/mariadb/smfprod.sql
 
@@ -125,7 +97,6 @@
     name: "{{ app }}-mariadb"
     path: "{{ builddir }}diversionforum.net/mariadb"
     force: true
-  # when: not smfprodsql.stat.exists
 
 - name: Create app pod
   ansible.builtin.include_role:
@@ -177,7 +148,6 @@
   vars:
     container_name: "{{ app }}-phpmyadmin"
     mariadb_container_name: "{{ app }}-mariadb"
-    # mysql_root_password: "{{ mysql_root }}"
     pod_name: "{{ app }}"
   tags: update_phpmyadmin
 
@@ -187,11 +157,6 @@
       find {{ root }}{{ app }}/public_html -type d -exec chmod 0755 {} \;
       find {{ root }}{{ app }}/public_html -type f -exec chmod 0644 {} \;
       podman unshare chown -R 33:33 {{ root }}{{ app }}/public_html/
-
-- name: Pause two minutes to let mariadb initialize
-  ansible.builtin.pause:
-    minutes: 2
-  when: not smfprodsql.stat.exists
 
 - name: Remove build folder
   ansible.builtin.file:

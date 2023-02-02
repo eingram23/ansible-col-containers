@@ -1,0 +1,4 @@
+---
+- name: Init mariadb
+  ansible.builtin.pause:
+    minutes: 2
