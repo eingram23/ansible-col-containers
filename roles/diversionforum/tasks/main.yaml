@@ -111,21 +111,21 @@
     path: "{{ builddir }}diversionforum.net/php"
     force: true
 
-- name: Check if smfprod.sql already exists
-  ansible.builtin.stat:
-    path: "{{ builddir }}diversionforum.net/mariadb/smfprod.sql"
-  register: smfprodsql
+# - name: Check if smfprod.sql already exists
+#   ansible.builtin.stat:
+#     path: "{{ builddir }}diversionforum.net/mariadb/smfprod.sql"
+#   register: smfprodsql
 
-- block:
-    - name: Extract df sql backup
-      ansible.builtin.shell: gunzip -c /home/poduser/dfsqlbackup.bak.gz > {{ builddir }}diversionforum.net/mariadb/smfprod.sql
+# - block:
+- name: Extract df sql backup
+  ansible.builtin.shell: gunzip -c /home/poduser/dfsqlbackup.bak.gz > {{ builddir }}diversionforum.net/mariadb/smfprod.sql
 
-    - name: Build diversionforum.net-mariadb image
-      containers.podman.podman_image:
-        name: "{{ app }}-mariadb"
-        path: "{{ builddir }}diversionforum.net/mariadb"
-        force: true
-  when: not smfprodsql.stat.exists
+- name: Build diversionforum.net-mariadb image
+  containers.podman.podman_image:
+    name: "{{ app }}-mariadb"
+    path: "{{ builddir }}diversionforum.net/mariadb"
+    force: true
+  # when: not smfprodsql.stat.exists
 
 - name: Create app pod
   ansible.builtin.include_role:
