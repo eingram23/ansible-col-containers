@@ -14,6 +14,7 @@
     src: ssh-key-git.key.j2
     dest: /home/poduser/.ssh/ssh-key-git.key
     mode: '0400'
+  tags: code_update
 
 # - name: Pause playbook until web files are uploaded to host
 #   pause:
@@ -28,6 +29,7 @@
     accept_hostkey: true
     update: true
     force: true
+  tags: code_update
 
 - name: Clone Containers repo from github
   ansible.builtin.git:
@@ -38,6 +40,12 @@
     clone: true
     update: true
     force: true
+
+- name: Remove github key
+  ansible.builtin.file:
+    path: /home/poduser/.ssh/ssh-key-git.key
+    state: absent
+  tags: code_update
 
 - name: Build ycdisp.com-web image
   containers.podman.podman_image:
@@ -99,15 +107,39 @@
     - { search: '$username_dbc = "username";', replace: '$username_dbc = "yandcprod";' }
     - { search: '$password_dbc = "password";', replace: '$password_dbc = "{{ mysql_yandcprod }}";' }
 
-- name: Change site URL to test.ycdisp.com (if env = test)
-  ansible.builtin.lineinfile:
-    path: "{{ root }}{{ app }}/public_html/includes/globals.ini.php"
-    search_string: 'define("siteUrl","http://www.ycdisp.com/");'
-    line: 'define("siteUrl","http://test.ycdisp.com/");'
+- block:
+    - name: Change site URL in globals.ini.php to test.ycdisp.com (if env = test)
+      ansible.builtin.lineinfile:
+        path: "{{ root }}{{ app }}/public_html/includes/globals.ini.php"
+        search_string: 'define("siteUrl","http://www.ycdisp.com/");'
+        line: 'define("siteUrl","http://test.ycdisp.com/");'
+
+    - name: Change site URL in scripts.cart.js to test.ycdisp.com (if env = test)
+      ansible.builtin.lineinfile:
+        path: "{{ root }}{{ app }}/public_html/js/scripts.cart.js"
+        search_string: "$('.labels a').attr('href','http://www.ycdisp.com/get-quote/');"
+        line: "$('.labels a').attr('href','http://test.ycdisp.com/get-quote/');"
   when: env == "test"
 
-- name: Remove build folder
-  ansible.builtin.file:
-    path: "{{ builddir }}"
-    state: absent
+- block:
+    - name: Remove build folder
+      ansible.builtin.file:
+        path: "{{ builddir }}"
+        state: absent
+
+    - name: Remove read permissions on admin/index.php
+      ansible.builtin.file:
+        path: "{{ root }}{{ app }}/public_html/admin/index.php"
+        state: files
+        mode: u-r,g-r,o-r
   when: env == "www"
+
+- name: Restart ycdisp.com apache container
+  containers.podman.podman_container:
+    name: "{{ app }}-web"
+    image: localhost/{{ app }}-web
+    state: started
+    restart: true
+  tags:
+    - code_update
+    - never
