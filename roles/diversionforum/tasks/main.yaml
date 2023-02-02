@@ -36,11 +36,15 @@
     dest: /home/poduser/.ssh/ssh-key-git.key
     mode: '0400'
 
-- name: Create site root folder
+- name: Create site supporting folders
   ansible.builtin.file:
-    path: "{{ root }}{{ app }}"
+    path: "{{ item }}"
     state: directory
+    recurse: true
     mode: '0755'
+  loop:
+    - "{{ root }}{{ app }}"
+    - "{{ builddir }}"
 
 - name: Check if Settings.php already exists
   ansible.builtin.stat:
@@ -77,43 +81,38 @@
 - name: Clone containers repo from github
   ansible.builtin.git:
     repo: "{{ repo }}containers.git"
-    dest: "{{ root }}temp-containers"
+    dest: "{{ builddir }}"
     key_file: /home/poduser/.ssh/ssh-key-git.key
     accept_hostkey: true
     clone: true
     update: true
 
-- name: Create build dir
-  ansible.builtin.file:
-    path: "{{ builddir }}{{ app }}"
-    state: directory
+# - name: Copy diversionforum.net container out to build dir
+#   ansible.builtin.copy:
+#     src: "{{ root }}temp-containers/diversionforum.net/"
+#     dest: "{{ builddir }}{{ app }}"
+#     remote_src: true
 
-- name: Copy diversionforum.net container out to build dir
-  ansible.builtin.copy:
-    src: "{{ root }}temp-containers/diversionforum.net/"
-    dest: "{{ builddir }}{{ app }}"
-    remote_src: true
-
-- name: Remove container clone
-  ansible.builtin.file:
-    path: "{{ root }}temp-containers"
-    state: absent
+# - name: Remove container clone
+#   ansible.builtin.file:
+#     path: "{{ root }}temp-containers"
+#     state: absent
 
 - name: Build diversionforum.net-web image
   containers.podman.podman_image:
     name: "{{ app }}-nginx"
-    path: "{{ builddir }}{{ app }}/nginx"
+    path: "{{ builddir }}diversionforum.net/nginx"
     force: true
 
 - name: Build diversionforum.net-php image
   containers.podman.podman_image:
     name: "{{ app }}-php"
-    path: "{{ builddir }}{{ app }}/php"
+    path: "{{ builddir }}diversionforum.net/php"
     force: true
 
 - name: Check if smfprod.sql already exists
   ansible.builtin.stat:
-    path: "{{ builddir }}{{ app }}/mariadb/smfprod.sql"
+    path: "{{ builddir }}diversionforum.net/mariadb/smfprod.sql"
   register: smfprodsql
 
 - block:
@@ -123,7 +122,7 @@
     - name: Build diversionforum.net-mariadb image
       containers.podman.podman_image:
         name: "{{ app }}-mariadb"
-        path: "{{ builddir }}{{ app }}/mariadb"
+        path: "{{ builddir }}diversionforum.net/mariadb"
         force: true
   when: not smfprodsql.stat.exists
 
@@ -192,3 +191,9 @@
   ansible.builtin.pause:
     minutes: 2
   when: not smfprodsql.stat.exists
+
+- name: Remove build folder
+  ansible.builtin.file:
+    path: "{{ builddir }}"
+    state: absent
+  when: env == "www"

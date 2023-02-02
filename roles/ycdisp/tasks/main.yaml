@@ -1,13 +1,13 @@
 ---
-- name: Create supporting folder structure
+- name: Create site supporting folders
   ansible.builtin.file:
     path: "{{ item }}"
     state: directory
-    mode: 0775
+    recurse: true
+    mode: '0755'
   loop:
-    - "{{ root }}"
-    - /home/poduser/.ssh
-    # - /home/poduser/.config/systemd/user
+    - "{{ root }}{{ app }}"
+    - "{{ builddir }}"
 
 - name: Create github key
   ansible.builtin.template:
@@ -32,7 +32,7 @@
 - name: Clone Containers repo from github
   ansible.builtin.git:
     repo: "{{ repo }}Containers.git"
-    dest: "{{ root }}Containers"
+    dest: "{{ builddir }}"
     key_file: /home/poduser/.ssh/ssh-key-git.key
     accept_hostkey: true
     clone: true
@@ -41,7 +41,7 @@
 - name: Build ycdisp.com-web image
   containers.podman.podman_image:
     name: "{{ app }}-web"
-    path: "{{ root }}Containers/ycdisp.com/apache"
+    path: "{{ builddir }}ycdisp.com/apache"
     force: true
     build:
       extra_args: --build-arg PASSWORD={{ smtp_pw }}
@@ -49,12 +49,12 @@
 - name: Copy sql backup to build Location
   ansible.builtin.copy:
     src: yandcprod.sql
-    dest: "{{ root }}Containers/ycdisp.com/mariadb"
+    dest: "{{ builddir }}ycdisp.com/mariadb"
 
 - name: Build ycdisp.com-db image
   containers.podman.podman_image:
     name: "{{ app }}-db"
-    path: "{{ root }}Containers/ycdisp.com/mariadb"
+    path: "{{ builddir }}ycdisp.com/mariadb"
     force: true
 
 - name: Create ycdisp.com pod
@@ -104,3 +104,9 @@
     search_string: 'define("siteUrl","http://www.ycdisp.com/");'
     line: 'define("siteUrl","http://test.ycdisp.com/");'
   when: env == "test"
+
+- name: Remove build folder
+  ansible.builtin.file:
+    path: "{{ builddir }}"
+    state: absent
+  when: env == "www"
