@@ -97,6 +97,7 @@
     name: "{{ app }}-mariadb"
     path: "{{ builddir }}diversionforum.net/mariadb"
     force: true
+  notify: Init mariadb
 
 - name: Create app pod
   ansible.builtin.include_role:
