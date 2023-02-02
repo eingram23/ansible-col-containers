@@ -117,7 +117,7 @@
 
 - block:
     - name: Extract df sql backup
-      ansible.builtin.shell: gunzip -c /home/poduser/dfsqlbackup.bak.gz > {{ builddir }}{{ app }}/mariadb/smfprod.sql
+      ansible.builtin.shell: gunzip -c /home/poduser/dfsqlbackup.bak.gz > {{ builddir }}diversionforum.net/mariadb/smfprod.sql
 
     - name: Build diversionforum.net-mariadb image
       containers.podman.podman_image:
