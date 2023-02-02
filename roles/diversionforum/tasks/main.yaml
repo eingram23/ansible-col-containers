@@ -86,6 +86,7 @@
     accept_hostkey: true
     clone: true
     update: true
+    force: true
 
 # - name: Copy diversionforum.net container out to build dir
 #   ansible.builtin.copy:

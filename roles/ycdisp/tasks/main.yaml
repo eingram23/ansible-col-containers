@@ -37,6 +37,7 @@
     accept_hostkey: true
     clone: true
     update: true
+    force: true
 
 - name: Build ycdisp.com-web image
   containers.podman.podman_image:
