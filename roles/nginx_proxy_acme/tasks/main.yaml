@@ -19,6 +19,10 @@
     database: passwd
 
 - ansible.builtin.setup:
+  register: facts
+
+- ansible.builtin.debug:
+    var: facts
     
 - name: Run nginx container
   containers.podman.podman_container:
