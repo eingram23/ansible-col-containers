@@ -1,4 +1,23 @@
 ---
+- name: Install podman-remote
+  ansible.builtin.package:
+    name: podman-remote
+    state: present
+  become: true
+  become_method: sudo
+  become_user: root
+
+- name: Enable/start podman.socket
+  ansible.builtin.systemd:
+    name: podman.socket
+    state: started
+    enabled: true
+    scope: user
+
+- name: Getent passwd
+  ansible.builtin.getent:
+    database: passwd
+
 - name: Run nginx container
   containers.podman.podman_container:
     name: nginx-proxy
@@ -8,13 +27,12 @@
     ports:
       - "80:80"
       - "443:443"
-    # env:
-    #   DOCKER_HOST: unix:///run/user/10002/podman//podman.sock
+    privileged: true
     volume:
       - certs:/etc/nginx/certs:z
       - vhost:/etc/nginx/vhost.d:z
       - html:/usr/share/nginx/html:z
-      - /run/user/1002/podman/podman.sock:/tmp/docker.sock
+      - /run/user/{{ getent_passwd[ ansible_user ].2 }}/podman/podman.sock:/tmp/docker.sock:z
 
 - name: Run acme-companion container
   containers.podman.podman_container:
