@@ -5,35 +5,29 @@
     dest: /home/poduser/.ssh/ssh-key-git.key
     mode: '0400'
 
+- name: Create site supporting folders
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+    recurse: true
+    mode: '0755'
+  loop:
+    - "{{ root }}{{ app }}"
+    - "{{ builddir }}"
+
 - name: Clone containers repo from github
   ansible.builtin.git:
     repo: "{{ repo }}containers.git"
-    dest: "{{ root }}temp-containers"
+    dest: "{{ builddir }}"
     key_file: /home/poduser/.ssh/ssh-key-git.key
     accept_hostkey: true
     clone: true
     update: true
 
-- name: Create build dir
-  ansible.builtin.file:
-    path: "{{ builddir }}{{ app }}"
-    state: directory
-
-- name: Copy wordpress container out to build dir
-  ansible.builtin.copy:
-    src: "{{ root }}temp-containers/wordpress/"
-    dest: "{{ builddir }}{{ app }}"
-    remote_src: true
-
-- name: Remove container clone
-  ansible.builtin.file:
-    path: "{{ root }}temp-containers"
-    state: absent
-
 - name: Build wordpress-web image
   containers.podman.podman_image:
     name: "{{ app }}-web"
-    path: "{{ builddir }}{{ app }}"
+    path: "{{ builddir }}wordpress"
     force: true
 
 - name: Create app pod
@@ -74,3 +68,7 @@
     restart_policy: always
     pod: "{{ app }}"
 
+# - name: Remove container clone
+#   ansible.builtin.file:
+#     path: "{{ builddir }}"
+#     state: absent

@@ -1,3 +1,5 @@
+---
+app: "{{ env }}-wordpress"
 root: '/home/poduser/code/'
 builddir: '/home/poduser/build/'
 repo: 'git@github.com:eingram23/'

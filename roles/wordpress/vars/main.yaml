@@ -1,2 +1,2 @@
-app: "wordpress{{ env | default() }}"
+---
 mariadb_ver: "10.9.4"
