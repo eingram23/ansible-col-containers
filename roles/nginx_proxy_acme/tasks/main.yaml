@@ -42,6 +42,7 @@
     restart_policy: unless-stopped
     env:
       DEFAULT_EMAIL: edward.ingram23@gmail.com
+    privileged: true
     volume:
       - certs:/etc/nginx/certs
       - vhost:/etc/nginx/vhost.d
