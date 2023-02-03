@@ -4,13 +4,18 @@
     path: /opt/nginx_proxy
     state: directory
     mode: '0755'
+    owner: poduser
+    group: poduser
+  become: true
+  become_method: sudo
+  become_user: root
 
 - name: Copy proxy.conf to host
   ansible.builtin.copy:
     src: proxy.conf
     dest: /opt/nginx_proxy
     mode: '0644'
-    
+
 - name: Run nginx container
   containers.podman.podman_container:
     name: nginx_proxy
