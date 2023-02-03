@@ -25,4 +25,4 @@
     ports:
       - "80:80"
     volume:
-      - /opt/nginx_proxy/default.conf:/etc/nginx/conf.d/default.conf
+      - /opt/nginx_proxy/:/etc/nginx/conf.d/
