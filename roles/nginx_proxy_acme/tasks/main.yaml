@@ -47,5 +47,5 @@
       - certs:/etc/nginx/certs
       - vhost:/etc/nginx/vhost.d
       - html:/usr/share/nginx/html
-      - /run/user/{{ ansible_real_user_id }}/podman/podman.sock:/tmp/docker.sock:ro
+      - /run/user/{{ ansible_real_user_id }}/podman/podman.sock:/var/run/docker.sock:ro
       - acme:/etc/acme.sh
