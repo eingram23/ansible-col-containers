@@ -1,0 +1,29 @@
+---
+- name: Run nginx container
+  containers.podman.podman_container:
+    name: nginx-proxy
+    image: docker.io/nginxproxy/nginx-proxy:{{ nginx_proxy_ver }}
+    state: started
+    restart_policy: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volume:
+      - certs:/etc/nginx/certs:z
+      - vhost:/etc/nginx/vhost.d:z
+      - html:/usr/share/nginx/html:z
+      - /var/run/docker.sock:/tmp/docker.sock:ro
+
+- name: Run acme-companion container
+  containers.podman.podman_container:
+    name: nginx-proxy-acme
+    image: docker.io/nginxproxy/acme-companion:{{ acme_ver }}
+    state: started
+    restart_policy: unless-stopped
+    env:
+      DEFAULT_EMAIL: edward.ingram23@gmail.com
+    volume:
+      - certs:/etc/nginx/certs
+      - vhost:/etc/nginx/vhost.d
+      - html:/usr/share/nginx/html
+      - acme:/etc/acme.sh
