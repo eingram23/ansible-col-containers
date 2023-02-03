@@ -10,10 +10,10 @@
   become_method: sudo
   become_user: root
 
-- name: Copy default.conf to host
-  ansible.builtin.copy:
-    src: default.conf
-    dest: /opt/nginx_proxy
+- name: Create default.conf on host
+  ansible.builtin.template:
+    src: default.conf.j2
+    dest: /opt/nginx_proxy/default.conf
     mode: '0644'
 
 - name: Run nginx container
