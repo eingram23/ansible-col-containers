@@ -9,12 +9,12 @@
       - "80:80"
       - "443:443"
     env:
-      DOCKER_HOST: unix:///tmp/podman.sock
+      DOCKER_HOST: unix:///run/user/10002/podman//podman.sock
     volume:
       - certs:/etc/nginx/certs:z
       - vhost:/etc/nginx/vhost.d:z
       - html:/usr/share/nginx/html:z
-      - /var/run/podman.sock:/tmp/podman.sock:ro
+      # - /run/podman/podman.sock:/tmp/podman.sock:ro
 
 - name: Run acme-companion container
   containers.podman.podman_container:
