@@ -10,9 +10,9 @@
   become_method: sudo
   become_user: root
 
-- name: Copy proxy.conf to host
+- name: Copy default.conf to host
   ansible.builtin.copy:
-    src: proxy.conf
+    src: default.conf
     dest: /opt/nginx_proxy
     mode: '0644'
 
@@ -25,4 +25,4 @@
     ports:
       - "80:80"
     volume:
-      - /opt/nginx_proxy/proxy.conf:/etc/nginx/conf.d/proxy.conf
+      - /opt/nginx_proxy/default.conf:/etc/nginx/conf.d/default.conf
