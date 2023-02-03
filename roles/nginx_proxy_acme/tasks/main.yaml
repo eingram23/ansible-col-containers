@@ -18,15 +18,20 @@
 #   ansible.builtin.getent:
 #     database: passwd
 
+- name: Create nginx-proxy pod
+  ansible.builtin.include_role:
+    name: eingram23.containers.create_pod
+
 - name: Run nginx container
   containers.podman.podman_container:
     name: nginx-proxy
     image: docker.io/nginxproxy/nginx-proxy:{{ nginx_proxy_ver }}
     state: started
     restart_policy: unless-stopped
-    ports:
-      - "80:80"
-      - "443:443"
+    pod: "{{ pod_name }}"
+    # ports:
+    #   - "80:80"
+    #   - "443:443"
     privileged: true
     volume:
       - certs:/etc/nginx/certs:z
@@ -40,12 +45,12 @@
     image: docker.io/nginxproxy/acme-companion:{{ acme_ver }}
     state: started
     restart_policy: unless-stopped
+    pod: "{{ pod_name }}"
     env:
       DEFAULT_EMAIL: edward.ingram23@gmail.com
     privileged: true
+    volumes_from:
+      - nginx-proxy
     volume:
-      - certs:/etc/nginx/certs
-      - vhost:/etc/nginx/vhost.d
-      - html:/usr/share/nginx/html
       - /run/user/{{ ansible_real_user_id }}/podman/podman.sock:/var/run/docker.sock:ro
       - acme:/etc/acme.sh
