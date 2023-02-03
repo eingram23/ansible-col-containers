@@ -32,7 +32,7 @@
       - certs:/etc/nginx/certs:z
       - vhost:/etc/nginx/vhost.d:z
       - html:/usr/share/nginx/html:z
-      - /run/user/{{ getent_passwd[ ansible_user ].2 }}/podman/podman.sock:/tmp/docker.sock:z
+      - /run/user/{{ getent_passwd[ ansible_become_user ].2 }}/podman/podman.sock:/tmp/docker.sock:z
 
 - name: Run acme-companion container
   containers.podman.podman_container:
