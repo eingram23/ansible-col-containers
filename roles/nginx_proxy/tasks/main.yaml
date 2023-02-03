@@ -1,0 +1,23 @@
+---
+- name: Create nginx_proxy supporting folder
+  ansible.builtin.file:
+    path: /opt/nginx_proxy
+    state: directory
+    mode: '0755'
+
+- name: Copy proxy.conf to host
+  ansible.builtin.copy:
+    src: proxy.conf
+    dest: /opt/nginx_proxy
+    mode: '0644'
+    
+- name: Run nginx container
+  containers.podman.podman_container:
+    name: nginx_proxy
+    image: docker.io/nginx:{{ ver }}
+    state: started
+    restart_policy: unless-stopped
+    ports:
+      - "80:80"
+    volume:
+      - /opt/nginx_proxy/proxy.conf:/etc/nginx/conf.d/proxy.conf
