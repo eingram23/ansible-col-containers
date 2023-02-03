@@ -14,7 +14,7 @@
       - certs:/etc/nginx/certs:z
       - vhost:/etc/nginx/vhost.d:z
       - html:/usr/share/nginx/html:z
-      - /run/user/1002/podman/podman.sock:/tmp/docker.sock:ro
+      - /run/user/1002/podman/podman.sock:/tmp/docker.sock
 
 - name: Run acme-companion container
   containers.podman.podman_container:
