@@ -1,4 +1,4 @@
-pod_name: "nginx-proxy"
+pod_name: "nginx-proxy-pod"
 publish_ports:
   - "80:80"
   - "443:443"
