@@ -1,11 +1,18 @@
 ---
-- name: Create nginx_proxy supporting folder
-  ansible.builtin.file:
-    path: /opt/nginx_proxy
-    state: directory
-    mode: '0755'
-    owner: poduser
-    group: poduser
+- block:
+    - name: Allow rootless podman to access lower ports
+      ansible.posix.sysctl:
+        name: net.ipv4.ip_unprivileged_port_start
+        value: '80'
+        state: present
+
+    - name: Create nginx_proxy supporting folder
+      ansible.builtin.file:
+        path: /opt/nginx_proxy
+        state: directory
+        mode: '0755'
+        owner: poduser
+        group: poduser
   become: true
   become_method: sudo
   become_user: root
