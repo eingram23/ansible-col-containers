@@ -6,8 +6,7 @@
     env:
       PMA_HOST: "{{ mariadb_container_name }}"
       MYSQL_ROOT_PASSWORD: "{{ mysql_root }}"
-      APACHE_PORT: "8090"
+      # APACHE_PORT: "8090"
     pod: "{{ pod_name }}"
     state: started
     restart_policy: always
-    # network: "{{ podman_network }}"

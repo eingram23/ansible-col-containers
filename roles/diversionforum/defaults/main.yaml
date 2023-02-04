@@ -1,7 +1,7 @@
 ---
 app: "{{ env }}-df"
-root: '/home/poduser/code/'
-builddir: '/home/poduser/build/'
+approot: "/opt/{{ app }}/"
+builddir: "/tmp/{{ app }}/"
 repo: 'git@github.com:eingram23/'
 mysql_root: "{{ lookup('hashi_vault', 'secret=secret/mysql/dfprod:root') }}"
 mysql_smfprod: "{{ lookup('hashi_vault', 'secret=secret/mysql/dfprod:smfprod') }}"
