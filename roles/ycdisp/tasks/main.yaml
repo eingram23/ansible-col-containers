@@ -16,10 +16,6 @@
     mode: '0400'
   tags: code_update
 
-# - name: Pause playbook until web files are uploaded to host
-#   pause:
-#     prompt: "Make sure web file backup is in /home/poduser and renamed to sitebackup.tar.gz"
-
 - name: Clone www.ycdisp.com repo from github
   ansible.builtin.git:
     repo: "{{ repo }}www.ycdisp.com.git"
