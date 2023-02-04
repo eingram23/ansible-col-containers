@@ -36,7 +36,6 @@
     cmd: |
       find {{ approot }}/public_html -type d -exec chmod 0755 {} \;
       find {{ approot }}/public_html -type f -exec chmod 0644 {} \;
-      podman unshare chown -R 33:33 {{ approot }}/public_html/
 
 - name: Clone Containers repo from github
   ansible.builtin.git:
