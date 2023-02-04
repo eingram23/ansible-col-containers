@@ -41,7 +41,7 @@
   ansible.builtin.git:
     repo: "{{ repo }}Containers.git"
     dest: "{{ builddir }}"
-    key_file: /root/.ssh/ssh-key-git.key
+    key_file: /root/ssh-key-git.key
     accept_hostkey: true
     clone: true
     update: true
