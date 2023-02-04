@@ -37,7 +37,7 @@
       path: /etc/systemd/system
       restart_policy: always
 
-- name: Enable contaier-nginx-proxy service
+- name: Enable container-nginx-proxy service
   ansible.builtin.systemd:
     name: container-nginx-proxy
     state: started
@@ -62,7 +62,7 @@
       path: /etc/systemd/system
       restart_policy: always
 
-- name: Enable contaier-nginx-proxy-acme service
+- name: Enable container-nginx-proxy-acme service
   ansible.builtin.systemd:
     name: container-nginx-proxy-acme
     state: started
