@@ -31,18 +31,18 @@
       - html:/usr/share/nginx/html:z
       - /var/run/docker.sock:/tmp/docker.sock:ro,z
 
-- name: Run acme-companion container
-  containers.podman.podman_container:
-    name: nginx-proxy-acme
-    image: docker.io/nginxproxy/acme-companion:{{ acme_ver }}
-    state: started
-    restart_policy: unless-stopped
-    pod: "{{ pod_name }}"
-    env:
-      DEFAULT_EMAIL: edward.ingram23@gmail.com
-    privileged: true
-    volumes_from:
-      - nginx-proxy
-    volume:
-      - /var/run/docker.sock:/var/run/docker.sock:ro
-      - acme:/etc/acme.sh
+# - name: Run acme-companion container
+#   containers.podman.podman_container:
+#     name: nginx-proxy-acme
+#     image: docker.io/nginxproxy/acme-companion:{{ acme_ver }}
+#     state: started
+#     restart_policy: unless-stopped
+#     pod: "{{ pod_name }}"
+#     env:
+#       DEFAULT_EMAIL: edward.ingram23@gmail.com
+#     privileged: true
+#     volumes_from:
+#       - nginx-proxy
+#     volume:
+#       - /var/run/docker.sock:/var/run/docker.sock:ro
+#       - acme:/etc/acme.sh
