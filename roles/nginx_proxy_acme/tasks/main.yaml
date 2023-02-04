@@ -13,9 +13,9 @@
     state: started
     enabled: true
 
-- name: Create nginx-proxy pod
-  ansible.builtin.include_role:
-    name: eingram23.containers.create_pod
+# - name: Create nginx-proxy pod
+#   ansible.builtin.include_role:
+#     name: eingram23.containers.create_pod
 
 - name: Run nginx container
   containers.podman.podman_container:
@@ -23,7 +23,10 @@
     image: docker.io/nginxproxy/nginx-proxy:{{ nginx_proxy_ver }}
     state: started
     restart_policy: unless-stopped
-    pod: "{{ pod_name }}"
+    # pod: "{{ pod_name }}"
+    publish:
+      - "80:80"
+      - "443:443"
     privileged: true
     volume:
       - certs:/etc/nginx/certs:z
@@ -31,18 +34,18 @@
       - html:/usr/share/nginx/html:z
       - /var/run/docker.sock:/tmp/docker.sock:ro,z
 
-# - name: Run acme-companion container
-#   containers.podman.podman_container:
-#     name: nginx-proxy-acme
-#     image: docker.io/nginxproxy/acme-companion:{{ acme_ver }}
-#     state: started
-#     restart_policy: unless-stopped
-#     pod: "{{ pod_name }}"
-#     env:
-#       DEFAULT_EMAIL: edward.ingram23@gmail.com
-#     privileged: true
-#     volumes_from:
-#       - nginx-proxy
-#     volume:
-#       - /var/run/docker.sock:/var/run/docker.sock:ro
-#       - acme:/etc/acme.sh
+- name: Run acme-companion container
+  containers.podman.podman_container:
+    name: nginx-proxy-acme
+    image: docker.io/nginxproxy/acme-companion:{{ acme_ver }}
+    state: started
+    restart_policy: unless-stopped
+    # pod: "{{ pod_name }}"
+    env:
+      DEFAULT_EMAIL: edward.ingram23@gmail.com
+    privileged: true
+    volumes_from:
+      - nginx-proxy
+    volume:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - acme:/etc/acme.sh
