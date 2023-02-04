@@ -49,7 +49,7 @@
 
 - name: Remove github key
   ansible.builtin.file:
-    path: /root/.ssh/ssh-key-git.key
+    path: /root/ssh-key-git.key
     state: absent
   tags: code_update
 
