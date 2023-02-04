@@ -101,13 +101,12 @@
   notify: Init mariadb
 
 - name: Create app pod
-  ansible.builtin.include_role:
-    name: eingram23.containers.create_pod
-  vars:
-    pod_name: "{{ app }}"
-    publish_ports:
-      - "{{ nginx_port }}:80"
-      - "{{ phpmyadmin_port }}:8090"
+  containers.podman.podman_pod:
+    name: "{{ app }}"
+    state: started
+    # publish_ports:
+    #   - "{{ nginx_port }}:80"
+    #   - "{{ phpmyadmin_port }}:8090"
 
 - name: Run diversionforum.net-web container
   containers.podman.podman_container:
