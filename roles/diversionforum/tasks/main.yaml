@@ -151,10 +151,10 @@
   vars:
     container_name: "{{ app }}-phpmyadmin"
     mariadb_container_name: "{{ app }}-mariadb"
-    pod_name: "{{ app }}"
+    # pod_name: "{{ app }}"
   tags: update_phpmyadmin
   when: env == "test"
-  
+
 - name: Set perms on webfiles
   ansible.builtin.shell:
     cmd: |
