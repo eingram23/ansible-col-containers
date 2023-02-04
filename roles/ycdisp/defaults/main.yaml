@@ -1,8 +1,8 @@
 ---
 app: "{{ env }}-ycdisp"
-root: '/home/poduser/code/'
-builddir: '/home/poduser/build/'
-repo: 'git@github.com:eingram23/'
+root: "/opt/{{ app }}/"
+builddir: "/tmp/"
+repo: "git@github.com:eingram23/"
 smtp_pw: "{{ lookup('hashi_vault', 'secret=secret/google/smtp:password') }}"
 mysql_root: "{{ lookup('hashi_vault', 'secret=secret/mysql/ycprod:root') }}"
 mysql_yandcprod: "{{ lookup('hashi_vault', 'secret=secret/mysql/ycprod:yandcprod') }}"

@@ -33,6 +33,15 @@
       - vhost:/etc/nginx/vhost.d:z
       - html:/usr/share/nginx/html:z
       - /var/run/docker.sock:/tmp/docker.sock:ro,z
+    generate_systemd:
+      path: /etc/systemd/system
+      restart_policy: always
+
+- name: Enable contaier-nginx-proxy service
+  ansible.builtin.systemd:
+    name: container-nginx-proxy
+    state: started
+    enabled: true
 
 - name: Run acme-companion container
   containers.podman.podman_container:
@@ -49,3 +58,12 @@
     volume:
       - /var/run/docker.sock:/var/run/docker.sock:ro
       - acme:/etc/acme.sh
+    generate_systemd:
+      path: /etc/systemd/system
+      restart_policy: always
+
+- name: Enable contaier-nginx-proxy-acme service
+  ansible.builtin.systemd:
+    name: container-nginx-proxy-acme
+    state: started
+    enabled: true
