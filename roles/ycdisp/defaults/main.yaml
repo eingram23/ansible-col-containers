@@ -1,6 +1,6 @@
 ---
 app: "{{ env }}-ycdisp"
-root: "/opt/{{ app }}/"
+approot: "/opt/{{ app }}/"
 builddir: "/tmp/"
 repo: "git@github.com:eingram23/"
 smtp_pw: "{{ lookup('hashi_vault', 'secret=secret/google/smtp:password') }}"

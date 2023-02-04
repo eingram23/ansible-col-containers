@@ -6,7 +6,7 @@
     recurse: true
     mode: '0755'
   loop:
-    - "{{ root }}"
+    - "{{ approot }}"
     - "{{ builddir }}"
 
 - name: Create github key
@@ -23,13 +23,20 @@
 - name: Clone www.ycdisp.com repo from github
   ansible.builtin.git:
     repo: "{{ repo }}www.ycdisp.com.git"
-    dest: "{{ root }}{{ app }}"
+    dest: "{{ approot }}"
     clone: true
     key_file: /root/ssh-key-git.key
     accept_hostkey: true
     update: true
     force: true
   tags: code_update
+
+- name: Set perms on webfiles
+  ansible.builtin.shell:
+    cmd: |
+      find {{ approot }}/public_html -type d -exec chmod 0755 {} \;
+      find {{ approot }}/public_html -type f -exec chmod 0644 {} \;
+      podman unshare chown -R 33:33 {{ approot }}/public_html/
 
 - name: Clone Containers repo from github
   ansible.builtin.git:
@@ -77,7 +84,7 @@
     name: "{{ app }}-web"
     image: localhost/{{ app }}-web
     volume:
-      - "{{ root }}{{ app }}/public_html:/var/www/html:z"
+      - "{{ approot }}/public_html:/var/www/html:z"
     state: started
     restart_policy: always
     pod: "{{ app }}"
@@ -99,7 +106,7 @@
 
 - name: Configure connection string
   ansible.builtin.lineinfile:
-    path: "{{ root }}{{ app }}/public_html/includes/globals.ini.php"
+    path: "{{ approot }}/public_html/includes/globals.ini.php"
     search_string: "{{ item.search }}"
     line: "{{ item.replace }}"
   loop:
@@ -110,13 +117,13 @@
 - block:
     - name: Change site URL in globals.ini.php to test.ycdisp.com (if env = test)
       ansible.builtin.lineinfile:
-        path: "{{ root }}{{ app }}/public_html/includes/globals.ini.php"
+        path: "{{ approot }}/public_html/includes/globals.ini.php"
         search_string: 'define("siteUrl","http://www.ycdisp.com/");'
         line: 'define("siteUrl","http://test.ycdisp.com/");'
 
     - name: Change site URL in scripts.cart.js to test.ycdisp.com (if env = test)
       ansible.builtin.lineinfile:
-        path: "{{ root }}{{ app }}/public_html/js/scripts.cart.js"
+        path: "{{ approot }}/public_html/js/scripts.cart.js"
         search_string: "$('.labels a').attr('href','http://www.ycdisp.com/get-quote/');"
         line: "$('.labels a').attr('href','http://test.ycdisp.com/get-quote/');"
   when: env == "test"
@@ -129,7 +136,7 @@
 
     - name: Remove read permissions on admin/index.php
       ansible.builtin.file:
-        path: "{{ root }}{{ app }}/public_html/admin/index.php"
+        path: "{{ approot }}/public_html/admin/index.php"
         state: files
         mode: u-r,g-r,o-r
   when: env == "www"
