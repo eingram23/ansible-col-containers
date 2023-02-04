@@ -35,7 +35,7 @@
   ansible.builtin.git:
     repo: "{{ repo }}Containers.git"
     dest: "{{ builddir }}"
-    key_file: /home/poduser/.ssh/ssh-key-git.key
+    key_file: /root/.ssh/ssh-key-git.key
     accept_hostkey: true
     clone: true
     update: true
@@ -43,7 +43,7 @@
 
 - name: Remove github key
   ansible.builtin.file:
-    path: /home/poduser/.ssh/ssh-key-git.key
+    path: /root/.ssh/ssh-key-git.key
     state: absent
   tags: code_update
 
