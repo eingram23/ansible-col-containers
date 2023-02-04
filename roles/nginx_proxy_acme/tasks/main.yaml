@@ -24,6 +24,9 @@
     state: started
     restart_policy: unless-stopped
     # pod: "{{ pod_name }}"
+    publish:
+      - "80:80"
+      - "443:443"
     privileged: true
     volume:
       - certs:/etc/nginx/certs:z
