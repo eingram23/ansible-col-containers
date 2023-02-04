@@ -1,7 +1,7 @@
 ---
 app: "{{ env }}-ycdisp"
 approot: "/opt/{{ app }}/"
-builddir: "/tmp/"
+builddir: "/tmp/{{ app }}"
 repo: "git@github.com:eingram23/"
 smtp_pw: "{{ lookup('hashi_vault', 'secret=secret/google/smtp:password') }}"
 mysql_root: "{{ lookup('hashi_vault', 'secret=secret/mysql/ycprod:root') }}"
