@@ -29,7 +29,7 @@
       - certs:/etc/nginx/certs:z
       - vhost:/etc/nginx/vhost.d:z
       - html:/usr/share/nginx/html:z
-      - /var/run/podman/podman.sock:/tmp/docker.sock:ro,z
+      - /var/run/docker.sock:/tmp/docker.sock:ro,z
 
 - name: Run acme-companion container
   containers.podman.podman_container:
@@ -44,5 +44,5 @@
     volumes_from:
       - nginx-proxy
     volume:
-      - /var/run/podman/podman.sock:/var/run/docker.sock:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro
       - acme:/etc/acme.sh
