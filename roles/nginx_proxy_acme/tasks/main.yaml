@@ -13,9 +13,9 @@
     state: started
     enabled: true
 
-- name: Create nginx-proxy pod
-  ansible.builtin.include_role:
-    name: eingram23.containers.create_pod
+# - name: Create nginx-proxy pod
+#   ansible.builtin.include_role:
+#     name: eingram23.containers.create_pod
 
 - name: Run nginx container
   containers.podman.podman_container:
@@ -23,7 +23,7 @@
     image: docker.io/nginxproxy/nginx-proxy:{{ nginx_proxy_ver }}
     state: started
     restart_policy: unless-stopped
-    pod: "{{ pod_name }}"
+    # pod: "{{ pod_name }}"
     privileged: true
     volume:
       - certs:/etc/nginx/certs:z
