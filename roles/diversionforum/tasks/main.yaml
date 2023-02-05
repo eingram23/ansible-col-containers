@@ -159,7 +159,6 @@
       PMA_HOST: "{{ app }}-db"
       MYSQL_ROOT_PASSWORD: "{{ mysql_root }}"
       VIRTUAL_HOST: "{{ app }}phpmyadmin.local.lan"
-    pod: "{{ pod_name }}"
     state: started
     restart_policy: always
     generate_systemd:
