@@ -169,7 +169,6 @@
   loop:
     - "container-{{ app }}-web"
     - "container-{{ app }}-db"
-    - "container-{{ app }}-php"
 
 - name: Enable phpmyadmin container service
   ansible.builtin.systemd:
