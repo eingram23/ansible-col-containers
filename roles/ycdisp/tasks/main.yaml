@@ -84,6 +84,9 @@
     state: started
     restart_policy: always
     pod: "{{ app }}"
+    generate_systemd:
+      path: /etc/systemd/system
+      restart_policy: always
 
 - name: Run ycdisp.com-db container
   containers.podman.podman_container:
@@ -99,6 +102,9 @@
     state: started
     restart_policy: always
     pod: "{{ app }}"
+    generate_systemd:
+      path: /etc/systemd/system
+      restart_policy: always
 
 - name: Configure connection string
   ansible.builtin.lineinfile:
@@ -136,6 +142,16 @@
         state: files
         mode: u-r,g-r,o-r
   when: env == "www"
+
+
+- name: Enable container services
+  ansible.builtin.systemd:
+    name: "{{ item }}"
+    state: started
+    enabled: true
+  loop:
+    - "container-{{ app }}-web"
+    - "container-{{ app }}-db"
 
 - name: Restart ycdisp.com apache container
   containers.podman.podman_container:
