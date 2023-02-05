@@ -80,7 +80,7 @@
 
 - name: Build diversionforum.net-web image
   containers.podman.podman_image:
-    name: "{{ app }}-nginx"
+    name: "{{ app }}-web"
     path: "{{ builddir }}diversionforum.net/nginx"
     force: true
 
@@ -95,7 +95,7 @@
 
 - name: Build diversionforum.net-mariadb image
   containers.podman.podman_image:
-    name: "{{ app }}-mariadb"
+    name: "{{ app }}-db"
     path: "{{ builddir }}diversionforum.net/mariadb"
     force: true
   notify: Init mariadb
