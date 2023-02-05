@@ -104,14 +104,11 @@
   containers.podman.podman_pod:
     name: "{{ app }}"
     state: started
-    # publish_ports:
-    #   - "{{ nginx_port }}:80"
-    #   - "{{ phpmyadmin_port }}:8090"
 
 - name: Run diversionforum.net-web container
   containers.podman.podman_container:
     name: "{{ app }}-nginx"
-    image: localhost/{{ app }}-nginx
+    image: localhost/{{ app }}-web
     env:
       VIRTUAL_HOST: "{{ env }}.diversionforum.net"
     volume:
@@ -119,6 +116,9 @@
     state: started
     restart_policy: always
     pod: "{{ app }}"
+    generate_systemd:
+      path: /etc/systemd/system
+      restart_policy: always
 
 - name: Run diversionforum.net-php container
   containers.podman.podman_container:
@@ -129,11 +129,14 @@
     state: started
     restart_policy: always
     pod: "{{ app }}"
+    generate_systemd:
+      path: /etc/systemd/system
+      restart_policy: always
 
 - name: Run diversionforum.net-mariadb container
   containers.podman.podman_container:
     name: "{{ app }}-mariadb"
-    image: localhost/{{ app }}-mariadb
+    image: localhost/{{ app }}-db
     env:
       MYSQL_ROOT_PASSWORD: "{{ mysql_root }}"
       MYSQL_DATABASE: smfprod
@@ -144,14 +147,24 @@
     state: started
     restart_policy: always
     pod: "{{ app }}"
+    generate_systemd:
+      path: /etc/systemd/system
+      restart_policy: always
 
-- name: Create phpmyadmin container
-  ansible.builtin.import_role:
-    name: eingram23.containers.phpmyadmin
-  vars:
-    container_name: "{{ app }}-phpmyadmin"
-    mariadb_container_name: "{{ app }}-mariadb"
-    # pod_name: "{{ app }}"
+- name: Pull phpmyadmin image and start container
+  containers.podman.podman_container:
+    name: "{{ app }}-phpmyadmin"
+    image: docker.io/phpmyadmin:{{ phpmyadmin_ver }}
+    env:
+      PMA_HOST: "{{ app }}-db"
+      MYSQL_ROOT_PASSWORD: "{{ mysql_root }}"
+      VIRTUAL_HOST: "{{ app }}phpmyadmin.local.lan"
+    pod: "{{ pod_name }}"
+    state: started
+    restart_policy: always
+    generate_systemd:
+      path: /etc/systemd/system
+      restart_policy: always
   tags: update_phpmyadmin
   when: env == "test"
 
@@ -168,3 +181,21 @@
     path: "{{ builddir }}"
     state: absent
   when: env == "www"
+
+- name: Enable container services
+  ansible.builtin.systemd:
+    name: "{{ item }}"
+    state: started
+    enabled: true
+  loop:
+    - "container-{{ app }}-web"
+    - "container-{{ app }}-db"
+    - "container-{{ app }}-php"
+
+- name: Enable phpmyadmin container service
+  ansible.builtin.systemd:
+    name: "{{ app }}-phpmyadmin"
+    state: started
+    enabled: true
+  when: env == "test"
+
