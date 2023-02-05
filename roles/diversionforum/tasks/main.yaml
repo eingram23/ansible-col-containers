@@ -107,7 +107,7 @@
 
 - name: Run diversionforum.net-web container
   containers.podman.podman_container:
-    name: "{{ app }}-nginx"
+    name: "{{ app }}-web"
     image: localhost/{{ app }}-web
     env:
       VIRTUAL_HOST: "{{ env }}.diversionforum.net"
@@ -135,7 +135,7 @@
 
 - name: Run diversionforum.net-mariadb container
   containers.podman.podman_container:
-    name: "{{ app }}-mariadb"
+    name: "{{ app }}-db"
     image: localhost/{{ app }}-db
     env:
       MYSQL_ROOT_PASSWORD: "{{ mysql_root }}"
