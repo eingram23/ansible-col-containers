@@ -11,3 +11,6 @@
     pod: "{{ pod_name }}"
     state: started
     restart_policy: always
+    generate_systemd:
+      path: /etc/systemd/system
+      restart_policy: always
