@@ -193,7 +193,7 @@
 
 - name: Enable phpmyadmin container service
   ansible.builtin.systemd:
-    name: "{{ app }}-phpmyadmin"
+    name: "container-{{ app }}-phpmyadmin"
     state: started
     enabled: true
   when: env == "test"
