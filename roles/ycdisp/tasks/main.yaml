@@ -107,6 +107,22 @@
       path: /etc/systemd/system
       restart_policy: always
 
+- name: Pull phpmyadmin image and start container
+  containers.podman.podman_container:
+    name: "{{ app }}-phpmyadmin"
+    image: docker.io/phpmyadmin:{{ phpmyadmin_ver }}
+    env:
+      PMA_HOST: "{{ app }}-db"
+      MYSQL_ROOT_PASSWORD: "{{ mysql_root }}"
+      VIRTUAL_HOST: "{{ app }}phpmyadmin.local.lan"
+    state: started
+    restart_policy: always
+    generate_systemd:
+      path: /etc/systemd/system
+      restart_policy: always
+  tags: update_phpmyadmin
+  when: env == "test"
+
 - name: Configure connection string
   ansible.builtin.lineinfile:
     path: "{{ approot }}/public_html/includes/globals.ini.php"
@@ -153,13 +169,21 @@
   loop:
     - "container-{{ app }}-web"
     - "container-{{ app }}-db"
+    - "container-{{ app }}-php"
 
-- name: Restart ycdisp.com apache container
-  containers.podman.podman_container:
-    name: "{{ app }}-web"
-    image: localhost/{{ app }}-web
+- name: Enable phpmyadmin container service
+  ansible.builtin.systemd:
+    name: "container-{{ app }}-phpmyadmin"
     state: started
-    restart: true
-  tags:
-    - code_update
-    - never
+    enabled: true
+  when: env == "test"
+
+# - name: Restart ycdisp.com apache container
+#   containers.podman.podman_container:
+#     name: "{{ app }}-web"
+#     image: localhost/{{ app }}-web
+#     state: started
+#     restart: true
+#   tags:
+#     - code_update
+#     - never
