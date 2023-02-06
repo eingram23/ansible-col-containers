@@ -99,7 +99,7 @@
       MYSQL_USER: yandcprod
       MYSQL_PASSWORD: "{{ mysql_yandcprod }}"
     volume:
-      - yandctest-data:/var/lib/mysql
+      - "{{ app }}-db-data:/var/lib/mysql"
     state: started
     restart_policy: always
     pod: "{{ app }}"
