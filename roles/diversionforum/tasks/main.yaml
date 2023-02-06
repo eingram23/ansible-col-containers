@@ -175,10 +175,7 @@
       MYSQL_ROOT_PASSWORD: "{{ mysql_root }}"
       VIRTUAL_HOST: "{{ app }}phpmyadmin.local.lan"
     state: started
-    restart_policy: always
-    generate_systemd:
-      path: /etc/systemd/system
-      restart_policy: always
+    restart_policy: unless-stopped
   tags: update_phpmyadmin
   when: env == "test"
 
@@ -205,12 +202,4 @@
     - "container-{{ app }}-web"
     - "container-{{ app }}-db"
     - "container-{{ app }}-php"
-
-- name: Enable phpmyadmin container service
-  ansible.builtin.systemd:
-    name: "container-{{ app }}-phpmyadmin"
-    state: started
-    enabled: true
-    daemon_reload: true
-  when: env == "test"
 
