@@ -107,12 +107,21 @@
       path: /etc/systemd/system
       restart_policy: always
 
+- name: Get info of web container
+  containers.podman.podman_container_info:
+    name: "{{ app }}-web"
+  register: web_info
+
+- name: Get IP address of web container
+  ansible.builtin.set_fact:
+    ip_web_info: "{{ web_info | json_query('containers[0].NetworkSettings.IPAddress') }}"
+
 - name: Pull phpmyadmin image and start container
   containers.podman.podman_container:
     name: "{{ app }}-phpmyadmin"
     image: docker.io/phpmyadmin:{{ phpmyadmin_ver }}
     env:
-      PMA_HOST: "{{ app }}-db"
+      PMA_HOST: "{{ ip_web_info }}"
       MYSQL_ROOT_PASSWORD: "{{ mysql_root }}"
       VIRTUAL_HOST: "{{ app }}phpmyadmin.local.lan"
     state: started
