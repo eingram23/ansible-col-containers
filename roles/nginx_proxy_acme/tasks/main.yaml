@@ -25,10 +25,6 @@
     state: started
     enabled: true
 
-# - name: Create nginx-proxy pod
-#   ansible.builtin.include_role:
-#     name: eingram23.containers.create_pod
-
 - name: Run nginx container
   containers.podman.podman_container:
     name: nginx-proxy
@@ -49,12 +45,6 @@
     generate_systemd:
       path: /etc/systemd/system
       restart_policy: always
-
-- name: Enable container-nginx-proxy service
-  ansible.builtin.systemd:
-    name: container-nginx-proxy
-    state: started
-    enabled: true
 
 - name: Run acme-companion container
   containers.podman.podman_container:
@@ -77,6 +67,10 @@
 
 - name: Enable container-nginx-proxy-acme service
   ansible.builtin.systemd:
-    name: container-nginx-proxy-acme
+    name: "{{ item }}"
     state: started
     enabled: true
+    daemon_reload: true
+  loop:
+    - container-nginx-proxy
+    - container-nginx-proxy-acme
