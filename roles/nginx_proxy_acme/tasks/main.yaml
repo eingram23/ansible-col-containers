@@ -7,6 +7,18 @@
     - podman-remote
     - podman-docker
 
+- name: Create supporting folder
+  ansible.builtin.file:
+    path: /opt/nginx-proxy
+    state: directory
+    mode: '0755'
+
+- name: Copy proxy.conf to host
+  ansible.builtin.copy:
+    src: proxy.conf
+    dest: /opt/nginx-proxy
+    mode: '0644'
+
 - name: Enable/start podman.socket
   ansible.builtin.systemd:
     name: podman.socket
@@ -32,6 +44,7 @@
       - certs:/etc/nginx/certs:z
       - vhost:/etc/nginx/vhost.d:z
       - html:/usr/share/nginx/html:z
+      - /opt/nginx-proxy/proxy.conf:/etc/nginx/conf.d/proxy.conf:ro
       - /var/run/docker.sock:/tmp/docker.sock:ro,z
     generate_systemd:
       path: /etc/systemd/system
