@@ -143,17 +143,15 @@
     - { search: '$password_dbc = "password";', replace: '$password_dbc = "{{ mysql_yandcprod }}";' }
 
 - block:
-    - name: Change site URL in globals.ini.php to test.ycdisp.com (if env = test)
-      ansible.builtin.lineinfile:
-        path: "{{ approot }}/public_html/includes/globals.ini.php"
-        search_string: 'define("siteUrl","http://www.ycdisp.com/");'
-        line: 'define("siteUrl","http://test.ycdisp.com/");'
-
-    - name: Change site URL in scripts.cart.js to test.ycdisp.com (if env = test)
-      ansible.builtin.lineinfile:
-        path: "{{ approot }}/public_html/js/scripts.cart.js"
-        search_string: "$('.labels a').attr('href','http://www.ycdisp.com/get-quote/');"
-        line: "$('.labels a').attr('href','http://test.ycdisp.com/get-quote/');"
+    - name: Change site URL to test.ycdisp.com (if env = test)
+      ansible.builtin.replace:
+        path: "{{ item }}"
+        regexp: 'www'
+        replace: 'test'
+      loop:
+        - "{{ approot }}/public_html/includes/globals.ini.php"
+        - "{{ approot }}/public_html/js/scripts.cart.js"
+        - "{{ approot }}/public_html/js/scripts.cart.js"
   when: env == "test"
 
 - block:
