@@ -17,6 +17,7 @@
     image: lscr.io/linuxserver/calibre:{{ calibre_ver }}
     state: started
     restart_policy: unless-stopped
+    privileged: true
     env:
       VIRTUAL_HOST: "{{ suffix }}callib.diversionforum.net"
       VIRTUAL_PORT: 8080
@@ -36,6 +37,7 @@
     image: lscr.io/linuxserver/calibre-web:{{ calibre_web_ver }}
     state: started
     restart_policy: unless-stopped
+    privileged: true
     env:
       VIRTUAL_HOST: "{{ suffix }}cal.diversionforum.net"
       VIRTUAL_PORT: 8083
