@@ -1,0 +1,60 @@
+---
+- name: Create supporting folders
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+    mode: '0755'
+    recurse: true
+    owner: '2000'
+    group: '2000'
+  loop:
+    - /opt/calibre/config
+    - /opt/calibre/books
+
+- name: Run calibre container
+  containers.podman.podman_container:
+    name: calibre
+    image: lscr.io/linuxserver/calibre:{{ calibre_ver }}
+    state: started
+    restart_policy: unless-stopped
+    env:
+      VIRTUAL_HOST: calibre-test.diversionforum.net
+      VIRTUAL_PORT: 8080
+      PUID: 2000
+      PGID: 2000
+      TZ: America/Los_Angeles
+    volume:
+      - /opt/calibre/config:/config:z
+    generate_systemd:
+      path: /etc/systemd/system
+      restart_policy: always
+
+- name: Run calibre-web container
+  containers.podman.podman_container:
+    name: calibre
+    image: lscr.io/linuxserver/calibre-web:{{ calibre_web_ver }}
+    state: started
+    restart_policy: unless-stopped
+    env:
+      VIRTUAL_HOST: calibre-web-test.diversionforum.net
+      VIRTUAL_PORT: 8083
+      PUID: 2000
+      PGID: 2000
+      TZ: America/Los_Angeles
+      DOCKER_MODS: linuxserver/mods:universal-calibre
+    volume:
+      - /opt/calibre/config:/config:z
+      - /opt/calibre/books:/books
+    generate_systemd:
+      path: /etc/systemd/system
+      restart_policy: always
+
+- name: Enable container services
+  ansible.builtin.systemd:
+    name: "{{ item }}"
+    state: started
+    enabled: true
+    daemon_reload: true
+  loop:
+    - container-calibre
+    - container-calibre-web
