@@ -117,6 +117,7 @@
     env:
       VIRTUAL_HOST: "{{ env }}.diversionforum.net"
       LETSENCRYPT_HOST: "{{ env }}.diversionforum.net"
+      LETSENCRYPT_EMAIL: "edward.ingram23@gmail.com"
     volume:
       - "{{ approot }}/public_html:/var/www/html:z"
     state: started

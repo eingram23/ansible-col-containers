@@ -37,6 +37,8 @@
     env:
       VIRTUAL_HOST: "{{ suffix }}lib.diversionforum.net"
       VIRTUAL_PORT: 8083
+      LETSENCRYPT_HOST: "{{ suffix }}lib.diversionforum.net"
+      LETSENCRYPT_EMAIL: "edward.ingram23@gmail.com"
       PUID: 2000
       PGID: 2000
       TZ: America/Los_Angeles

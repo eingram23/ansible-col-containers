@@ -80,6 +80,7 @@
     env:
       VIRTUAL_HOST: "{{ env }}.ycdisp.com"
       LETSENCRYPT_HOST: "{{ env }}.ycdisp.com"
+      LETSENCRYPT_EMAIL: "edward.ingram23@gmail.com"
     volume:
       - "{{ approot }}/public_html:/var/www/html:z"
     state: started
