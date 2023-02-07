@@ -16,7 +16,7 @@
     name: calibre-{{ suffix }}
     image: lscr.io/linuxserver/calibre:{{ calibre_ver }}
     state: started
-    restart_policy: unless-stopped
+    restart_policy: never
     privileged: true
     env:
       VIRTUAL_HOST: "{{ suffix }}callib.diversionforum.net"
@@ -24,12 +24,8 @@
       PUID: 2000
       PGID: 2000
       TZ: America/Los_Angeles
-      PASSWORD: "{{ lookup('hashi_vault', 'secret=secret/ssh/eingram:ssh_password') }}"
     volume:
       - /opt/calibre/config:/config:z
-    generate_systemd:
-      path: /etc/systemd/system
-      restart_policy: always
 
 - name: Run calibre-web container
   containers.podman.podman_container:
