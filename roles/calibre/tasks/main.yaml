@@ -13,7 +13,7 @@
 
 - name: Run calibre container
   containers.podman.podman_container:
-    name: calibre{{ suffix }}
+    name: calibre-{{ suffix }}
     image: lscr.io/linuxserver/calibre:{{ calibre_ver }}
     state: started
     restart_policy: unless-stopped
@@ -31,7 +31,7 @@
 
 - name: Run calibre-web container
   containers.podman.podman_container:
-    name: calibre-web{{ suffix }}
+    name: calibre-web-{{ suffix }}
     image: lscr.io/linuxserver/calibre-web:{{ calibre_web_ver }}
     state: started
     restart_policy: unless-stopped
