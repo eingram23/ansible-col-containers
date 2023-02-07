@@ -16,7 +16,7 @@
     name: calibre-{{ suffix }}
     image: lscr.io/linuxserver/calibre:{{ calibre_ver }}
     state: started
-    restart_policy: never
+    restart_policy: no
     privileged: true
     env:
       VIRTUAL_HOST: "{{ suffix }}callib.diversionforum.net"
