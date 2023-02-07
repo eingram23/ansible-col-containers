@@ -57,5 +57,5 @@
     enabled: true
     daemon_reload: true
   loop:
-    - container-calibre{{ suffix }}
-    - container-calibre-web{{ suffix }}
+    - container-calibre-{{ suffix }}
+    - container-calibre-web-{{ suffix }}
