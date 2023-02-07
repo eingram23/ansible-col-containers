@@ -23,6 +23,7 @@
       PUID: 2000
       PGID: 2000
       TZ: America/Los_Angeles
+      PASSWORD: "{{ lookup('hashi_vault', 'secret=secret/ssh/eingram:ssh_password') }}"
     volume:
       - /opt/calibre/config:/config:z
     generate_systemd:
