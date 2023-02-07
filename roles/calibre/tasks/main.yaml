@@ -19,7 +19,7 @@
     restart_policy: unless-stopped
     privileged: true
     env:
-      VIRTUAL_HOST: "{{ suffix }}callib.diversionforum.net"
+      VIRTUAL_HOST: "{{ suffix }}libdata.diversionforum.net"
       VIRTUAL_PORT: 8080
       PUID: 2000
       PGID: 2000
@@ -35,7 +35,7 @@
     restart_policy: unless-stopped
     privileged: true
     env:
-      VIRTUAL_HOST: "{{ suffix }}cal.diversionforum.net"
+      VIRTUAL_HOST: "{{ suffix }}lib.diversionforum.net"
       VIRTUAL_PORT: 8083
       PUID: 2000
       PGID: 2000
