@@ -18,7 +18,7 @@
     state: started
     restart_policy: unless-stopped
     env:
-      VIRTUAL_HOST: callib{{ suffix }}.diversionforum.net
+      VIRTUAL_HOST: "{{ suffix }}callib.diversionforum.net"
       VIRTUAL_PORT: 8080
       PUID: 2000
       PGID: 2000
@@ -36,7 +36,7 @@
     state: started
     restart_policy: unless-stopped
     env:
-      VIRTUAL_HOST: cal{{ suffix }}.diversionforum.net
+      VIRTUAL_HOST: "{{ suffix }}cal.diversionforum.net"
       VIRTUAL_PORT: 8083
       PUID: 2000
       PGID: 2000
