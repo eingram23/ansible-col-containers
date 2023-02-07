@@ -13,12 +13,12 @@
 
 - name: Run calibre container
   containers.podman.podman_container:
-    name: calibre
+    name: calibre{{ suffix }}
     image: lscr.io/linuxserver/calibre:{{ calibre_ver }}
     state: started
     restart_policy: unless-stopped
     env:
-      VIRTUAL_HOST: calibre-test.diversionforum.net
+      VIRTUAL_HOST: calibre{{ suffix }}.diversionforum.net
       VIRTUAL_PORT: 8080
       PUID: 2000
       PGID: 2000
@@ -31,12 +31,12 @@
 
 - name: Run calibre-web container
   containers.podman.podman_container:
-    name: calibre
+    name: calibre-web{{ suffix }}
     image: lscr.io/linuxserver/calibre-web:{{ calibre_web_ver }}
     state: started
     restart_policy: unless-stopped
     env:
-      VIRTUAL_HOST: calibre-web-test.diversionforum.net
+      VIRTUAL_HOST: calibre-web{{ suffix }}.diversionforum.net
       VIRTUAL_PORT: 8083
       PUID: 2000
       PGID: 2000
@@ -56,5 +56,5 @@
     enabled: true
     daemon_reload: true
   loop:
-    - container-calibre
-    - container-calibre-web
+    - container-calibre{{ suffix }}
+    - container-calibre-web{{ suffix }}
