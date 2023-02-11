@@ -3,7 +3,7 @@ groups:
     rules:
     - alert: InstanceDown
       # Condition for alerting
-      expr: up{instance == "tower"} == 0 
+      expr: up{instance = "tower"} == 0 
       for: 1m
       # Annotation - additional informational labels to store more information
       annotations:
