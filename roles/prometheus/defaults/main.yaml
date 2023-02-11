@@ -1,3 +1,3 @@
 container_name: "prometheus"
 fw_port:
-  - "9091/tcp"
+  - "9090/tcp"
