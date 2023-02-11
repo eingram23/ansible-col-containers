@@ -26,7 +26,7 @@
   "fiscalYearStartMonth": 0,
   "gnetId": 14694,
   "graphTooltip": 1,
-  "id": 11,
+  "id": 3,
   "links": [],
   "liveNow": false,
   "panels": [
@@ -94,7 +94,7 @@
         },
         "textMode": "auto"
       },
-      "pluginVersion": "9.2.5",
+      "pluginVersion": "9.3.1",
       "repeat": "host",
       "repeatDirection": "v",
       "targets": [
@@ -181,7 +181,7 @@
         "showThresholdLabels": false,
         "showThresholdMarkers": true
       },
-      "pluginVersion": "9.2.5",
+      "pluginVersion": "9.3.1",
       "targets": [
         {
           "datasource": {
@@ -263,7 +263,7 @@
         "showThresholdLabels": false,
         "showThresholdMarkers": true
       },
-      "pluginVersion": "9.2.5",
+      "pluginVersion": "9.3.1",
       "targets": [
         {
           "datasource": {
@@ -344,7 +344,7 @@
         "showThresholdLabels": false,
         "showThresholdMarkers": true
       },
-      "pluginVersion": "9.2.5",
+      "pluginVersion": "9.3.1",
       "targets": [
         {
           "datasource": {
@@ -426,7 +426,7 @@
         "showThresholdLabels": false,
         "showThresholdMarkers": true
       },
-      "pluginVersion": "9.2.5",
+      "pluginVersion": "9.3.1",
       "targets": [
         {
           "datasource": {
@@ -520,7 +520,7 @@
         },
         "showUnfilled": true
       },
-      "pluginVersion": "9.2.5",
+      "pluginVersion": "9.3.1",
       "targets": [
         {
           "datasource": {
@@ -614,7 +614,7 @@
         },
         "textMode": "auto"
       },
-      "pluginVersion": "9.2.5",
+      "pluginVersion": "9.3.1",
       "repeat": "host",
       "repeatDirection": "v",
       "targets": [
@@ -699,7 +699,7 @@
         },
         "textMode": "auto"
       },
-      "pluginVersion": "9.2.5",
+      "pluginVersion": "9.3.1",
       "repeat": "host",
       "repeatDirection": "v",
       "targets": [
@@ -759,7 +759,7 @@
         "alertThreshold": true
       },
       "percentage": false,
-      "pluginVersion": "9.2.5",
+      "pluginVersion": "9.3.1",
       "pointradius": 2,
       "points": false,
       "renderer": "flot",
@@ -877,7 +877,7 @@
         "showThresholdLabels": false,
         "showThresholdMarkers": true
       },
-      "pluginVersion": "9.2.5",
+      "pluginVersion": "9.3.1",
       "targets": [
         {
           "datasource": {
@@ -941,7 +941,7 @@
         "alertThreshold": true
       },
       "percentage": false,
-      "pluginVersion": "9.2.5",
+      "pluginVersion": "9.3.1",
       "pointradius": 5,
       "points": false,
       "renderer": "flot",
@@ -1133,7 +1133,7 @@
         "alertThreshold": true
       },
       "percentage": false,
-      "pluginVersion": "9.2.5",
+      "pluginVersion": "9.3.1",
       "pointradius": 5,
       "points": false,
       "renderer": "flot",
@@ -1252,7 +1252,7 @@
       },
       "paceLength": 10,
       "percentage": false,
-      "pluginVersion": "9.2.5",
+      "pluginVersion": "9.3.1",
       "pointradius": 5,
       "points": false,
       "renderer": "flot",
@@ -1758,8 +1758,7 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green",
-                "value": null
+                "color": "green"
               },
               {
                 "color": "red",
@@ -1909,8 +1908,7 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green",
-                "value": null
+                "color": "green"
               },
               {
                 "color": "red",
@@ -1995,8 +1993,7 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "red",
-                "value": null
+                "color": "red"
               },
               {
                 "color": "#EAB839",
@@ -2120,8 +2117,7 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green",
-                "value": null
+                "color": "green"
               },
               {
                 "color": "red",
@@ -2441,14 +2437,37 @@
       {
         "current": {
           "selected": true,
-          "text": "HL-DC1.homelab.local:9182",
-          "value": "HL-DC1.homelab.local:9182"
+          "text": "WindowsProd",
+          "value": "WindowsProd"
+        },
+        "definition": "label_values(windows_cpu_time_total, job)",
+        "hide": 0,
+        "includeAll": false,
+        "label": "Job",
+        "multi": false,
+        "name": "job",
+        "options": [],
+        "query": {
+          "query": "label_values(windows_cpu_time_total, job)",
+          "refId": "StandardVariableQuery"
+        },
+        "refresh": 1,
+        "regex": "",
+        "skipUrlSync": false,
+        "sort": 0,
+        "type": "query"
+      },
+      {
+        "current": {
+          "selected": false,
+          "text": "hl-dc1",
+          "value": "hl-dc1"
         },
         "datasource": {
           "type": "prometheus",
           "uid": "prom"
         },
-        "definition": "label_values(windows_cpu_time_total, instance)",
+        "definition": "label_values(windows_cpu_time_total{job=\"$job\"}, instance)",
         "hide": 0,
         "includeAll": false,
         "label": "Server",
@@ -2456,8 +2475,8 @@
         "name": "server",
         "options": [],
         "query": {
-          "query": "label_values(windows_cpu_time_total, instance)",
-          "refId": "prometheus-server-Variable-Query"
+          "query": "label_values(windows_cpu_time_total{job=\"$job\"}, instance)",
+          "refId": "StandardVariableQuery"
         },
         "refresh": 1,
         "regex": "",
@@ -2471,7 +2490,7 @@
     ]
   },
   "time": {
-    "from": "now-1h",
+    "from": "now-5m",
     "to": "now"
   },
   "timepicker": {
