@@ -48,6 +48,8 @@
     state: started
     restart_policy: always
     pod: "{{ pod_name }}"
+    env:
+      GF_INSTALL_PLUGINS=grafana-statusmap
     volume:
       # - "{{ container_name }}_config:/etc/grafana"
       # - "{{ container_name }}_data:/var/lib/grafana"
