@@ -49,7 +49,7 @@
     restart_policy: always
     pod: "{{ pod_name }}"
     env:
-      GF_INSTALL_PLUGINS=grafana-statusmap
+      GF_INSTALL_PLUGINS=flant-grafana-statusmap,grafana-piechart-panel
     volume:
       # - "{{ container_name }}_config:/etc/grafana"
       # - "{{ container_name }}_data:/var/lib/grafana"
