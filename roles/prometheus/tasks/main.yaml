@@ -43,7 +43,8 @@
     src: prometheus.yml.j2
     dest: /opt/prometheus/prometheus.yml
     mode: '0644'
-
+  notify: Restart prometheus container
+  
 - name: Open firewall ports
   ansible.builtin.include_role:
     name: eingram23.homelab.firewall
