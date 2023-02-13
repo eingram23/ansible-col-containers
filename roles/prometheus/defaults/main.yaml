@@ -1,3 +1,4 @@
 container_name: "prometheus"
 fw_port:
   - "9090/tcp"
+privkey: "{{ lookup('hashi_vault', 'secret=secret/git/ssh:key') }}"
