@@ -13,4 +13,4 @@ rule_files:
   # - "second.rules"
 
 scrape_configs:
-"{{ prometheus_config | indent 2}}"
+"{{ prometheus_config | indent(2, true)}}"
