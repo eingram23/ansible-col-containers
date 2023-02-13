@@ -68,13 +68,21 @@
       # - "/opt/grafana/dashboardfiles:/var/lib/grafana/dashboards"
       - "/opt/grafana/datasources:/etc/grafana/provisioning/datasources"
 
+- name: Find dashboards on remote server
+  ansible.builtin.find:
+    paths:
+      - "/var/tmp/config/grafana/dashboards/"
+    patterns:
+      - "*"
+  register: dashboards
+
 - name: Copy grafana dashboards to remote server
   ansible.builtin.copy:
-    src: "/var/tmp/configs/grafana/dashboards/{{ item }}"
+    src: "{{ item.path }}"
     dest: /opt/grafana/dashboards
     mode: '0644'
     owner: poduser
     group: poduser
     remote_src: true
-  with_fileglob: "*"
+  loop: "{{ dashboards.files }}"
   notify: Restart grafana container
