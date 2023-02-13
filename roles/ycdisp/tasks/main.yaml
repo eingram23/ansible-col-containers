@@ -161,7 +161,7 @@
     - name: Remove read permissions on admin/index.php
       ansible.builtin.file:
         path: "{{ approot }}/public_html/admin/index.php"
-        state: files
+        state: file
         mode: u-r,g-r,o-r
   when: env == "www"
 
