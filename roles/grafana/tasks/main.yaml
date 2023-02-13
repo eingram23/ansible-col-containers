@@ -60,7 +60,7 @@
     pod: "{{ pod_name }}"
     env:
       GF_PLUGINS_ALLOW_LOADING_UNSIGNED_PLUGINS: true
-      GF_INSTALL_PLUGINS: https://github.com/flant/grafana-statusmap/releases/download/v0.5.1/flant-statusmap-panel-0.5.1.zip
+      GF_INSTALL_PLUGINS: https://github.com/flant/grafana-statusmap/releases/download/v0.5.1/flant-statusmap-panel-0.5.1.zip;flant-statusmap-panel
     volume:
       # - "{{ container_name }}_config:/etc/grafana"
       # - "{{ container_name }}_data:/var/lib/grafana"
