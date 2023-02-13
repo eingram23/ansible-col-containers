@@ -40,15 +40,3 @@
     volume:
       - "{{ container_name }}-data:/alertmanager"
       - /opt/alertmanager/alertmanager.yml:/etc/alertmanager/alertmanager.yml
-
-- name: Create alertmanager.yml on remote server
-  ansible.builtin.template:
-    src: alertmanager.yml.j2
-    dest: /opt/alertmanager/alertmanager.yml
-    mode: '0644'
-    owner: poduser
-    group: poduser
-  tags:
-    - never
-    - update_alertmanager
-  notify: Restart alertmanager container
