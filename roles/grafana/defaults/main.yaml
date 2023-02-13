@@ -1,3 +1,4 @@
 container_name: "grafana"
 fw_port:
   - "3000/tcp"
+privkey: "{{ lookup('hashi_vault', 'secret=secret/git/ssh:key') }}"
