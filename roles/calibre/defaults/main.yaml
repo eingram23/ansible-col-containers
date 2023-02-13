@@ -1,2 +1,2 @@
 ---
-suffix: "{{ env | default([]) }}"
+suffix: "{{ env | default() }}"
