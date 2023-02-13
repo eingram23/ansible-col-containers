@@ -1,0 +1,16 @@
+global:
+
+alerting:
+  alertmanagers:
+  - static_configs:
+    - targets:
+      - alertmanager:9093
+
+rule_files:
+  - "node-exporter.rules"
+  - "alertmanager.rules"
+  - "prometheus.rules"
+  # - "second.rules"
+
+scrape_configs:
+"{{ prometheus_config | indent 2}}"
