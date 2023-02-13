@@ -7,6 +7,10 @@
     - podman-remote
     - podman-docker
 
+- name: Open firewall ports
+  ansible.builtin.include_role:
+    name: eingram23.homelab.firewall
+    
 - name: Create supporting folder
   ansible.builtin.file:
     path: /opt/nginx-proxy
