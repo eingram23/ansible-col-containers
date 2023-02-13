@@ -71,7 +71,7 @@
 - name: Find dashboards on remote server
   ansible.builtin.find:
     paths:
-      - "/var/tmp/config/grafana/dashboards/"
+      - "/var/tmp/config/grafana/dashboards"
     patterns:
       - "*"
   register: dashboards
