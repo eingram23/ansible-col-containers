@@ -1,0 +1,32 @@
+---
+- name: Create supporting folders
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+    mode: '0755'
+    recurse: true
+    owner: '2000'
+    group: '2000'
+  loop:
+    - /opt/node-exporter
+
+- name: Run node-exporter container
+  containers.podman.podman_container:
+    name: node-exporter
+    image: docker.io/nginxproxy/nginx-proxy:{{ nginx_proxy_ver }}
+    state: started
+    restart_policy: unless-stopped
+    publish:
+      - "9100:9100"
+    privileged: true
+    network: host
+    pid: host
+    command: >
+      --path.rootfs=/host
+    volume:
+      - /:/host:ro,rslave
+      - certs:/etc/nginx/certs:z,ro
+      - /opt/node-exporter:/etc/node-exporter
+    generate_systemd:
+      path: /etc/systemd/system
+      restart_policy: always
