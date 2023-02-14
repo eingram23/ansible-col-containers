@@ -3,3 +3,8 @@
     path: /opt/node-exporter/tls.crt
     state: file
   register: crt_file
+
+- ansible.builtin.import_role:
+    name: eingram23.containers.node_exporter
+    tasks_from: create_cert
+  when: not crt_file.stat.exists
