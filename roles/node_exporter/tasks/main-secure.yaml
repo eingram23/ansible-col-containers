@@ -60,7 +60,7 @@
     pid: host
     command: >
       --path.rootfs=/host
-      --web.config=web-config.yml
+      --web.config.file=web-config.yml
     volume:
       - /:/host:ro,rslave
       - /opt/node-exporter:/etc/node-exporter
