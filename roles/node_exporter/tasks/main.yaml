@@ -10,22 +10,41 @@
   loop:
     - /opt/node-exporter
 
+- name: Login to vault and use the resulting token
+  community.hashi_vault.vault_login:
+    url: https://vault.local.lan
+    auth_method: userpass
+    username: "eingram"
+    password: "{{ lookup('hashi_vault', 'secret=secret/ssh/eingram:ssh_password') }}"
+    validate_certs: false
+  register: login_data
+
+- name: Generate a certificate with an existing token
+  community.hashi_vault.vault_pki_generate_certificate:
+    role_name: ycdisp-dot-net
+    common_name: metrics-srv1.ycdisp.net
+    ttl: 8760h
+    url: https://vault.local.lan
+    auth_method: token
+    token: "{{ login_data.login.auth.client_token }}"
+  register: cert_data
+
+
 - name: Run node-exporter container
   containers.podman.podman_container:
     name: node-exporter
     image: docker.io/nginxproxy/nginx-proxy:{{ nginx_proxy_ver }}
     state: started
     restart_policy: unless-stopped
-    publish:
-      - "9100:9100"
     privileged: true
     network: host
     pid: host
     command: >
       --path.rootfs=/host
+      --web.config=
     volume:
       - /:/host:ro,rslave
-      - certs:/etc/nginx/certs:z,ro
+      - certs:/etc/node-exporter/:z,ro
       - /opt/node-exporter:/etc/node-exporter
     generate_systemd:
       path: /etc/systemd/system
