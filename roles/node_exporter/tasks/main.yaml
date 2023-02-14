@@ -5,35 +5,70 @@
     state: directory
     mode: '0755'
     recurse: true
-    owner: '2000'
-    group: '2000'
+    owner: poduser
+    group: poduser
   loop:
     - /opt/node-exporter
+  become: true
+  become_method: sudo
+  become_user: root
 
-- name: Login to vault and use the resulting token
-  community.hashi_vault.vault_login:
-    url: https://vault.local.lan
-    auth_method: userpass
-    username: "eingram"
-    password: "{{ lookup('hashi_vault', 'secret=secret/ssh/eingram:ssh_password') }}"
-    validate_certs: false
-  register: login_data
+- name: Copy files to host
+  ansible.builtin.copy:
+    src: config.yml
+    dest: /opt/node-exporter
+    mode: '0644'
+    owner: poduser
+    group: poduser
 
-- name: Generate a certificate with an existing token
-  community.hashi_vault.vault_pki_generate_certificate:
-    role_name: ycdisp-dot-net
-    common_name: metrics-srv1.ycdisp.net
-    ttl: 8760h
-    url: https://vault.local.lan
-    auth_method: token
-    token: "{{ login_data.login.auth.client_token }}"
-  register: cert_data
+# - name: Run vault tasks on localhost
+#   block:
+#     - name: Login to vault and use the resulting token
+#       community.hashi_vault.vault_login:
+#         url: https://vault.local.lan
+#         auth_method: userpass
+#         username: "eingram"
+#         password: "{{ lookup('hashi_vault', 'secret=secret/ssh/eingram:ssh_password') }}"
+#         validate_certs: false
+#       register: login_data
 
+#     - name: Generate a certificate with an existing token
+#       community.hashi_vault.vault_pki_generate_certificate:
+#         role_name: ycdisp-dot-net
+#         common_name: "{{ hostvar }}"
+#         ttl: "{{ ttl }}"
+#         url: https://vault.local.lan/
+#         engine_mount_point: pki_int
+#         auth_method: token
+#         token: "{{ login_data.login.auth.client_token }}"
+#         validate_certs: false
+#       register: cert_data
+#   delegate_to: localhost
+
+# - name: Create tls.crt on host
+#   ansible.builtin.template:
+#     src: tls.crt.j2
+#     dest: /opt/node-exporter/tls.crt
+#     mode: '440'
+#     owner: poduser
+#     group: poduser
+
+# - name: Create tls.key on host
+#   ansible.builtin.template:
+#     src: tls.key.j2
+#     dest: /opt/node-exporter/tls.key
+#     mode: '400'
+#     owner: poduser
+#     group: poduser
+
+- name: Run podman unshare
+  ansible.builtin.shell:
+    podman unshare chown -R 65534:65534 /opt/node-exporter
 
 - name: Run node-exporter container
   containers.podman.podman_container:
     name: node-exporter
-    image: docker.io/nginxproxy/nginx-proxy:{{ nginx_proxy_ver }}
+    image: docker.io/prom/node-exporter:{{ ver }}
     state: started
     restart_policy: unless-stopped
     privileged: true
@@ -41,11 +76,10 @@
     pid: host
     command: >
       --path.rootfs=/host
-      --web.config=
+      --web.config=config.yml
     volume:
       - /:/host:ro,rslave
-      - certs:/etc/node-exporter/:z,ro
       - /opt/node-exporter:/etc/node-exporter
-    generate_systemd:
-      path: /etc/systemd/system
-      restart_policy: always
+    # generate_systemd:
+    #   path: /etc/systemd/system
+    #   restart_policy: always
