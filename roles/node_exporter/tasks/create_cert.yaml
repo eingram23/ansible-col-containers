@@ -19,6 +19,7 @@
     password: "{{ lookup('hashi_vault', 'secret=secret/ssh/eingram:ssh_password') }}"
     validate_certs: false
   register: cert_data
+  delegate_to: localhost
 
 - name: Display cert
   ansible.builtin.debug:
