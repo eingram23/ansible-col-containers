@@ -1,6 +1,3 @@
-- ansible.builtin.debug:
-    msg: Test run create_cert
-
 # - name: Login to vault and use the resulting token
 #   community.hashi_vault.vault_login:
 #     url: https://vault.local.lan
@@ -10,14 +7,23 @@
 #     validate_certs: false
 #   register: login_data
 
-# - name: Generate a certificate with an existing token
-#   community.hashi_vault.vault_pki_generate_certificate:
-#     role_name: ycdisp-dot-net
-#     common_name: "{{ hostvar }}"
-#     ttl: "{{ ttl }}"
-#     url: https://vault.local.lan/
-#     engine_mount_point: pki_int
-#     auth_method: token
-#     token: "{{ login_data.login.auth.client_token }}"
-#     validate_certs: false
-#   register: cert_data
+- name: Generate a certificate with an existing token
+  community.hashi_vault.vault_pki_generate_certificate:
+    role_name: "{{ vault_role }}"
+    common_name: "{{ hostvar }}"
+    ttl: "{{ ttl }}"
+    url: https://vault.local.lan/
+    engine_mount_point: pki_int
+    auth_method: userpass
+    username: "eingram"
+    password: "{{ lookup('hashi_vault', 'secret=secret/ssh/eingram:ssh_password') }}"
+    validate_certs: false
+  register: cert_data
+
+- name: Display cert
+  ansible.builtin.debug:
+    var: cert_data.data.data.certificate
+
+- name: Display key
+  ansible.builtin.debug:
+    var: cert_data.data.data.private_key
