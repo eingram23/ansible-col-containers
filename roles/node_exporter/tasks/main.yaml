@@ -13,6 +13,14 @@
   become_method: sudo
   become_user: root
 
+- name: Open firewall ports
+  ansible.builtin.include_role:
+    name: eingram23.homelab.firewall
+    apply:
+      become: true
+      become_method: sudo
+      become_user: root
+
 - name: Copy files to host
   ansible.builtin.copy:
     src: config.yml
