@@ -23,7 +23,7 @@
 
 - name: Copy files to host
   ansible.builtin.copy:
-    src: config.yml
+    src: web-config.yml
     dest: /opt/node-exporter
     mode: '0644'
     owner: poduser
