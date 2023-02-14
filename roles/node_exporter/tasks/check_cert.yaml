@@ -1,0 +1,5 @@
+- name: Check for node-exporter tls.crt
+  ansible.builtin.file:
+    path: /opt/node-exporter/tls.crt
+    state: file
+  register: crt_file
