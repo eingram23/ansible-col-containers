@@ -43,7 +43,7 @@
 - name: Create key on host
   ansible.builtin.copy:
     dest: /opt/node-exporter/tls.key
-    content: "{{ cert_data.data.data[private_key] }}"
+    content: "{{ cert_data.data.data.private_key }}"
     mode: '0400'
     owner: poduser
     group: poduser
