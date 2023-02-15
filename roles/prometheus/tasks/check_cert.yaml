@@ -1,9 +1,0 @@
-- name: Check for node-exporter tls.crt
-  ansible.builtin.stat:
-    path: /opt/node-exporter/tls.crt
-  register: crt_file
-
-- ansible.builtin.import_role:
-    name: eingram23.homelab.vault_cert
-    tasks_from: create_cert
-  when: not crt_file.stat.exists
