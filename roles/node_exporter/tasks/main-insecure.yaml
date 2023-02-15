@@ -1,0 +1,25 @@
+---
+- name: Open firewall ports
+  ansible.builtin.include_role:
+    name: eingram23.homelab.firewall
+    apply:
+      become: true
+      become_method: sudo
+      become_user: root
+
+- name: Run node-exporter container
+  containers.podman.podman_container:
+    name: node-exporter
+    image: docker.io/prom/node-exporter:{{ ver }}
+    state: started
+    restart_policy: unless-stopped
+    privileged: true
+    network: host
+    pid: host
+    command: >
+      --path.rootfs=/host
+    volume:
+      - /:/host:ro,rslave
+    # generate_systemd:
+    #   path: /etc/systemd/system
+    #   restart_policy: always
