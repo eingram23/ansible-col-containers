@@ -1,4 +1,4 @@
 ---
 fw_port:
   - "9100/tcp"
-common_name: "node-exporter"
+common_name: "node-exporter.local.lan"
