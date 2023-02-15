@@ -30,9 +30,9 @@
     group: poduser
 
 - name: Create cert on host
-  ansible.builtin.copy:
-    dest: "/opt/node-exporter/tls.crt"
-    content: "{{ cert_data.data.data[item] }}"
+  ansible.builtin.template:
+    src: tls.crt.j2
+    dest: /opt/node-exporter/tls.crt
     mode: '0440'
     owner: poduser
     group: poduser
@@ -42,17 +42,15 @@
 
 - name: Create key on host
   ansible.builtin.copy:
-    dest: "/opt/node-exporter/tls.key"
-    content: "{{ cert_data.data.data[item] }}"
+    dest: /opt/node-exporter/tls.key
+    content: "{{ cert_data.data.data[private_key] }}"
     mode: '0400'
     owner: poduser
     group: poduser
-  loop:
-    - private_key
 
 - name: Create rootca on host
   ansible.builtin.copy:
-    dest: "/opt/node-exporter/ca.crt"
+    dest: /opt/node-exporter/ca.crt
     content: "{{ lookup('hashi_vault', 'secret=secret/cert/rootca:crt') }}"
     mode: '0440'
     owner: poduser
