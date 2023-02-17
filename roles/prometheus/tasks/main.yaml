@@ -45,6 +45,42 @@
     mode: '0644'
   notify: Restart prometheus container
 
+- name: Check for tls.crt
+  ansible.builtin.stat:
+    path: /opt/prometheus/tls.crt
+  register: crt_file
+
+- name: Run cert tasks
+  when: not crt_file.stat.exists
+  block:
+    - ansible.builtin.import_role:
+        name: eingram23.homelab.vault_cert
+        tasks_from: gen_cert
+
+    - name: Create tls.crt on host
+      ansible.builtin.template:
+        src: tls.crt.j2
+        dest: /opt/prometheus/tls.crt
+        mode: '440'
+        owner: poduser
+        group: poduser
+
+    - name: Create tls.key on host
+      ansible.builtin.template:
+        src: tls.key.j2
+        dest: /opt/prometheus/tls.key
+        mode: '400'
+        owner: poduser
+        group: poduser
+
+    - name: Create rootca on host
+      ansible.builtin.copy:
+        dest: /opt/prometheus/ca.crt
+        content: "{{ lookup('hashi_vault', 'secret=secret/cert/rootca:crt') }}"
+        mode: '0440'
+        owner: poduser
+        group: poduser
+
 - name: Open firewall ports
   ansible.builtin.include_role:
     name: eingram23.homelab.firewall

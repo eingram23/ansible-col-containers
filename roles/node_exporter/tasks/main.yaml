@@ -1,18 +1,4 @@
 ---
-- name: Create supporting folders
-  ansible.builtin.file:
-    path: "{{ item }}"
-    state: directory
-    mode: '0755'
-    recurse: true
-    owner: poduser
-    group: poduser
-  loop:
-    - /opt/node-exporter
-  become: true
-  become_method: sudo
-  become_user: root
-
 - name: Open firewall ports
   ansible.builtin.include_role:
     name: eingram23.homelab.firewall
@@ -20,45 +6,6 @@
       become: true
       become_method: sudo
       become_user: root
-
-- name: Copy files to host
-  ansible.builtin.copy:
-    src: web-config.yml
-    dest: /opt/node-exporter
-    mode: '0644'
-    owner: poduser
-    group: poduser
-
-- name: Create cert on host
-  ansible.builtin.template:
-    src: tls.crt.j2
-    dest: /opt/node-exporter/tls.crt
-    mode: '0440'
-    owner: poduser
-    group: poduser
-  loop:
-    - certificate
-    - issuing_ca
-
-- name: Create key on host
-  ansible.builtin.copy:
-    dest: /opt/node-exporter/tls.key
-    content: "{{ cert_data.data.data.private_key }}"
-    mode: '0400'
-    owner: poduser
-    group: poduser
-
-- name: Create rootca on host
-  ansible.builtin.copy:
-    dest: /opt/node-exporter/ca.crt
-    content: "{{ lookup('hashi_vault', 'secret=secret/cert/rootca:crt') }}"
-    mode: '0440'
-    owner: poduser
-    group: poduser
- 
-- name: Run podman unshare
-  ansible.builtin.shell:
-    podman unshare chown -R 65534:65534 /opt/node-exporter
 
 - name: Run node-exporter container
   containers.podman.podman_container:
@@ -71,10 +18,8 @@
     pid: host
     command: >
       --path.rootfs=/host
-      --web.config.file=/etc/node-exporter/web-config.yml
     volume:
       - /:/host:ro,rslave
-      - /opt/node-exporter:/etc/node-exporter
     # generate_systemd:
     #   path: /etc/systemd/system
     #   restart_policy: always
