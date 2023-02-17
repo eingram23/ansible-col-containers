@@ -45,7 +45,7 @@
     - name: Create root ca on host
       ansible.builtin.copy:
         content: "{{ cert_data.data.data.issuing_ca }}"
-        dest: /opt/node-exporter/tls.crt
+        dest: /opt/node-exporter/ca.crt
         mode: '0440'
         owner: poduser
         group: poduser
