@@ -43,7 +43,7 @@
       when: not crt_file.stat.exists
 
     - name: Create root ca on host
-      ansible.builtin.template:
+      ansible.builtin.copy:
         content: "{{ cert_data.data.data.issuing_ca }}"
         dest: /opt/node-exporter/tls.crt
         mode: '0440'
@@ -51,7 +51,7 @@
         group: poduser
 
     - name: Create cert on host
-      ansible.builtin.template:
+      ansible.builtin.copy:
         content: "{{ cert_data.data.data.certificate }}"
         dest: /opt/node-exporter/tls.crt
         mode: '0440'
