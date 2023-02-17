@@ -1,0 +1,28 @@
+- job_name: 'LinuxProdSec'
+  scheme: https
+  tls_config:
+    ca_file: /etc/prometheus/ca.crt
+    cert_file: /etc/prometheus/tls.crt
+    key_file: /etc/prometheus/tls.key
+  scrape_interval: 60s
+  static_configs:
+    - targets: ['yc-appsrv1.ycdisp.net:9100']
+      labels:
+        instance: 'yc-appsrv1'
+- job_name: 'LinuxDevSec'
+  scheme: https
+  tls_config:
+    ca_file: /etc/prometheus/ca.crt
+    cert_file: /etc/prometheus/tls.crt
+    key_file: /etc/prometheus/tls.key
+  scrape_interval: 60s
+  static_configs:
+    - targets: ['yc-appsrv1-dev.local.lan:9100']
+      labels:
+        instance: 'yc-appsrv1-dev'
+- job_name: 'VMware'
+  metrics_path: '/metrics'
+  scrape_interval: 60s
+    - targets: ['vmware_exporter:9272']
+      labels:
+        instance: 'vcsa-1'
