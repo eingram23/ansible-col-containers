@@ -59,11 +59,11 @@
     mode: '0644'
   notify: Restart prometheus container
 
-- name: Modify prometheus.yml to change vmware target
-  ansible.builtin.lineinfile:
-    path: /opt/prometheus/prometheus.yml
-    search_string: 'vmware-exporter.monitoring.svc.cluster.local:9272'
-    line: "      - targets: ['vmware_exporter:9272']"
+# - name: Modify prometheus.yml to change vmware target
+#   ansible.builtin.lineinfile:
+#     path: /opt/prometheus/prometheus.yml
+#     search_string: 'vmware-exporter.monitoring.svc.cluster.local:9272'
+#     line: "      - targets: ['vmware_exporter:9272']"
 
 - name: Check for tls.crt
   ansible.builtin.stat:
