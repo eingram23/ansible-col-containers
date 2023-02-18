@@ -13,7 +13,6 @@ rule_files:
   # - "second.rules"
 
 scrape_configs:
-{{ prometheus_config | indent(2, true)}}
   - job_name: 'LinuxProdSec'
     scheme: https
     tls_config:
@@ -42,3 +41,4 @@ scrape_configs:
       - targets: ['vmware_exporter:9272']
         labels:
           instance: 'vcsa-1'
+{{ prometheus_config | indent(2, true)}}
