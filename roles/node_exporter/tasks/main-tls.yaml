@@ -44,7 +44,7 @@
         alt_names:
           - "{{ common_name }}"
         ip_sans:
-          - "{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}"
+          - "{{ ip_address }}"
         ttl: "{{ ttl }}"
         url: https://vault.local.lan/
         engine_mount_point: pki_int
