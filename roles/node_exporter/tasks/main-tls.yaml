@@ -42,17 +42,9 @@
         tasks_from: gen_cert
       when: not crt_file.stat.exists
 
-    - name: Create root ca on host
-      ansible.builtin.copy:
-        content: "{{ cert_data.data.data.issuing_ca }}"
-        dest: /opt/node-exporter/ca.crt
-        mode: '0440'
-        owner: poduser
-        group: poduser
-
     - name: Create cert on host
-      ansible.builtin.copy:
-        content: "{{ cert_data.data.data.certificate }}"
+      ansible.builtin.template:
+        src: tls.crt.j2
         dest: /opt/node-exporter/tls.crt
         mode: '0440'
         owner: poduser
@@ -60,19 +52,19 @@
 
     - name: Create key on host
       ansible.builtin.copy:
-        content: "{{ cert_data.data.data.private_key }}"
         dest: /opt/node-exporter/tls.key
+        content: "{{ cert_data.data.data.private_key }}"
         mode: '0400'
         owner: poduser
         group: poduser
 
-    # - name: Create rootca on host
-    #   ansible.builtin.copy:
-    #     dest: /opt/node-exporter/ca.crt
-    #     content: "{{ lookup('hashi_vault', 'secret=secret/cert/rootca:crt') }}"
-    #     mode: '0440'
-    #     owner: poduser
-    #     group: poduser
+    - name: Create rootca on host
+      ansible.builtin.copy:
+        dest: /opt/node-exporter/ca.crt
+        content: "{{ cert_data.data.data.ca_chain[1] }}"
+        mode: '0440'
+        owner: poduser
+        group: poduser
 
 - name: Run podman unshare
   ansible.builtin.shell:
