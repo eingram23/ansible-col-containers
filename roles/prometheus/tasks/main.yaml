@@ -100,18 +100,18 @@
         owner: poduser
         group: poduser
 
-    - name: Create tls.key on host
-      ansible.builtin.template:
-        src: tls.key.j2
+    - name: Create key on host
+      ansible.builtin.copy:
         dest: /opt/prometheus/tls.key
-        mode: '400'
+        content: "{{ cert_data.data.data.private_key }}"
+        mode: '0400'
         owner: poduser
         group: poduser
 
     - name: Create rootca on host
       ansible.builtin.copy:
         dest: /opt/prometheus/ca.crt
-        content: "{{ lookup('hashi_vault', 'secret=secret/cert/rootca:crt') }}"
+        content: "{{ cert_data.data.data.ca_chain[1] }}"
         mode: '0440'
         owner: poduser
         group: poduser
