@@ -53,9 +53,24 @@
 - name: Run cert tasks
   when: not crt_file.stat.exists
   block:
-    - ansible.builtin.import_role:
-        name: eingram23.homelab.vault_cert
-        tasks_from: gen_cert
+    - name: Generate a certificate with an existing token
+      community.hashi_vault.vault_pki_generate_certificate:
+        role_name: "{{ vault_role }}"
+        common_name: "{{ common_name }}"
+        alt_names:
+          - "{{ common_name }}"
+        ip_sans:
+          - "{{ ip_address }}"
+        ttl: "{{ ttl }}"
+        url: https://vault.local.lan/
+        engine_mount_point: pki_int
+        auth_method: userpass
+        username: "eingram"
+        password: "{{ lookup('hashi_vault', 'secret=secret/ssh/eingram:ssh_password') }}"
+        validate_certs: false
+      register: cert_data
+      delegate_to: localhost
+      become: false
 
     - name: Create tls.crt on host
       ansible.builtin.template:
