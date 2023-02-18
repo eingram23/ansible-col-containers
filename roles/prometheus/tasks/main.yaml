@@ -10,6 +10,20 @@
   become_method: sudo
   become_user: root
 
+- name: Run podman unshare
+  ansible.builtin.shell:
+    podman unshare chown -R 0:0 /opt/prometheus
+
+- name: Copy prometheus files to remote server
+  ansible.builtin.copy:
+    src: "{{ item }}"
+    dest: /opt/prometheus/
+    mode: '0644'
+    owner: poduser
+    group: poduser
+  with_fileglob: "*"
+  notify: Restart prometheus container
+  
 - name: Create github key
   ansible.builtin.template:
     src: ssh-key-git.key.j2
@@ -104,6 +118,10 @@
       become_method: sudo
       become_user: root
 
+- name: Run podman unshare
+  ansible.builtin.shell:
+    podman unshare chown -R 65534:65534 /opt/prometheus
+
 - name: Create and run prometheus container
   containers.podman.podman_container:
     name: "{{ container_name }}"
@@ -122,12 +140,3 @@
       - "{{ container_name }}-data:/prometheus"
       - /opt/prometheus/:/etc/prometheus/
 
-- name: Copy prometheus files to remote server
-  ansible.builtin.copy:
-    src: "{{ item }}"
-    dest: /opt/prometheus/
-    mode: '0644'
-    owner: poduser
-    group: poduser
-  with_fileglob: "*"
-  notify: Restart prometheus container

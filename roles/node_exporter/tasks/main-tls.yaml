@@ -21,6 +21,10 @@
       become_method: sudo
       become_user: root
 
+- name: Run podman unshare
+  ansible.builtin.shell:
+    podman unshare chown -R 0:0 /opt/node-exporter
+
 - name: Copy files to host
   ansible.builtin.copy:
     src: web-config.yml
