@@ -35,11 +35,4 @@ scrape_configs:
       - targets: ['yc-appsrv1-dev.local.lan:9100']
         labels:
           instance: 'yc-appsrv1-dev'
-  - job_name: 'VMware'
-    metrics_path: '/metrics'
-    scrape_interval: 60s
-    static_configs:
-      - targets: ['vmware_exporter:9272']
-        labels:
-          instance: 'vcsa-1'
 {{ prometheus_config | indent(2, true)}}
