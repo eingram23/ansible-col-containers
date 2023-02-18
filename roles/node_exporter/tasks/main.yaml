@@ -7,6 +7,16 @@
       become_method: sudo
       become_user: root
 
+- name: Enable processes collector
+  ansible.builtin.set_fact:
+    collect_processes: --collector.processes
+  when: processes == "yes"
+
+- name: Enable systemd collector
+  ansible.builtin.set_fact:
+    collect_systemd: --collector.systemd
+  when: systemd == "yes"
+
 - name: Run node-exporter container
   containers.podman.podman_container:
     name: node-exporter
@@ -18,6 +28,8 @@
     pid: host
     command: >
       --path.rootfs=/host
+      {{ collect_processes }}
+      {{ collect_systemd }}
     volume:
       - /:/host:ro,rslave
     # generate_systemd:
