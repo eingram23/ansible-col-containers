@@ -38,6 +38,7 @@ scrape_configs:
   - job_name: 'VMware'
     metrics_path: '/metrics'
     scrape_interval: 60s
+    static_configs:
       - targets: ['vmware_exporter:9272']
         labels:
           instance: 'vcsa-1'
