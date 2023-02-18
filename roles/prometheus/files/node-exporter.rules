@@ -4,7 +4,7 @@ groups:
     - alert: InstanceDown
       # Condition for alerting
       expr: up{job="LinuxProd | WindowsProd" or instance = "yc-appsrv1"} == 0 
-      for: 1m
+      for: 5m
       # Annotation - additional informational labels to store more information
       annotations:
         title: 'Instance {{ $labels.instance }} down'
