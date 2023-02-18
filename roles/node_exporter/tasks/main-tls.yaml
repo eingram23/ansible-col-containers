@@ -88,6 +88,16 @@
   ansible.builtin.shell:
     podman unshare chown -R 65534:65534 /opt/node-exporter
 
+- name: Enable processes collector
+  ansible.builtin.set_fact:
+    collect_processes: --collector.processes
+  when: processes == "yes"
+
+- name: Enable systemd collector
+  ansible.builtin.set_fact:
+    collect_systemd: --collector.systemd
+  when: systemd == "yes"
+
 - name: Run node-exporter container
   containers.podman.podman_container:
     name: node-exporter
@@ -100,6 +110,8 @@
     command: >
       --path.rootfs=/host
       --web.config.file=/etc/node-exporter/web-config.yml
+      {{ collect_processes }}
+      {{ collect_systemd }}
     volume:
       - /:/host:ro,rslave
       - /opt/node-exporter:/etc/node-exporter
