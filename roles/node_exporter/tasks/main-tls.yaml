@@ -114,7 +114,7 @@
       {{ collect_systemd }}
     volume:
       - /:/host:ro,rslave
-      - /var/run/dbus/system_bus_socket:/var/run/dbus/system_bus_socket:ro
+      - /var/run/dbus/system_bus_socket:/var/run/dbus/system_bus_socket:rw
       - /opt/node-exporter:/etc/node-exporter
     # generate_systemd:
     #   path: /etc/systemd/system
