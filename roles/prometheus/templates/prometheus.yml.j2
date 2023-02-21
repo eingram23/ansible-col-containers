@@ -42,4 +42,11 @@ scrape_configs:
       - targets: ['vmware-exporter.local.lan:9272']
         labels:
           instance: 'vcsa-1'
+  - job_name: 'Alertmanager'
+    metrics_path: '/metrics'
+    scrape_interval: 60s
+    static_configs:
+      - targets: ['alertmanager:9093']
+        labels:
+          instance: 'alertmanager'
 {{ prometheus_config | indent(2, true)}}
