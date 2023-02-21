@@ -39,7 +39,7 @@ scrape_configs:
     metrics_path: '/metrics'
     scrape_interval: 60s
     static_configs:
-      - targets: ['vmware-exporter.local.lan:9272']
+      - targets: ['vmware-exporter:9272']
         labels:
           instance: 'vcsa-1'
   - job_name: 'Alertmanager'
