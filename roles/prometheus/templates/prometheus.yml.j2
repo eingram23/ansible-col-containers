@@ -36,7 +36,6 @@ scrape_configs:
       - targets: ['yc-appsrv1-dev.local.lan:9100']
         labels:
           instance: 'yc-appsrv1-dev'
-          env: 'prod'
   - job_name: 'VMware'
     metrics_path: '/metrics'
     scrape_interval: 60s
