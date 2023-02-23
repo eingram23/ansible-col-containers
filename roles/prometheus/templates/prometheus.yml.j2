@@ -24,6 +24,7 @@ scrape_configs:
       - targets: ['yc-appsrv1.ycdisp.net:9100']
         labels:
           instance: 'yc-appsrv1'
+          env: 'prod'
   - job_name: 'LinuxDevSec'
     scheme: https
     tls_config:
@@ -35,6 +36,7 @@ scrape_configs:
       - targets: ['yc-appsrv1-dev.local.lan:9100']
         labels:
           instance: 'yc-appsrv1-dev'
+          env: 'prod'
   - job_name: 'VMware'
     metrics_path: '/metrics'
     scrape_interval: 60s
@@ -42,6 +44,7 @@ scrape_configs:
       - targets: ['vmware-exporter:9272']
         labels:
           instance: 'vcsa-1'
+          env: 'prod'
   - job_name: 'Alertmanager'
     metrics_path: '/metrics'
     scrape_interval: 60s

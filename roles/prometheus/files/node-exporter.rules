@@ -1,9 +1,9 @@
 groups:
-  - name: ProdJobs
+  - name: Prod
     rules:
-    - alert: InstanceDown
+    - alert: ProdInstanceDown
       # Condition for alerting
-      expr: up{job="LinuxProd|WindowsProd"} == 0 
+      expr: up{env="prod"} == 0 
       for: 5m
       # Annotation - additional informational labels to store more information
       annotations:
@@ -12,20 +12,20 @@ groups:
       # Labels - additional labels to be attached to the alert
       labels:
         severity: 'critical'
-  - name: ProdInstances
-    rules:
-    - alert: InstanceDown
-      # Condition for alerting
-      # expr: up == 0 and (instance == "homeassistant" or instance == "homenas")
-      expr: up{instance="yc-appsrv1"} == 0
-      for: 5m
-      # Annotation - additional informational labels to store more information
-      annotations:
-        title: 'Instance {{ $labels.instance }} down'
-        description: '{{ $labels.instance }} of job {{ $labels.job }} has been down for more than 5 minutes.'
-      # Labels - additional labels to be attached to the alert
-      labels:
-        severity: 'critical'
+  # - name: ProdInstances
+  #   rules:
+  #   - alert: InstanceDown
+  #     # Condition for alerting
+  #     # expr: up == 0 and (instance == "homeassistant" or instance == "homenas")
+  #     expr: up{instance="yc-appsrv1"} == 0
+  #     for: 5m
+  #     # Annotation - additional informational labels to store more information
+  #     annotations:
+  #       title: 'Instance {{ $labels.instance }} down'
+  #       description: '{{ $labels.instance }} of job {{ $labels.job }} has been down for more than 5 minutes.'
+  #     # Labels - additional labels to be attached to the alert
+  #     labels:
+  #       severity: 'critical'
   - name: node-exporter
     rules:
     - alert: NodeFilesystemSpaceFillingUp
