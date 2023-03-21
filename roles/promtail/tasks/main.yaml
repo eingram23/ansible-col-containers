@@ -1,0 +1,38 @@
+---
+- name: Open firewall ports
+  ansible.builtin.include_role:
+    name: eingram23.homelab.firewall
+    apply:
+      become: true
+      become_method: sudo
+      become_user: root
+
+- name: Enable processes collector
+  ansible.builtin.set_fact:
+    collect_processes: --collector.processes
+  when: processes == "yes"
+
+- name: Enable systemd collector
+  ansible.builtin.set_fact:
+    collect_systemd: --collector.systemd
+  when: systemd == "yes"
+
+- name: Run node-exporter container
+  containers.podman.podman_container:
+    name: node-exporter
+    image: docker.io/prom/node-exporter:{{ ver }}
+    state: started
+    restart_policy: unless-stopped
+    privileged: true
+    network: host
+    pid: host
+    command: >
+      --path.rootfs=/host
+      {{ collect_processes }}
+      {{ collect_systemd }}
+    volume:
+      - /:/host:ro,rslave
+      - /var/run/dbus/system_bus_socket:/var/run/dbus/system_bus_socket:rw
+    # generate_systemd:
+    #   path: /etc/systemd/system
+    #   restart_policy: always

@@ -1,0 +1,121 @@
+---
+- name: Create supporting folders
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+    mode: '0755'
+    recurse: true
+    owner: poduser
+    group: poduser
+  loop:
+    - /opt/node-exporter
+  become: true
+  become_method: sudo
+  become_user: root
+
+- name: Open firewall ports
+  ansible.builtin.include_role:
+    name: eingram23.homelab.firewall
+    apply:
+      become: true
+      become_method: sudo
+      become_user: root
+
+- name: Run podman unshare
+  ansible.builtin.shell:
+    podman unshare chown -R 0:0 /opt/node-exporter
+
+- name: Copy files to host
+  ansible.builtin.copy:
+    src: web-config.yml
+    dest: /opt/node-exporter
+    mode: '0644'
+    owner: poduser
+    group: poduser
+
+- name: Check for node-exporter tls.crt
+  ansible.builtin.stat:
+    path: /opt/node-exporter/tls.crt
+  register: crt_file
+
+- name: Run cert tasks
+  when: not crt_file.stat.exists
+  block:
+    - name: Generate a certificate with an existing token
+      community.hashi_vault.vault_pki_generate_certificate:
+        role_name: "{{ vault_role }}"
+        common_name: "{{ common_name }}"
+        alt_names:
+          - "{{ common_name }}"
+        ip_sans:
+          - "{{ ip_address }}"
+        ttl: "{{ ttl }}"
+        url: https://vault.local.lan/
+        engine_mount_point: pki_int
+        auth_method: userpass
+        username: "eingram"
+        password: "{{ lookup('hashi_vault', 'secret=secret/ssh/eingram:ssh_password') }}"
+        validate_certs: false
+      register: cert_data
+      delegate_to: localhost
+      become: false
+
+    - name: Create cert on host
+      ansible.builtin.template:
+        src: tls.crt.j2
+        dest: /opt/node-exporter/tls.crt
+        mode: '0440'
+        owner: poduser
+        group: poduser
+
+    - name: Create key on host
+      ansible.builtin.copy:
+        dest: /opt/node-exporter/tls.key
+        content: "{{ cert_data.data.data.private_key }}"
+        mode: '0400'
+        owner: poduser
+        group: poduser
+
+    - name: Create rootca on host
+      ansible.builtin.copy:
+        dest: /opt/node-exporter/ca.crt
+        content: "{{ cert_data.data.data.ca_chain[1] }}"
+        mode: '0440'
+        owner: poduser
+        group: poduser
+
+- name: Run podman unshare
+  ansible.builtin.shell:
+    podman unshare chown -R 65534:65534 /opt/node-exporter
+
+- name: Enable processes collector
+  ansible.builtin.set_fact:
+    collect_processes: --collector.processes
+  when: processes == "yes"
+
+- name: Enable systemd collector
+  ansible.builtin.set_fact:
+    collect_systemd: --collector.systemd
+  when: systemd == "yes"
+
+- name: Run node-exporter container
+  containers.podman.podman_container:
+    name: node-exporter
+    image: docker.io/prom/node-exporter:{{ ver }}
+    state: started
+    restart_policy: unless-stopped
+    privileged: true
+    network: host
+    pid: host
+    command: >
+      --path.rootfs=/host
+      --web.config.file=/etc/node-exporter/web-config.yml
+      {{ collect_processes }}
+      {{ collect_systemd }}
+    volume:
+      - /:/host:ro,rslave
+      - /var/run/dbus/system_bus_socket:/var/run/dbus/system_bus_socket:rw
+      - /opt/node-exporter:/etc/node-exporter
+    # generate_systemd:
+    #   path: /etc/systemd/system
+    #   restart_policy: always
