@@ -61,3 +61,4 @@
     state: started
     enabled: true
     daemon_reload: true
+    scope: user
