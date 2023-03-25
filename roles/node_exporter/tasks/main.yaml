@@ -21,7 +21,7 @@
   ansible.builtin.file:
     path: ./.config/systemd/user
     state: directory
-    mode: '0644'
+    mode: '0700'
 
 - name: Run node-exporter container
   containers.podman.podman_container:
