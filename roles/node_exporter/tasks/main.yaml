@@ -56,6 +56,14 @@
     insertafter: '# User specific environment and startup programs'
     line: 'export XDG_RUNTIME_DIR=/run/user/$(id -u)'
 
+- name: Get poduser info
+  ansible.builtin.user:
+    name: poduser
+  register: poduser_info
+
+- ansible.builtin.debug:
+    var: poduser_info.uid
+    
 - name: Enable container-node-exporter service
   ansible.builtin.systemd:
     name: container-node-exporter
@@ -64,4 +72,4 @@
     daemon_reload: true
     scope: user
   environment:
-    XDG_RUNTIME_DIR: "/run/user/1002"
+    XDG_RUNTIME_DIR: "/run/user/{{ poduser_info.uid }}"
