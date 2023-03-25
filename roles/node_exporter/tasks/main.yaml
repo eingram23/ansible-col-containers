@@ -17,12 +17,6 @@
     collect_systemd: --collector.systemd
   when: systemd == "yes"
 
-- name: Create user systemd folder
-  ansible.builtin.file:
-    path: /home/poduser/.config/systemd/user
-    state: directory
-    mode: '0700'
-
 - name: Run node-exporter container
   containers.podman.podman_container:
     name: node-exporter
@@ -48,12 +42,19 @@
     path: /var/lib/systemd/linger/poduser
   register: poduser_lingering
 
-- name: Enable lingering is needed
+- name: Enable lingering if needed
   ansible.builtin.command: "loginctl enable-linger podman"
   when: not poduser_lingering.stat.exists
   become: true
   become_method: sudo
   become_user: root
+
+- name: Set XDG_RUNTIME_DIR env variable
+  ansible.builtin.lineinfile:
+    path: /home/poduser/.bash_profile
+    search_string: 'export XDG_RUNTIME_DIR=/run/user/$(id -u)'
+    insertafter: '# User specific environment and startup programs'
+    line: 'export XDG_RUNTIME_DIR=/run/user/$(id -u)'
 
 - name: Enable container-node-exporter service
   ansible.builtin.systemd:
