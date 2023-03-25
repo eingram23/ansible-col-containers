@@ -61,9 +61,6 @@
     name: poduser
   register: poduser_info
 
-- ansible.builtin.debug:
-    var: poduser_info.uid
-    
 - name: Enable container-node-exporter service
   ansible.builtin.systemd:
     name: container-node-exporter
