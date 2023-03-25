@@ -152,4 +152,4 @@
     daemon_reload: true
     scope: user
   environment:
-    XDG_RUNTIME_DIR: "/run/user/{{ poduser_info.uid }}"
+    XDG_RUNTIME_DIR: /run/user/{{ poduser_info.uid }}
