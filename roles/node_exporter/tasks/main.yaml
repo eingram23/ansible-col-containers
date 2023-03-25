@@ -19,7 +19,7 @@
 
 - name: Create user systemd folder
   ansible.builtin.file:
-    path: ./.config/systemd/user
+    path: /home/poduser/.config/systemd/user
     state: directory
     mode: '0700'
 
@@ -40,7 +40,7 @@
       - /:/host:ro,rslave
       - /var/run/dbus/system_bus_socket:/var/run/dbus/system_bus_socket:rw
     generate_systemd:
-      path: ./.config/systemd/user
+      path: /home/poduser/.config/systemd/user
       restart_policy: always
 
 - name: Enable container-node-exporter service
