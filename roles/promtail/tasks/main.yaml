@@ -42,6 +42,7 @@
     image: docker.io/grafana/promtail:{{ ver }}
     state: stopped
     restart_policy: always
+    privileged: true
     volume:
       - /opt/promtail/config.yml:/etc/promtail/config.yml
       - /var/log:/var/log:Z:ro
