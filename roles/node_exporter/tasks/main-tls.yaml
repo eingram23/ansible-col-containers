@@ -103,7 +103,7 @@
     name: node-exporter
     image: docker.io/prom/node-exporter:{{ ver }}
     state: started
-    restart_policy: unless-stopped
+    restart_policy: always
     privileged: true
     network: host
     pid: host

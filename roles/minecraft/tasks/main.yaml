@@ -14,7 +14,7 @@
     name: "minecraft-paper"
     image: itzg/minecraft-server:{{ minecraft_ver }}
     state: started
-    restart_policy: unless-stopped
+    restart_policy: always
     pod: minecraft
     env:
       EULA=TRUE

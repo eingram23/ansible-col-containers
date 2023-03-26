@@ -176,7 +176,7 @@
       MYSQL_ROOT_PASSWORD: "{{ mysql_root }}"
       VIRTUAL_HOST: "{{ app }}phpmyadmin.local.lan"
     state: started
-    restart_policy: unless-stopped
+    restart_policy: always
   tags: update_phpmyadmin
   when: env == "test"
 

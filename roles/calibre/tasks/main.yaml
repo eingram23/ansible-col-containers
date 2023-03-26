@@ -16,7 +16,7 @@
     name: calibre{{ suffix }}
     image: lscr.io/linuxserver/calibre:{{ calibre_ver }}
     state: started
-    restart_policy: unless-stopped
+    restart_policy: always
     privileged: true
     env:
       VIRTUAL_HOST: "{{ suffix }}libdata.diversionforum.net"
@@ -32,7 +32,7 @@
     name: calibre-web{{ suffix }}
     image: lscr.io/linuxserver/calibre-web:{{ calibre_web_ver }}
     state: started
-    restart_policy: unless-stopped
+    restart_policy: always
     privileged: true
     env:
       VIRTUAL_HOST: "{{ suffix }}lib.diversionforum.net"

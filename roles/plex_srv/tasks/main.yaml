@@ -4,7 +4,7 @@
     name: "plex_srv"
     image: lscr.io/linuxserver/plex:{{ plex_srv_ver }}
     state: started
-    restart_policy: unless-stopped
+    restart_policy: always
     env:
       PUID=0
       PGID=0

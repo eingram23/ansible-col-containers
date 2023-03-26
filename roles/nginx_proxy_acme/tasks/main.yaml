@@ -34,7 +34,7 @@
     name: nginx-proxy
     image: docker.io/nginxproxy/nginx-proxy:{{ nginx_proxy_ver }}
     state: started
-    restart_policy: unless-stopped
+    restart_policy: always
     # pod: "{{ pod_name }}"
     publish:
       - "80:80"
@@ -55,7 +55,7 @@
     name: nginx-proxy-acme
     image: docker.io/nginxproxy/acme-companion:{{ acme_ver }}
     state: started
-    restart_policy: unless-stopped
+    restart_policy: always
     # pod: "{{ pod_name }}"
     env:
       DEFAULT_EMAIL: edward.ingram23@gmail.com
