@@ -45,7 +45,7 @@
     privileged: true
     volume:
       - /opt/promtail/config.yml:/etc/promtail/config.yml
-      - /var/log:/var/log:Z:ro
+      - /var/log:/var/log:ro
     generate_systemd:
       path: /home/poduser/.config/systemd/user
       restart_policy: always
