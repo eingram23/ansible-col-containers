@@ -41,7 +41,7 @@
     name: promtail
     image: docker.io/grafana/promtail:{{ ver }}
     state: started
-    restart_policy: always
+    restart_policy: no
       - /opt/promtail/config.yaml:/etc/promtail/config.yaml
       - /var/log:/var/log:ro
     generate_systemd:
