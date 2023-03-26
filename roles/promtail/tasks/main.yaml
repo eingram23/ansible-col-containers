@@ -42,11 +42,12 @@
     image: docker.io/grafana/promtail:{{ ver }}
     state: started
     restart_policy: always
+    volume:
       - /opt/promtail/config.yaml:/etc/promtail/config.yaml
       - /var/log:/var/log:ro
     generate_systemd:
       path: /home/poduser/.config/systemd/user
-      # restart_policy: always
+      restart_policy: always
 
 - name: Check if poduser is lingering
   ansible.builtin.stat:
