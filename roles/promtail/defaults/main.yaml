@@ -1,6 +1,3 @@
 ---
 fw_port:
-  - "9100/tcp"
-common_name: "{{ hostvar }}"
-collect_processes: ""
-collect_systemd: ""
+  - "9080/tcp"
