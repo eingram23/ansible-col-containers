@@ -32,19 +32,19 @@
       become_method: sudo
       become_user: root
 
-- name: Run podman unshare
-  ansible.builtin.shell:
-    podman unshare chown -R 65534:65534 /opt/promtail
+# - name: Run podman unshare
+#   ansible.builtin.shell:
+#     podman unshare chown -R 65534:65534 /opt/promtail
 
 - name: Run promtail container
   containers.podman.podman_container:
     name: promtail
     image: docker.io/grafana/promtail:{{ ver }}
-    state: started
+    state: stopped
     restart_policy: always
     volume:
-      - /opt/promtail/config.yaml:/etc/promtail/config.yaml
-      - /var/log:/var/log:ro
+      - /opt/promtail/config.yml:/etc/promtail/config.yml
+      - /var/log:/var/log:Z:ro
     generate_systemd:
       path: /home/poduser/.config/systemd/user
       restart_policy: always

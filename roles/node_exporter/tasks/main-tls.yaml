@@ -102,7 +102,7 @@
   containers.podman.podman_container:
     name: node-exporter
     image: docker.io/prom/node-exporter:{{ ver }}
-    state: started
+    state: stopped
     restart_policy: always
     privileged: true
     network: host
