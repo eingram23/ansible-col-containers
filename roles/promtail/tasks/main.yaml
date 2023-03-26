@@ -41,11 +41,11 @@
     name: promtail
     image: docker.io/grafana/promtail:{{ ver }}
     state: started
-    restart_policy: no
+    restart_policy: always
       - /opt/promtail/config.yaml:/etc/promtail/config.yaml
       - /var/log:/var/log:ro
     generate_systemd:
-      path: /etc/systemd/system
+      path: /home/poduser/.config/systemd/user
       restart_policy: always
 
 - name: Check if poduser is lingering
