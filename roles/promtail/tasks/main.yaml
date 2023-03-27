@@ -25,7 +25,7 @@
     image: docker.io/grafana/promtail:{{ ver }}
     state: stopped
     restart_policy: always
-    ports:
+    publish:
       - "9080:9080"
     volume:
       - /opt/promtail/config.yml:/etc/promtail/config.yml
