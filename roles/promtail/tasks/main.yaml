@@ -4,37 +4,20 @@
     path: /opt/promtail
     state: directory
     mode: '0755'
-    owner: poduser
-    group: poduser
-  become: true
-  become_method: sudo
-  become_user: root
-
-- name: Run podman unshare
-  ansible.builtin.shell:
-    podman unshare chown -R 0:0 /opt/promtail
+    owner: root
+    group: root
 
 - name: Copy promtail config to remote server
   ansible.builtin.copy:
     src: "{{ item }}"
     dest: /opt/promtail/
     mode: '0644'
-    owner: poduser
-    group: poduser
   with_fileglob: "*"
   notify: Restart promtail container
 
 - name: Open firewall ports
   ansible.builtin.include_role:
     name: eingram23.homelab.firewall
-    apply:
-      become: true
-      become_method: sudo
-      become_user: root
-
-# - name: Run podman unshare
-#   ansible.builtin.shell:
-#     podman unshare chown -R 65534:65534 /opt/promtail
 
 - name: Run promtail container
   containers.podman.podman_container:
@@ -47,32 +30,8 @@
       - /opt/promtail/config.yml:/etc/promtail/config.yml
       - /var/log:/var/log:ro
     generate_systemd:
-      path: /home/poduser/.config/systemd/user
+      path: /etc/systemd/system
       restart_policy: always
-
-- name: Check if poduser is lingering
-  ansible.builtin.stat:
-    path: /var/lib/systemd/linger/poduser
-  register: poduser_lingering
-
-- name: Enable lingering if needed
-  ansible.builtin.command: "loginctl enable-linger podman"
-  when: not poduser_lingering.stat.exists
-  become: true
-  become_method: sudo
-  become_user: root
-
-- name: Set XDG_RUNTIME_DIR env variable
-  ansible.builtin.lineinfile:
-    path: /home/poduser/.bash_profile
-    search_string: 'export XDG_RUNTIME_DIR=/run/user/$(id -u)'
-    insertafter: '# User specific environment and startup programs'
-    line: 'export XDG_RUNTIME_DIR=/run/user/$(id -u)'
-
-- name: Get poduser info
-  ansible.builtin.user:
-    name: poduser
-  register: poduser_info
 
 - name: Enable container-promtail service
   ansible.builtin.systemd:
@@ -80,6 +39,3 @@
     state: started
     enabled: true
     daemon_reload: true
-    scope: user
-  environment:
-    XDG_RUNTIME_DIR: /run/user/{{ poduser_info.uid }}
