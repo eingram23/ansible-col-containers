@@ -1,0 +1,4 @@
+container_name: "loki"
+fw_port:
+  - "3100/tcp"
+# privkey: "{{ lookup('hashi_vault', 'secret=secret/git/ssh:key') }}"
