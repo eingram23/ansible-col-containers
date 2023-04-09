@@ -30,6 +30,11 @@
     dest: /var/tmp/ssh-key-git.key
     mode: '0400'
 
+- name: Make sure configs folder doesn't exist
+  ansible.builtin.file:
+    path: /var/tmp/configs
+    state: absent
+
 - name: Pull down configs from git
   ansible.builtin.git:
     repo: 'git@github.com:eingram23/configs.git'
@@ -37,7 +42,6 @@
     clone: true
     key_file: /var/tmp/ssh-key-git.key
     accept_hostkey: true
-    force: true
 
 - name: Delete key
   ansible.builtin.file:
