@@ -37,6 +37,7 @@
     clone: true
     key_file: /var/tmp/ssh-key-git.key
     accept_hostkey: true
+    force: true
 
 - name: Delete key
   ansible.builtin.file:
