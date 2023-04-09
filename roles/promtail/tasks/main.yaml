@@ -30,6 +30,7 @@
     volume:
       - /opt/promtail/config.yml:/etc/promtail/config.yml
       - /var/log:/var/log:ro
+      - /opt/roottest:/etc/roottest
     generate_systemd:
       path: /etc/systemd/system
       restart_policy: always
