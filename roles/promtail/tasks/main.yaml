@@ -29,8 +29,7 @@
       - "9080:9080"
     volume:
       - /opt/promtail/config.yml:/etc/promtail/config.yml
-      - /var/log:/var/log:ro
-      - /opt/roottest:/etc/roottest
+      - /var/log:/etc/promtail/var/log:ro
     generate_systemd:
       path: /etc/systemd/system
       restart_policy: always
