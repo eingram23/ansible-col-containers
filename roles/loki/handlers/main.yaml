@@ -2,6 +2,6 @@
 - name: Restart loki container
   containers.podman.podman_container:
     name: loki
-    image: prom/prometheus:{{ ver }}
+    image: grafana/loki:{{ ver }}
     state: started
     restart: true
