@@ -32,7 +32,7 @@
       - /opt/promtail/config.yml:/etc/promtail/config.yml
       - /var/log:/etc/promtail/var/log:ro
     command: >
-      -client.external-labels=hostname=$(HOSTNAME)
+      -client.external-labels=hostname={{ inventory_hostname }}
       -config.file=/etc/promtail/config.yml
     generate_systemd:
       path: /etc/systemd/system
