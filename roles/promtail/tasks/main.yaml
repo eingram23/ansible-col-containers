@@ -33,6 +33,7 @@
       - /var/log:/etc/promtail/var/log:ro
     command: >
       -client.external-labels=hostname=$(HOSTNAME)
+      -config.file=/etc/promtail/config.yml
     generate_systemd:
       path: /etc/systemd/system
       restart_policy: always
