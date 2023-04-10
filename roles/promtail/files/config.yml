@@ -10,10 +10,26 @@ clients:
   - url: http://podhost1.local.lan:3100/loki/api/v1/push
 
 scrape_configs:
-- job_name: system
+- job_name: messages
   static_configs:
   - targets:
       - localhost
     labels:
-      job: varlogs
-      __path__: /etc/promtail/var/log/{messages,secure,cron}
+      job: messages
+      __path__: /etc/promtail/var/log/messages
+
+- job_name: secure
+  static_configs:
+  - targets:
+      - localhost
+    labels:
+      job: secure
+      __path__: /etc/promtail/var/log/secure
+
+- job_name: cron
+  static_configs:
+  - targets:
+      - localhost
+    labels:
+      job: cron
+      __path__: /etc/promtail/var/log/cron
