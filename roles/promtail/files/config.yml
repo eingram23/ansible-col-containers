@@ -16,4 +16,4 @@ scrape_configs:
       - localhost
     labels:
       job: varlogs
-      __path__: /etc/promtail/var/log/messages
+      __path__: /etc/promtail/var/log/{messages,secure,cron}
