@@ -1,0 +1,49 @@
+---
+- name: Create and run unifi container
+  containers.podman.podman_container:
+    name: "{{ container_name }}-controller"
+    image: linuxserver/unifi-controller:{{ ver }}
+    state: started
+    restart_policy: always
+    publish:
+      - 8443:8443
+      - 3478:3478/udp
+      - 10001:10001/udp
+      - 8080:8080
+      - 1900:1900/udp
+      - 8843:8843
+      - 8880:8880
+      - 6789:6789
+      - 5514:5514/udp
+    env:
+      PUID=1000
+      PGID=1000
+      MEM_LIMIT=1024
+      MEM_STARTUP=1024
+    volume:
+      - unifi-data:/config
+    generate_systemd:
+      path: /home/poduser/.config/systemd/user
+      restart_policy: always
+
+- name: Set XDG_RUNTIME_DIR env variable
+  ansible.builtin.lineinfile:
+    path: /home/poduser/.bash_profile
+    search_string: 'export XDG_RUNTIME_DIR=/run/user/$(id -u)'
+    insertafter: '# User specific environment and startup programs'
+    line: 'export XDG_RUNTIME_DIR=/run/user/$(id -u)'
+
+- name: Get poduser info
+  ansible.builtin.user:
+    name: poduser
+  register: poduser_info
+
+- name: Enable container-unifi-controller service
+  ansible.builtin.systemd:
+    name: container-{{ container_name }}-controller
+    state: started
+    enabled: true
+    daemon_reload: true
+    scope: user
+  environment:
+    XDG_RUNTIME_DIR: /run/user/{{ poduser_info.uid }}
