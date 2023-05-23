@@ -2,7 +2,7 @@
 - name: Create and run unifi container
   containers.podman.podman_container:
     name: "{{ container_name }}-controller"
-    image: linuxserver/unifi-controller:{{ ver }}
+    image: docker.io/linuxserver/unifi-controller:{{ ver }}
     state: started
     restart_policy: always
     publish:
