@@ -3,7 +3,7 @@
   containers.podman.podman_container:
     name: "{{ container_name }}-controller"
     image: docker.io/linuxserver/unifi-controller:{{ ver }}
-    state: started
+    state: stopped
     restart_policy: always
     publish:
       - 8443:8443
