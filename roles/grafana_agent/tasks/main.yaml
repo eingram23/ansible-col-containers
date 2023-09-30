@@ -17,7 +17,7 @@
 - name: Run grafana_agent container
   containers.podman.podman_container:
     name: grafana_agent
-    image: grafana/agent:{{ ver }}
+    image: docker.io/grafana/agent:{{ ver }}
     state: stopped
     restart_policy: always
     privileged: true
