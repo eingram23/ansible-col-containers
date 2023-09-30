@@ -4,23 +4,12 @@
     path: /opt/grafana_agent
     state: directory
     mode: '0755'
-    owner: poduser
-    group: poduser
-  become: true
-  become_method: sudo
-  become_user: root
-
-- name: Run podman unshare
-  ansible.builtin.shell:
-    podman unshare chown -R 0:0 /opt/grafana_agent
 
 - name: Copy agent.yaml to remote server
   ansible.builtin.copy:
     src: "{{ item }}"
     dest: /opt/grafana_agent/
     mode: '0644'
-    owner: poduser
-    group: poduser
   with_fileglob: "*"
   notify: Restart grafana_agent container
 
@@ -46,27 +35,8 @@
       - /opt/grafana_agent/agent.yaml:/etc/agent-config/agent.yaml
       - /var/run/dbus/system_bus_socket:/var/run/dbus/system_bus_socket:rw
     generate_systemd:
-      path: /home/poduser/.config/systemd/user
+      path: /etc/systemd/system
       restart_policy: always
-
-- name: Check if poduser is lingering
-  ansible.builtin.stat:
-    path: /var/lib/systemd/linger/poduser
-  register: poduser_lingering
-
-- name: Enable lingering if needed
-  ansible.builtin.command: "loginctl enable-linger podman"
-  when: not poduser_lingering.stat.exists
-  become: true
-  become_method: sudo
-  become_user: root
-
-- name: Set XDG_RUNTIME_DIR env variable
-  ansible.builtin.lineinfile:
-    path: /home/poduser/.bash_profile
-    search_string: 'export XDG_RUNTIME_DIR=/run/user/$(id -u)'
-    insertafter: '# User specific environment and startup programs'
-    line: 'export XDG_RUNTIME_DIR=/run/user/$(id -u)'
 
 - name: Get poduser info
   ansible.builtin.user:
@@ -79,6 +49,4 @@
     state: started
     enabled: true
     daemon_reload: true
-    scope: user
-  environment:
-    XDG_RUNTIME_DIR: /run/user/{{ poduser_info.uid }}
+
