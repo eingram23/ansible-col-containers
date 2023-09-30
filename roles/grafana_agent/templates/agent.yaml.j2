@@ -5,6 +5,9 @@ metrics:
   wal_directory: /tmp/agent
   global:
     scrape_interval: 60s
+    scrape_timeout: 10s
+    external_labels:
+      env: {{ env }}
     remote_write:
     - url: http://prom.local.lan:9090/api/v1/write
 
@@ -19,12 +22,14 @@ logs:
           - targets: [localhost]
             labels:
               job: varlogs
+              env: {{ env }}
               __path__: /var/log/*log
       - job_name: messages
         static_configs:
           - targets: [localhost]
             labels:
               job: messages
+              env: {{ env }}
               __path__: /var/log/messages
       - job_name: journal
         journal:
@@ -34,6 +39,7 @@ logs:
           # matches: _TRANSPORT=kernel
           labels:
             job: systemd-journal
+            env: {{ env }}
         relabel_configs:
           - source_labels: ['__journal__systemd_unit']
             target_label: 'unit'

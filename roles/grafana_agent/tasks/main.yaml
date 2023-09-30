@@ -5,13 +5,14 @@
     state: directory
     mode: '0755'
 
-- name: Copy agent.yaml to remote server
-  ansible.builtin.copy:
-    src: "{{ item }}"
-    dest: /opt/grafana_agent/
+- name: Create agent.yaml on remote server
+  ansible.builtin.template:
+    src: "{{ item }}.j2"
+    dest: /opt/grafana_agent/{{ item }}
     mode: '0644'
-  with_fileglob: "*"
-  notify: Restart grafana_agent container
+  loop:
+    - agent.yaml.j2
+  # notify: Restart grafana_agent container
 
 - name: Run grafana_agent container
   containers.podman.podman_container:
