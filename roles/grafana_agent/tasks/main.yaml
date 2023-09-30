@@ -11,7 +11,7 @@
     dest: /opt/grafana_agent/{{ item }}
     mode: '0644'
   loop:
-    - agent.yaml.j2
+    - agent.yaml
   # notify: Restart grafana_agent container
 
 - name: Run grafana_agent container
