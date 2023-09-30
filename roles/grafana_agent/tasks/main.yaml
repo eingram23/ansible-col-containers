@@ -23,10 +23,9 @@
     privileged: true
     network: host
     pid: host
+    cap-add: 
+      - SYS_TIME
     command: >
-      --net="host"
-      --pid="host"
-      --cap-add=SYS_TIME
       --config.file=/etc/agent-config/agent.yaml
     volume:
       - /:/host/root:ro,rslave
@@ -38,11 +37,6 @@
     generate_systemd:
       path: /etc/systemd/system
       restart_policy: always
-
-- name: Get poduser info
-  ansible.builtin.user:
-    name: poduser
-  register: poduser_info
 
 - name: Enable container-grafana_agent service
   ansible.builtin.systemd:
