@@ -1,5 +1,5 @@
 ---
-- name: Create grafana_agent folder
+- name: Create grafana_agent folder structure
   ansible.builtin.file:
     path: /opt/grafana_agent
     state: directory
@@ -32,7 +32,7 @@
       - /:/host/root:ro,rslave
       - /sys:/host/sys:ro,rslave
       - /proc:/host/proc:ro,rslave
-      - /tmp/agent:/etc/agent
+      - /opt/grafana_agent:/etc/agent
       - /opt/grafana_agent/agent.yaml:/etc/agent-config/agent.yaml
       - /var/run/dbus/system_bus_socket:/var/run/dbus/system_bus_socket:rw
     generate_systemd:
