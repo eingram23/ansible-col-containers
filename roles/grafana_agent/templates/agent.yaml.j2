@@ -57,7 +57,7 @@ integrations:
   process_exporter:
     enabled: true
     process_names:
-    - name: "{{.Comm}}"
+    - name: "{{ '{{' }}.Comm{{ '}}' }}"
       cmdline:
       - '.+'
     procfs_path: "/host/proc"
