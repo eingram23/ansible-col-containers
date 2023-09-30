@@ -24,7 +24,7 @@
     network: host
     pid: host
     cap-add: 
-      - SYS_TIME
+      - sys_time
     command: >
       --config.file=/etc/agent-config/agent.yaml
     volume:
