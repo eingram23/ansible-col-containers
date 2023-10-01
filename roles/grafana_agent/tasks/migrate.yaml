@@ -18,6 +18,7 @@
     - name: Delete dangling podman images
       ansible.builtin.shell: podman image rm -a
   become: true
+  become_method: sudo
   become_user: poduser
 
 - name: Stop container-promtail
