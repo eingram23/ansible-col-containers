@@ -5,6 +5,7 @@
         name: container-node-exporter
         state: stopped
         enabled: false
+        scope: user
 
     - name: Remove node-exporter container
       containers.podman.podman_container:
