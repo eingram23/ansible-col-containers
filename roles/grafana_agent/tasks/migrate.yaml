@@ -7,7 +7,7 @@
         enabled: false
 
     - name: Remove node-exporter container
-      ansible.builtin.podman_container:
+      containers.podman.podman_container:
         name: node-exporter
         state: absent
 
@@ -27,7 +27,7 @@
     enabled: false
 
 - name: Remove promtail container
-  ansible.builtin.podman_container:
+  containers.podman.podman_container:
     name: promtail
     state: absent
 
