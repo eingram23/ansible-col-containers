@@ -12,12 +12,12 @@
         name: node-exporter
         state: absent
 
-    - name: Run podman system prune
-      ansible.builtin.shell: >
-        echo y | podman system prune
+    # - name: Run podman system prune
+    #   ansible.builtin.shell: >
+    #     echo y | podman system prune
 
-    - name: Delete dangling podman images
-      ansible.builtin.shell: podman image rm -a
+    # - name: Delete dangling podman images
+    #   ansible.builtin.shell: podman image rm -a
   become: true
   become_method: sudo
   become_user: poduser
@@ -33,9 +33,9 @@
     name: promtail
     state: absent
 
-- name: Run podman system prune
-  ansible.builtin.shell: |
-    echo y | podman system prune
+# - name: Run podman system prune
+#   ansible.builtin.shell: |
+#     echo y | podman system prune
 
-- name: Delete dangling podman images
-  ansible.builtin.shell: podman image rm -a
+# - name: Delete dangling podman images
+#   ansible.builtin.shell: podman image rm -a
