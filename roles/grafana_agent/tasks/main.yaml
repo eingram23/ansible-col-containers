@@ -5,6 +5,12 @@
     state: directory
     mode: '0755'
 
+- name: Enable persistent storage for journalctl
+  ansible.builtin.file:
+    path: /var/log/journal
+    state: directory
+    mode: '0644'
+    
 - name: Create agent.yaml on remote server
   ansible.builtin.template:
     src: "{{ item }}.j2"
