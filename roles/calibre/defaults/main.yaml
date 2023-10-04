@@ -1,2 +1,3 @@
 ---
-suffix: "{{ env | default() }}"
+env: ""
+upgrade: "no"
