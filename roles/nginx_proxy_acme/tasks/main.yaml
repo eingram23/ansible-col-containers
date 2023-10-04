@@ -10,7 +10,7 @@
 - name: Open firewall ports
   ansible.builtin.include_role:
     name: eingram23.homelab.firewall
-    
+
 - name: Create supporting folder
   ansible.builtin.file:
     path: /opt/nginx-proxy
@@ -29,13 +29,31 @@
     state: started
     enabled: true
 
+- name: Prep for upgrade
+  when: upgrade == "yes"
+  block:
+    - name: Stop systemd service for nginx-proxy containers
+      ansible.builtin.systemd:
+        name: "{{ item }}"
+        state: stopped
+      loop:
+        - container-nginx-proxy
+        - container-nginx-proxy-acme
+
+    - name: Remove nginx-proxy containers
+      containers.podman.podman_container:
+        name: "{{ item }}"
+        state: absent
+      loop:
+        - container-nginx-proxy
+        - container-nginx-proxy-acme
+
 - name: Run nginx container
   containers.podman.podman_container:
     name: nginx-proxy
     image: docker.io/nginxproxy/nginx-proxy:{{ nginx_proxy_ver }}
     state: started
     restart_policy: always
-    # pod: "{{ pod_name }}"
     publish:
       - "80:80"
       - "443:443"
@@ -56,7 +74,6 @@
     image: docker.io/nginxproxy/acme-companion:{{ acme_ver }}
     state: started
     restart_policy: always
-    # pod: "{{ pod_name }}"
     env:
       DEFAULT_EMAIL: edward.ingram23@gmail.com
     privileged: true

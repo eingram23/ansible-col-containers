@@ -11,15 +11,34 @@
     - /opt/calibre/config
     - /opt/calibre/books
 
+- name: Prep for upgrade
+  when: upgrade == "yes"
+  block:
+    - name: Stop systemd service for calibre containers
+      ansible.builtin.systemd:
+        name: "{{ item }}"
+        state: stopped
+      loop:
+        - container-calibre
+        - container-calibre-web
+
+    - name: Remove calibre containers
+      containers.podman.podman_container:
+        name: "{{ item }}"
+        state: absent
+      loop:
+        - calibre
+        - calibre-web
+
 - name: Run calibre container
   containers.podman.podman_container:
-    name: calibre{{ suffix }}
+    name: calibre
     image: lscr.io/linuxserver/calibre:{{ calibre_ver }}
     state: started
     restart_policy: always
     privileged: true
     env:
-      VIRTUAL_HOST: "{{ suffix }}libdata.diversionforum.net"
+      VIRTUAL_HOST: "{{ env }}libdata.diversionforum.net"
       VIRTUAL_PORT: 8080
       PUID: 2000
       PGID: 2000
@@ -29,15 +48,15 @@
 
 - name: Run calibre-web container
   containers.podman.podman_container:
-    name: calibre-web{{ suffix }}
+    name: calibre-web
     image: lscr.io/linuxserver/calibre-web:{{ calibre_web_ver }}
     state: started
     restart_policy: always
     privileged: true
     env:
-      VIRTUAL_HOST: "{{ suffix }}lib.diversionforum.net"
+      VIRTUAL_HOST: "{{ env }}lib.diversionforum.net"
       VIRTUAL_PORT: 8083
-      LETSENCRYPT_HOST: "{{ suffix }}lib.diversionforum.net"
+      LETSENCRYPT_HOST: "{{ env }}lib.diversionforum.net"
       LETSENCRYPT_EMAIL: "edward.ingram23@gmail.com"
       PUID: 2000
       PGID: 2000
@@ -57,4 +76,5 @@
     enabled: true
     daemon_reload: true
   loop:
-    - container-calibre-web{{ suffix }}
+    - container-calibre
+    - container-calibre-web
