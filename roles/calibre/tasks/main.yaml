@@ -76,5 +76,4 @@
     enabled: true
     daemon_reload: true
   loop:
-    - container-calibre
     - container-calibre-web
