@@ -14,6 +14,7 @@
       ansible.builtin.systemd:
         name: "{{ item }}"
         state: stopped
+        scope: user
       loop:
         - container-unifi-controller
 
