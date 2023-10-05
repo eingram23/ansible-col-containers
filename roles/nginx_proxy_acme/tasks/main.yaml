@@ -45,8 +45,8 @@
         name: "{{ item }}"
         state: absent
       loop:
-        - container-nginx-proxy
-        - container-nginx-proxy-acme
+        - nginx-proxy
+        - nginx-proxy-acme
 
 - name: Run nginx container
   containers.podman.podman_container:
