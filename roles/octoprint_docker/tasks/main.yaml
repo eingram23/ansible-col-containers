@@ -1,5 +1,18 @@
 ---
-- name: Start docker container
+- name: UPGRADE - Remove existing container
+  when: upgrade == "yes"
+  block:
+    - name: Stop octoprint container
+      community.docker.docker_container:
+        name: octoprint
+        state: stopped
+
+    - name: Stop octoprint container
+      community.docker.docker_container:
+        name: octoprint
+        state: absent
+
+- name: Create octoprint container
   community.docker.docker_container:
     name: octoprint
     image: octoprint/octoprint:{{ ver }}
