@@ -101,7 +101,7 @@
     name: poduser
   register: poduser_info
 
-- name: Enable pod-unifi service
+- name: Enable and start pod-unifi service
   ansible.builtin.systemd:
     name: pod-unifi
     state: started
