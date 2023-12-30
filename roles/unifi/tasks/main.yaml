@@ -28,7 +28,7 @@
 - name: Create and run unifi container
   containers.podman.podman_container:
     name: unifi-controller
-    image: docker.io/linuxserver/unifi-controller:{{ ver }}
+    image: lscr.io/linuxserver/unifi-network-application:{{ ver }}
     state: stopped
     restart_policy: always
     publish:
@@ -44,6 +44,11 @@
     env:
       PUID=1000
       PGID=1000
+      MONGO_USER=unifi
+      MONGO_PASS={{ lookup('hashi_vault', 'secret=secret/ssh/eingram:ssh_password') }}
+      MONGO_HOST=unifi-db
+      MONGO_PORT=27017
+      MONGO_DBNAME=unifi
       MEM_LIMIT=1024
       MEM_STARTUP=1024
     volume:
