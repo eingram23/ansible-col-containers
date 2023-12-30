@@ -48,7 +48,7 @@
     name: unifi-network-application
     image: lscr.io/linuxserver/unifi-network-application:{{ unifi_ver }}
     state: stopped
-    pod: new:unifi
+    pod: unifi
     restart_policy: unless-stopped
     # publish:
     #   - 8443:8443
