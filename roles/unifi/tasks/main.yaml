@@ -143,3 +143,12 @@
     scope: user
   environment:
     XDG_RUNTIME_DIR: /run/user/{{ poduser_info.uid }}
+
+- name: Hide mongo pw in init script
+  ansible.builtin.lineinfile:
+    path: /opt/unifi/init-mongo.js
+    search_string: "{{ lookup('hashi_vault', 'secret=secret/ssh/eingram:ssh_password') }}"
+    line: var pwd = ""
+    owner: podman
+    group: podman
+    mode: '0644'
