@@ -72,9 +72,9 @@
       MEM_STARTUP=1024
     volume:
       - unifi-data:/config
-    # generate_systemd:
-    #   path: /home/poduser/.config/systemd/user
-    #   restart_policy: unless-stopped
+    generate_systemd:
+      path: /home/poduser/.config/systemd/user
+      restart_policy: always
 
 - name: Create unifi-db container
   containers.podman.podman_container:
@@ -88,6 +88,9 @@
       MONGO_INITDB_ROOT_PASSWORD={{ lookup('hashi_vault', 'secret=secret/ssh/eingram:ssh_password') }}
     volumes:
       - unifi-db-data:/data/db
+    generate_systemd:
+      path: /home/poduser/.config/systemd/user
+      restart_policy: always
 
 - name: Set XDG_RUNTIME_DIR env variable
   ansible.builtin.lineinfile:
