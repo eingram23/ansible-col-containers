@@ -25,7 +25,7 @@
   ansible.builtin.template:
     src: init-mongo.js.j2
     dest: /opt/unifi/init-mongo.js
-    mode: '0400'
+    mode: '0755'
     owner: poduser
     group: poduser
 
