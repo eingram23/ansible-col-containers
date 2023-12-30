@@ -25,10 +25,31 @@
       loop:
         - unifi-pod
 
-- name: Create pod
-  containers.podman.podman_pod:
-    name: unifi
+# - name: Create pod
+#   containers.podman.podman_pod:
+#     name: unifi
+#     state: stopped
+#     publish:
+#       - 8443:8443
+#       - 3478:3478/udp
+#       - 10001:10001/udp
+#       - 8080:8080
+#       - 1900:1900/udp
+#       - 8843:8843
+#       - 8880:8880
+#       - 6789:6789
+#       - 5514:5514/udp
+#     generate_systemd:
+#       path: /home/poduser/.config/systemd/user
+#       restart_policy: unless-stopped
+
+- name: Create unifi-network-application container
+  containers.podman.podman_container:
+    name: unifi-network-application
+    image: lscr.io/linuxserver/unifi-network-application:{{ unifi_ver }}
     state: stopped
+    pod: new:unifi
+    restart_policy: always
     publish:
       - 8443:8443
       - 3478:3478/udp
@@ -39,27 +60,6 @@
       - 8880:8880
       - 6789:6789
       - 5514:5514/udp
-    generate_systemd:
-      path: /home/poduser/.config/systemd/user
-      restart_policy: unless-stopped
-
-- name: Create unifi-network-application container
-  containers.podman.podman_container:
-    name: unifi-network-application
-    image: lscr.io/linuxserver/unifi-network-application:{{ unifi_ver }}
-    state: stopped
-    pod: unifi
-    restart_policy: always
-    # publish:
-    #   - 8443:8443
-    #   - 3478:3478/udp
-    #   - 10001:10001/udp
-    #   - 8080:8080
-    #   - 1900:1900/udp
-    #   - 8843:8843
-    #   - 8880:8880
-    #   - 6789:6789
-    #   - 5514:5514/udp
     env:
       PUID=1000
       PGID=1000
