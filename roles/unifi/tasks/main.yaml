@@ -16,7 +16,7 @@
         state: stopped
         scope: user
       loop:
-        - pod-unifi
+        - container-unifi
 
     - name: Remove unifi pod
       containers.podman.podman_pod:
@@ -103,7 +103,7 @@
 
 - name: Enable pod-unifi service
   ansible.builtin.systemd:
-    name: pod-unifi
+    name: container-unifi
     state: started
     enabled: true
     daemon_reload: true
