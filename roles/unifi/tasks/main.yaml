@@ -61,9 +61,9 @@
       - 8880:8880
       - 6789:6789
       - 5514:5514/udp
-    generate_systemd:
-      path: /home/poduser/.config/systemd/user
-      restart_policy: always
+    # generate_systemd:
+    #   path: /home/poduser/.config/systemd/user
+    #   restart_policy: always
 
 - name: Create unifi-network-application container
   containers.podman.podman_container:
@@ -94,9 +94,9 @@
       MEM_STARTUP=1024
     volume:
       - unifi-data:/config
-    generate_systemd:
-      path: /home/poduser/.config/systemd/user
-      restart_policy: always
+    # generate_systemd:
+    #   path: /home/poduser/.config/systemd/user
+    #   restart_policy: always
 
 - name: Create unifi-db container
   containers.podman.podman_container:
@@ -111,9 +111,9 @@
     volumes:
       - unifi-db-data:/data/db
       - /opt/unifi/init-mongo.js:/docker-entrypoint-initdb.d/init-mongo.js:ro
-    generate_systemd:
-      path: /home/poduser/.config/systemd/user
-      restart_policy: always
+    # generate_systemd:
+    #   path: /home/poduser/.config/systemd/user
+    #   restart_policy: always
 
 - name: Set XDG_RUNTIME_DIR env variable
   ansible.builtin.lineinfile:
@@ -126,6 +126,14 @@
   ansible.builtin.user:
     name: poduser
   register: poduser_info
+
+- name: Generate systemd units for unifi pod and containers
+  containers.podman.podman_generate_systemd:
+    name: unifi
+    new: true
+    no_header: true
+    restart_policy: always
+    dest: ~/.config/systemd/user/
 
 - name: Enable and start pod-unifi service
   ansible.builtin.systemd:
