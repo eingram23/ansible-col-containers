@@ -130,7 +130,6 @@
 - name: Generate systemd units for unifi pod and containers
   containers.podman.podman_generate_systemd:
     name: unifi
-    new: true
     no_header: true
     restart_policy: always
     dest: ~/.config/systemd/user/
