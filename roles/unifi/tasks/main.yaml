@@ -10,27 +10,25 @@
 - name: Prep for upgrade
   when: upgrade == "yes"
   block:
-    - name: Stop systemd service for unifi container
+    - name: Stop systemd service for unifi pod
       ansible.builtin.systemd:
         name: "{{ item }}"
         state: stopped
         scope: user
       loop:
-        - container-unifi-network-application
+        - pod-unifi
 
-    - name: Remove unifi containers
-      containers.podman.podman_container:
+    - name: Remove unifi pod
+      containers.podman.podman_pod:
         name: "{{ item }}"
         state: absent
       loop:
-        - unifi-network-application
+        - unifi-pod
 
-- name: Create and run unifi container
-  containers.podman.podman_container:
-    name: unifi-network-application
-    image: lscr.io/linuxserver/unifi-network-application:{{ ver }}
+- name: Create pod
+  containers.podman.podman_pod:
+    name: unifi
     state: stopped
-    restart_policy: always
     publish:
       - 8443:8443
       - 3478:3478/udp
@@ -41,6 +39,27 @@
       - 8880:8880
       - 6789:6789
       - 5514:5514/udp
+    generate_systemd:
+      path: /home/poduser/.config/systemd/user
+      restart_policy: unless-stopped
+
+- name: Create unifi-network-application container
+  containers.podman.podman_container:
+    name: unifi-network-application
+    image: lscr.io/linuxserver/unifi-network-application:{{ unifi_ver }}
+    state: stopped
+    pod: unifi
+    restart_policy: always
+    # publish:
+    #   - 8443:8443
+    #   - 3478:3478/udp
+    #   - 10001:10001/udp
+    #   - 8080:8080
+    #   - 1900:1900/udp
+    #   - 8843:8843
+    #   - 8880:8880
+    #   - 6789:6789
+    #   - 5514:5514/udp
     env:
       PUID=1000
       PGID=1000
@@ -53,9 +72,22 @@
       MEM_STARTUP=1024
     volume:
       - unifi-data:/config
-    generate_systemd:
-      path: /home/poduser/.config/systemd/user
-      restart_policy: always
+    # generate_systemd:
+    #   path: /home/poduser/.config/systemd/user
+    #   restart_policy: unless-stopped
+
+- name: Create unifi-db container
+  containers.podman.podman_container:
+    name: unifi-db
+    image: docker.io/mongo:{{ mongo_ver }}
+    state: stopped
+    pod: unifi
+    restart_policy: unless-stopped
+    env:
+      MONGO_INITDB_ROOT_USERNAME=unifi
+      MONGO_INITDB_ROOT_PASSWORD={{ lookup('hashi_vault', 'secret=secret/ssh/eingram:ssh_password') }}
+    volumes:
+      - unifi-db-data:/data/db
 
 - name: Set XDG_RUNTIME_DIR env variable
   ansible.builtin.lineinfile:
@@ -69,9 +101,9 @@
     name: poduser
   register: poduser_info
 
-- name: Enable container-unifi-network-application service
+- name: Enable pod-unifi service
   ansible.builtin.systemd:
-    name: container-unifi-network-application
+    name: pod-unifi
     state: started
     enabled: true
     daemon_reload: true
