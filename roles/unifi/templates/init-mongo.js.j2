@@ -1,2 +1,21 @@
-db.getSiblingDB("unifi").createUser({user: "unifi", pwd: "{{ lookup('hashi_vault', 'secret=secret/ssh/eingram:ssh_password') }}", roles: [{role: "dbOwner", db: "unifi"}]});
-db.getSiblingDB("unifi_stat").createUser({user: "unifi", pwd: "{{ lookup('hashi_vault', 'secret=secret/ssh/eingram:ssh_password') }}", roles: [{role: "dbOwner", db: "unifi_stat"}]});
+var user = "unifi";
+var pwd = "{{ lookup('hashi_vault', 'secret=secret/ssh/eingram:ssh_password') }}";
+var data_db = "unifi";
+var cfg_db = db + "_stat";
+
+db.getSiblingDB(data_db).createUser(
+        {
+                user: user,
+                pwd: pwd,
+                roles: [
+                        {
+                                role: "dbOwner",
+                                db: data_db
+                        },
+                        {
+                                role: "dbOwner",
+                                db: cfg_db
+                        }
+                ]
+        }
+);
