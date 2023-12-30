@@ -149,6 +149,6 @@
     path: /opt/unifi/init-mongo.js
     search_string: "{{ lookup('hashi_vault', 'secret=secret/ssh/eingram:ssh_password') }}"
     line: var pwd = ""
-    owner: podman
-    group: podman
+    owner: poduser
+    group: poduser
     mode: '0644'
