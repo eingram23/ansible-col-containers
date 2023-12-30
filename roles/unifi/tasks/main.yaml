@@ -41,7 +41,7 @@
       - 5514:5514/udp
     generate_systemd:
       path: /home/poduser/.config/systemd/user
-      restart_policy: unless-stopped
+      restart_policy: always
 
 - name: Create unifi-network-application container
   containers.podman.podman_container:
@@ -49,7 +49,7 @@
     image: lscr.io/linuxserver/unifi-network-application:{{ unifi_ver }}
     state: stopped
     pod: new:unifi
-    restart_policy: always
+    restart_policy: unless-stopped
     # publish:
     #   - 8443:8443
     #   - 3478:3478/udp
