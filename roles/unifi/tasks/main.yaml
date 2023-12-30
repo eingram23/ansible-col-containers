@@ -7,6 +7,28 @@
       become_method: sudo
       become_user: root
 
+- name: Create unifi folder
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+    mode: '0755'
+    owner: poduser
+    group: poduser
+    recurse: true
+  loop:
+    - /opt/unifi
+  become: true
+  become_method: sudo
+  become_user: root
+
+- name: Create mongodb init on host
+  ansible.builtin.template:
+    src: init-mongo.js.j2
+    dest: /opt/unifi/init-mongo.js
+    mode: '0400'
+    owner: poduser
+    group: poduser
+
 - name: Prep for upgrade
   when: upgrade == "yes"
   block:
@@ -83,11 +105,12 @@
     state: stopped
     pod: unifi
     restart_policy: unless-stopped
-    env:
-      MONGO_INITDB_ROOT_USERNAME=unifi
-      MONGO_INITDB_ROOT_PASSWORD={{ lookup('hashi_vault', 'secret=secret/ssh/eingram:ssh_password') }}
+    # env:
+      # MONGO_INITDB_ROOT_USERNAME=unifi
+      # MONGO_INITDB_ROOT_PASSWORD={{ lookup('hashi_vault', 'secret=secret/ssh/eingram:ssh_password') }}
     volumes:
       - unifi-db-data:/data/db
+      - /opt/unifi/init-mongo.js:/docker-entrypoint-initdb.d/init-mongo.js:ro
     generate_systemd:
       path: /home/poduser/.config/systemd/user
       restart_policy: always
