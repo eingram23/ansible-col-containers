@@ -30,3 +30,4 @@
       - "53:53/udp"
       - "80:80/tcp"
     restart_policy: always
+  tags: update
