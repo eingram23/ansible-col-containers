@@ -18,6 +18,7 @@
   community.docker.docker_container:
     name: pihole
     image: pihole/pihole:{{ ver }}
+    image_name_mismatch: recreate
     env:
       TZ: 'America/Los_Angeles'
       WEBPASSWORD: "{{ lookup('hashi_vault', 'secret=secret/ssh/eingram:ssh_password') }}"
