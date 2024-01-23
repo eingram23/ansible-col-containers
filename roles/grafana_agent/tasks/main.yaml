@@ -5,12 +5,22 @@
     state: directory
     mode: '0755'
 
+- name: Make sure podman is installed
+  ansible.builtin.package:
+    name: podman
+    state: present
+
+- name: Install podman-plugins
+  ansible.builtin.package:
+    name: podman-plugins
+    state: present
+
 - name: Enable persistent storage for journalctl
   ansible.builtin.file:
     path: /var/log/journal
     state: directory
     mode: '0644'
-    
+
 - name: Create agent.yaml on remote server
   ansible.builtin.template:
     src: "{{ item }}.j2"
@@ -29,7 +39,7 @@
     privileged: true
     network: host
     pid: host
-    cap_add: 
+    cap_add:
       - SYS_TIME
     command: >
       --config.file=/etc/agent-config/agent.yaml
@@ -51,4 +61,3 @@
     state: started
     enabled: true
     daemon_reload: true
-
