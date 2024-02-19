@@ -1,4 +1,10 @@
 ---
+- name: Ensure vars are set
+  ansible.builtin.assert:
+    that: 
+      - migrate == "no" or migrate == "yes"
+      - env == "dev" or env == "prod"
+
 - name: Create grafana_agent folder structure
   ansible.builtin.file:
     path: /opt/grafana_agent
