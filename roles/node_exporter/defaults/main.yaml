@@ -1,6 +1,10 @@
 ---
 fw_port:
   - "9100/tcp"
-common_name: "{{ hostvar }}"
+processes: "yes"
+systemd: "no"
 collect_processes: ""
 collect_systemd: ""
+renew_cert: "no"
+vault_role: "local-dot-lan"
+ttl: 31622400
