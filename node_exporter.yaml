@@ -1,0 +1,15 @@
+---
+# NEEDED VARS: hostvar, [ttl, vault_role (local-dot-lan ycdisp-dot-net)] # if using tls
+- name: Deploy node-exporter
+  hosts: "{{ hostvar | default([]) }}"
+  become: true
+  become_method: sudo
+  become_user: poduser
+  gather_facts: true
+
+  tasks:
+
+    - name: Deploy node-exporter container
+      ansible.builtin.import_role:
+        name: eingram23.containers.node_exporter
+

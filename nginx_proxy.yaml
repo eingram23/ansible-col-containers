@@ -1,0 +1,11 @@
+---
+- name: Deploy nginx+acme proxy containers
+  hosts: "{{ hostvar | default ([])}}"
+  gather_facts: false
+  become: true
+
+  tasks:
+
+    - name: Run nginx_proxy_acme role
+      ansible.builtin.include_role:
+        name: eingram23.containers.nginx_proxy_acme

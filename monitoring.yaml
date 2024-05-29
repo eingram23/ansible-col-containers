@@ -1,0 +1,55 @@
+---
+# NEEDED VARS: hostvar, ttl, vault_role (local-dot-lan ycdisp-dot-net)
+- name: Deploy monitoring pod and containers (prometheus, grafana, vmware_exporter, alertmanager, loki)
+  hosts: "{{ hostvar | default([]) }}"
+  gather_facts: false
+  become: true
+  become_method: sudo
+  become_user: poduser
+
+  vars:
+    pod_name: "monitoring"
+    publish_ports:
+      - "9090:9090"
+      - "9093:9093"
+      - "3000:3000"
+      - "9272:9272"
+      - "3100:3100"
+
+  tasks:
+
+    - name: Create monitoring pod
+      ansible.builtin.import_role:
+        name: eingram23.containers.create_pod
+      tags:
+        - always
+
+    - name: Create prometheus container
+      ansible.builtin.import_role:
+        name: eingram23.containers.prometheus
+      tags:
+        - prometheus
+
+    - name: Create grafana container
+      ansible.builtin.import_role:
+        name: eingram23.containers.grafana
+      tags:
+        - grafana
+
+    - name: Create vmware_exporter container
+      ansible.builtin.import_role:
+        name: eingram23.containers.vmware_exporter
+      tags:
+        - vmware_exporter
+
+    - name: Create alertmanager container
+      ansible.builtin.import_role:
+        name: eingram23.containers.alertmanager
+      tags:
+        - alertmanager
+
+    - name: Create loki container
+      ansible.builtin.import_role:
+        name: eingram23.containers.loki
+      tags:
+        - loki

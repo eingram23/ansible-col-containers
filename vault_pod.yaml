@@ -1,0 +1,38 @@
+---
+- name: Create and run vault-server container
+  hosts: "{{ hostvar | default([]) }}"
+  gather_facts: false
+  become: true
+  become_method: sudo
+
+  vars:
+    pod_name: "vault_pod"
+    vault_container_ver: "1.11"
+    vault_container_name: "vault"
+
+  tasks:
+
+    - name: Allow port 8200/tcp through firewall
+      ansible.builtin.include_role:
+        name: eingram23.homelab.firewall
+      vars:
+        fw_port:
+          - "8200/tcp"
+
+    - block:
+        - name: Create app pod
+          ansible.builtin.include_role:
+            name: eingram23.containers.create_pod
+          vars:
+            publish_ports:
+              - "8200:8200"
+
+        - name: Build container
+          ansible.builtin.include_role:
+            name: eingram23.containers.vault-dev
+          vars:
+            container_name: "{{ vault_container_name }}"
+            ver: "{{ vault_container_ver }}"
+      become: true
+      become_user: poduser
+      become_method: sudo

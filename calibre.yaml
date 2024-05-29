@@ -1,0 +1,12 @@
+---
+# NEEDED VARS: hostvar, env (-test)
+- name: Deploy calibre
+  hosts: "{{ hostvar | default([]) }}"
+  become: true
+  gather_facts: false
+
+  tasks:
+
+    - name: Deploy calibre
+      ansible.builtin.include_role:
+        name: eingram23.containers.calibre

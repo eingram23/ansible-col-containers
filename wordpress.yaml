@@ -1,0 +1,26 @@
+---
+# NEEDED VARS: hostvar, env
+- name: Deploy diversionforum.net
+  hosts: "{{ hostvar | default([]) }}"
+  become: true
+  become_method: sudo
+  become_user: poduser
+  gather_facts: false
+
+  tasks:
+
+    - name: Set facts (www)
+      when: env is not defined
+      block:
+        - ansible.builtin.set_fact:
+            wp_port: 8086
+
+    - name: Set facts (dev)
+      when: env == "-dev"
+      block:
+        - ansible.builtin.set_fact:
+            wp_port: 8087
+
+    - name: Deploy wordpress
+      ansible.builtin.include_role:
+        name: eingram23.containers.wordpress

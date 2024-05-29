@@ -1,0 +1,19 @@
+---
+# NEEDED VARS: hostvar, env (test, www)
+- name: Deploy diversionforum.net
+  hosts: "{{ hostvar | default([]) }}"
+  become: true
+  gather_facts: false
+
+  tasks:
+
+    - name: Deploy diversionforum.net site
+      ansible.builtin.include_role:
+        name: eingram23.containers.diversionforum
+
+    - name: Deploy diversionforum.net site (phpmyadmin update)
+      ansible.builtin.include_role:
+        name: eingram23.containers.diversionforum
+      tags:
+        - update_phpmyadmin
+        - never

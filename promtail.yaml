@@ -1,0 +1,13 @@
+---
+# NEEDED VARS: hostvar
+- name: Deploy promtail
+  hosts: "{{ hostvar | default([]) }}"
+  become: true
+  become_method: sudo
+  gather_facts: false
+
+  tasks:
+
+    - name: Deploy promtail container
+      ansible.builtin.import_role:
+        name: eingram23.containers.promtail

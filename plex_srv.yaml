@@ -1,0 +1,58 @@
+---
+- name: Deploy plex media server container
+  hosts: "{{ hostvar | default('homenas.local.lan') }}"
+  gather_facts: false
+  become: true
+
+  vars:
+    fw_port:
+      - "32400/tcp"
+      - "1900/udp"
+      - "5353/udp"
+      - "8324/tcp"
+      - "32410/udp"
+      - "32412/udp"
+      - "32413/udp"
+      - "32414/udp"
+      - "32469/tcp"
+
+  tasks:
+
+    - name: Disable SELinux (for allowing samba share on PlexMedia with podman)
+      ansible.posix.selinux:
+        state: disabled
+
+    - name: Enable linger for shareaccess user
+      ansible.builtin.command: loginctl enable-linger shareaccess
+
+    - name: Open firewall port
+      ansible.builtin.include_role:
+        name: eingram23.homelab.firewall
+    
+    - name: Change user/owner of Plex files to shareaccess
+      ansible.builtin.file:
+        path: /mnt/pool0/PlexMedia
+        state: directory
+        owner: shareaccess
+        group: shareaccess
+        mode: '0755'
+        recurse: true
+
+    # - name: Set chmod g+s on PlexMedia folder
+    #   ansible.builtin.file:
+    #     path: /mnt/pool0/PlexMedia
+    #     state: directory
+    #     mode: 'g+s'
+    #     recurse: true
+        
+- name: Start plex_srv container
+  hosts: "{{ hostvar | default('homenas.local.lan') }}"
+  gather_facts: false
+  become: true
+  become_method: sudo
+  become_user: shareaccess
+
+  tasks:
+
+    - ansible.builtin.include_role:
+        name: eingram23.containers.plex_srv

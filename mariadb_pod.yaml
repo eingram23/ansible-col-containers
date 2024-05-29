@@ -1,0 +1,70 @@
+---
+- name: Create mariadb pod and containers (mariadb, phpmyadmin)
+  hosts: "{{ hostvar | default([]) }}"
+  gather_facts: false
+  become: true
+  become_method: sudo
+
+  vars:
+    pod_name: "mariadb_pod"
+    mariadb_container_ver: "10.9.2"
+    mariadb_container_name: "mariadb"
+    phpmyadmin_container_ver: "5.2.0-apache"
+    phpmyadmin_container_name: "phpmyadmin"
+
+  tasks:
+
+    - name: Open firewall ports
+      ansible.builtin.include_role:
+        name: eingram23.homelab.firewall
+      vars:
+        fw_port:
+          - "3306/tcp"
+          - "8080/tcp"
+
+    - block:
+        - name: Create pod
+          ansible.builtin.include_role:
+            name: eingram23.containers.create_pod
+          vars:
+            publish_ports:
+              - "3306:3306"
+              - "8080:80"
+
+        - name: Create mariadb container
+          ansible.builtin.include_role:
+            name: eingram23.containers.mariadb
+          vars:
+            container_name: "{{ mariadb_container_name }}"
+            ver: "{{ mariadb_container_ver }}"
+
+        - name: Create phpmyadmin container
+          ansible.builtin.include_role:
+            name: eingram23.containers.phpmyadmin
+          vars:
+            container_name: "{{ phpmyadmin_container_name }}"
+            ver: "{{ phpmyadmin_container_ver }}"
+
+      become: true
+      become_user: poduser
+      become_method: sudo
+
+    - name: Install software req
+      ansible.builtin.package:
+        name: "{{ package_item }}"
+        state: present
+      loop:
+        - python3-mysql
+        - mysql
+      loop_control:
+        loop_var: package_item
+
+    - name: Create mariadb superuser
+      become: false
+      ansible.builtin.include_role:
+        name: eingram23.database.mariadb
+        tasks_from: create_new_user
+      vars:
+        mariadb_user: eingram
+        mariadb_user_pw: "{{ lookup('hashi_vault', 'secret=secret/ssh/eingram:ssh_password') }}"
+        mariadb_user_priv: '*.*:ALL,GRANT'

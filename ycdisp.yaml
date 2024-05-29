@@ -1,0 +1,12 @@
+---
+# NEEDED VARS: hostvar, env (test, www)
+- name: Deploy ycdisp.com
+  hosts: "{{ hostvar | default([]) }}"
+  become: true
+  gather_facts: false
+
+  tasks:
+
+    - name: Deploy ycdisp.com site
+      ansible.builtin.include_role:
+        name: eingram23.containers.ycdisp

@@ -1,0 +1,78 @@
+---
+- name: Create postgres pod and containers (postgres, pgadmin)
+  hosts: "{{ hostvar | default([]) }}"
+  gather_facts: false
+  become: true
+  become_method: sudo
+
+  vars:
+    pod_name: "postgres_pod"
+    postgres_container_ver: "13.8"
+    postgres_container_name: "postgres"
+    pgadmin_container_ver: "6.13"
+    pgadmin_container_name: "pgadmin4"
+
+  tasks:
+
+    - name: Open firewall port for postgres/phpmyadmin
+      ansible.builtin.include_role:
+        name: eingram23.homelab.firewall
+      vars:
+        fw_port:
+          - "5432/tcp"
+          - "8081/tcp"
+
+    - name: Create pgadmin4 directory
+      ansible.builtin.file:
+        path: /opt/pgadmin4
+        state: directory
+        mode: '0755'
+        owner: poduser
+        group: poduser
+
+    - block:
+        - name: Create pod
+          ansible.builtin.include_role:
+            name: eingram23.containers.create_pod
+          vars:
+            publish_ports:
+              - "5432:5432"
+              - "8081:80"
+
+        - name: Create postgres container
+          ansible.builtin.include_role:
+            name: eingram23.containers.postgres
+          vars:
+            container_name: "{{ postgres_container_name }}"
+            ver: "{{ postgres_container_ver }}"
+
+        - name: Create pgadmin container
+          ansible.builtin.include_role:
+            name: eingram23.containers.pgadmin
+          vars:
+            container_name: "{{ pgadmin_container_name }}"
+            ver: "{{ pgadmin_container_ver }}"
+
+      become: true
+      become_user: poduser
+      become_method: sudo
+
+    - name: Install software req
+      ansible.builtin.dnf:
+        name: "{{ package_item }}"
+        state: present
+        disable_gpg_check: true
+      loop:
+        - 'https://download.postgresql.org/pub/repos/yum/reporpms/EL-8-x86_64/pgdg-redhat-repo-latest.noarch.rpm'
+        - python3-psycopg2
+      loop_control:
+        loop_var: package_item
+
+    - name: Disable default postgresql repo
+      command: dnf -qy module disable postgresql
+
+    - name: Install postgresql
+      ansible.builtin.dnf:
+        name: postgresql13
+        state: present
+

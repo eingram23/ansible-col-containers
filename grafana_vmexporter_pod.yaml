@@ -1,0 +1,49 @@
+---
+- name: Deploy grafana pod
+  hosts: "{{ hostvar | default([]) }}"
+  gather_facts: false
+  become: true
+  become_method: sudo
+
+  vars:
+    pod_name: "grafana_pod"
+    grafana_container_ver: "9.0.1"
+    grafana_container_name: "grafana"
+    vmware_exporter_container_ver: "v0.18.3"
+    vmware_exporter_container_name: "vmware_exporter"
+
+  tasks:
+
+    - name: Open firewall ports
+      ansible.builtin.include_role:
+        name: eingram23.homelab.firewall
+      vars:
+        fw_port:
+          - "3000/tcp"
+          - "9272/tcp"
+
+    - block:
+        - name: Create app pod
+          ansible.builtin.include_role:
+            name: eingram23.containers.create_pod
+          vars:
+            publish_ports:
+              - "3000:3000"
+              - "9272:9272"
+
+        - name: Create grafana container
+          ansible.builtin.include_role:
+            name: eingram23.containers.grafana
+          vars:
+            container_name: "{{ grafana_container_name }}"
+            ver: "{{ grafana_container_ver }}"
+
+        - name: Create vmware_exporter container
+          ansible.builtin.include_role:
+            name: eingram23.containers.vmware_exporter
+          vars:
+            container_name: "{{ vmware_exporter_container_name }}"
+            ver: "{{ vmware_exporter_container_ver }}"
+      become: true
+      become_user: poduser
+      become_method: sudo

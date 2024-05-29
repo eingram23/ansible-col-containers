@@ -1,0 +1,13 @@
+---
+- name: Deploy obico_ml container
+  hosts: "{{ hostvar | default('homenas.local.lan') }}"
+  gather_facts: false
+  become: true
+  become_method: sudo
+  become_user: poduser
+
+  tasks:
+
+    - name: Run obico_ml role
+      ansible.builtin.import_role:
+        name: eingram23.containers.obico_ml

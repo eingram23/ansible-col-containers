@@ -1,0 +1,51 @@
+- name: Deploy docker pihole
+  hosts: "{{ hostvar | default('dietpi1.local.lan') }}"
+  gather_facts: false
+  become: true
+  become_method: sudo
+
+  tasks:
+
+    - name: Install python modules
+      ansible.builtin.pip:
+        name: "{{ item }}"
+      loop:
+        - requests
+        - docker
+
+    - name: Install openssh-client for scp access
+      ansible.builtin.apt:
+        name: openssh-client
+        state: present
+
+    - name: Add gpu_mem=128 to /boot/config.txt
+      ansible.builtin.lineinfile:
+        path: /boot/config.txt
+        regexp: '^gpu_mem=128'
+        insertafter: "#-------RPi camera module-------"
+        line: 'gpu_mem=128'
+      notify: Reboot server
+
+    - name: Add start_x=1 to /boot/config.txt
+      ansible.builtin.lineinfile:
+        path: /boot/config.txt
+        regexp: '^start_x=1'
+        insertafter: "#-------RPi camera module-------"
+        line: 'start_x=1'
+      notify: Reboot server
+
+    - name: Add bcm2835-v4l2 module to start up
+      ansible.builtin.lineinfile:
+        path: /etc/modules
+        regexp: 'bcm2835-v4l2'
+        insertafter: '# at boot time, one per line. Lines beginning with "#" are ignored.'
+        line: 'bcm2835-v4l2'
+      notify: Reboot server
+
+    - ansible.builtin.include_role:
+        name: eingram23.containers.octoprint_docker
+
+  handlers:
+
+    - name: Reboot server
+      ansible.builtin.reboot:

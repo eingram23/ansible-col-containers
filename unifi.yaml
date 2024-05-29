@@ -1,0 +1,13 @@
+---
+- name: Deploy unifi-controller
+  hosts: "{{ hostvar | default('homenas.local.lan') }}"
+  gather_facts: false
+  become: true
+  become_method: sudo
+  become_user: poduser
+
+  tasks:
+
+    - name: Run unifi controller role
+      ansible.builtin.import_role:
+        name: eingram23.containers.unifi
