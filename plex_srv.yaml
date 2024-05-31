@@ -1,5 +1,5 @@
 ---
-- name: Deploy plex media server container
+- name: Deploy plex media server container prereqs
   hosts: "{{ hostvar | default('homenas.local.lan') }}"
   gather_facts: false
   become: true
@@ -28,7 +28,7 @@
     - name: Open firewall port
       ansible.builtin.include_role:
         name: eingram23.homelab.firewall
-    
+
     - name: Change user/owner of Plex files to shareaccess
       ansible.builtin.file:
         path: /mnt/pool0/PlexMedia
@@ -38,14 +38,7 @@
         mode: '0755'
         recurse: true
 
-    # - name: Set chmod g+s on PlexMedia folder
-    #   ansible.builtin.file:
-    #     path: /mnt/pool0/PlexMedia
-    #     state: directory
-    #     mode: 'g+s'
-    #     recurse: true
-        
-- name: Start plex_srv container
+- name: Deploy plex_srv container
   hosts: "{{ hostvar | default('homenas.local.lan') }}"
   gather_facts: false
   become: true
