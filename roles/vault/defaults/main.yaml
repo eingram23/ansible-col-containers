@@ -1,0 +1,4 @@
+---
+container_name: "vault"
+user_account: "poduser"
+host_folder: "/opt/vault"

@@ -1,0 +1,55 @@
+---
+- name: Copy vault config files to remote server
+  ansible.builtin.copy:
+    src: "{{ item }}"
+    dest: "{{ host_folder }}/"
+    mode: '0644'
+  with_fileglob: "*"
+
+- name: Create vault container
+  containers.podman.podman_container:
+    name: "{{ container_name }}"
+    image: docker.io/hashicorp/vault:"{{ ver }}"
+    state: started
+    restart_policy: always
+    # env:
+    #   VAULT_ADDR: "http://127.0.0.1:8200"
+    #   VAULT_DEV_ROOT_TOKEN_ID: "{{ lookup('hashi_vault', 'secret=secret/ssh/eingram:ssh_password') }}"
+    volumes:
+      - vault_data:/vault/file
+      - "{{ host_folder }}:/vault/config"
+    cap_add:
+      - IPC_LOCK
+    entrypoint: vault server -config=/vault/config/vault.hcl
+    generate_systemd:
+      path: /home/{{ user_account }}/.config/systemd/user
+      restart_policy: always
+
+- name: Create policies
+  ansible.builtin.shell:
+    cmd: |
+      podman exec vault-0 /bin/sh -c "`cat {{ host_folder }}/ansible-policy.sh`"
+      podman exec vault-0 /bin/sh -c "`cat {{ host_folder }}/pki-policy.sh`"
+      podman exec vault-0 /bin/sh -c "`cat {{ host_folder }}/admins-policy.sh`"
+
+# - name: Set XDG_RUNTIME_DIR env variable
+#   ansible.builtin.lineinfile:
+#     path: /home/{{ user_account }}/.bash_profile
+#     search_string: 'export XDG_RUNTIME_DIR=/run/user/$(id -u)'
+#     insertafter: '# User specific environment and startup programs'
+#     line: 'export XDG_RUNTIME_DIR=/run/user/$(id -u)'
+
+# - name: Get {{ user_account }} info
+#   ansible.builtin.user:
+#     name: "{{ user_account }}"
+#   register: user_info
+
+# - name: Enable container-{{ container_name }} service
+#   ansible.builtin.systemd:
+#     name: container-{{ container_name }}
+#     state: started
+#     enabled: true
+#     daemon_reload: true
+#     scope: user
+#   environment:
+#     XDG_RUNTIME_DIR: /run/user/{{ user_info.uid }}

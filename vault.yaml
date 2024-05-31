@@ -1,0 +1,37 @@
+---
+- name: Deploy vault container prereqs
+  hosts: "{{ hostvar | default([]) }}"
+  gather_facts: false
+  become: true
+  become_method: sudo
+
+  vars:
+    fw_port:
+      - "8200/tcp"
+
+  tasks:
+
+    - name: Create vault folder
+      ansible.builtin.file:
+        path: "{{ host_folder }}"
+        state: directory
+        mode: '0755'
+        owner: poduser
+        group: poduser
+
+    - name: Open firewall ports
+      ansible.builtin.include_role:
+        name: eingram23.homelab.firewall
+
+- name: Deploy vault container
+  hosts: "{{ hostvar | default([]) }}"
+  gather_facts: false
+  become: true
+  become_method: sudo
+  become_user: poduser
+
+  tasks:
+
+    - name: Deploy vault container
+      ansible.builtin.import_role:
+        name: eingram23.containers.vault
