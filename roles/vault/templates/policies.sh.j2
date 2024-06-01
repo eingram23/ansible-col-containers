@@ -1,3 +1,9 @@
+#!/usr/bin/env bash
+
+export VAULT_ADDR='http://0.0.0.0:8200'
+
+vault login {{ init_keys.root_token }}
+
 vault policy write admins - <<EOF
 # Read system health check
 path "sys/health"
@@ -63,5 +69,16 @@ path "sys/mounts"
 path "pki_int*"                      
 { 
   capabilities = ["create", "read", "update", "delete", "list", "sudo"]
+}
+EOF
+
+vault auth enable approle
+vault write auth/approle/role/ansible token_num_uses=0 token_ttl=0m secret_id_num_uses=0 token_no_default_policy=false token_policies="ansible"
+vault auth enable userpass
+vault write auth/userpass/users/eingram password=temppassword policies=admins
+
+vault policy write ansible - <<EOF
+path "secret/*" {
+  capabilities = [ "read" ]
 }
 EOF

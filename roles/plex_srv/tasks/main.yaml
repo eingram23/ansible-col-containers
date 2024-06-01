@@ -1,8 +1,33 @@
 ---
-- name: Create and run plex_srv container
+- name: Run root tasks
+  become: true
+  become_method: sudo
+  become_user: root
+  block:
+    - name: Disable SELinux (for allowing samba share on PlexMedia with podman)
+      ansible.posix.selinux:
+        state: disabled
+
+    - name: Enable linger for {{ user_account }} user
+      ansible.builtin.command: loginctl enable-linger {{ user_account }}
+
+    - name: Open firewall port
+      ansible.builtin.include_role:
+        name: eingram23.homelab.firewall
+
+    - name: Change user/owner of Plex files to {{ user_account }}
+      ansible.builtin.file:
+        path: /mnt/pool0/PlexMedia
+        state: directory
+        owner: {{ user_account }}
+        group: {{ user_account }}
+        mode: '0755'
+        recurse: true
+
+- name: Create and run {{ container_name }} container
   containers.podman.podman_container:
-    name: "plex_srv"
-    image: lscr.io/linuxserver/plex:{{ plex_srv_ver }}
+    name: "{{ container_name }}"
+    image: lscr.io/linuxserver/plex:{{ ver }}
     state: stopped
     restart_policy: always
     env:
@@ -21,27 +46,27 @@
       - /mnt/pool0/PlexMedia/AnimTVShows:/animtvshows:Z
       - /mnt/pool0/PlexMedia/Videos:/videos:Z
     generate_systemd:
-      path: /home/shareaccess/.config/systemd/user
+      path: /home/{{ user_account }}/.config/systemd/user
       restart_policy: always
 
 - name: Set XDG_RUNTIME_DIR env variable
   ansible.builtin.lineinfile:
-    path: /home/shareaccess/.bash_profile
+    path: /home/{{ user_account }}/.bash_profile
     search_string: 'export XDG_RUNTIME_DIR=/run/user/$(id -u)'
     insertafter: '# User specific environment and startup programs'
     line: 'export XDG_RUNTIME_DIR=/run/user/$(id -u)'
 
-- name: Get shareaccess info
+- name: Get {{ user_account }} info
   ansible.builtin.user:
-    name: shareaccess
-  register: shareaccess_info
+    name: "{{ user_account }}"
+  register: user_info
 
-- name: Enable container-plex_srv service
+- name: Enable container-{{ container_name }} service
   ansible.builtin.systemd:
-    name: container-plex_srv
+    name: container-{{ container_name }}
     state: started
     enabled: true
     daemon_reload: true
     scope: user
   environment:
-    XDG_RUNTIME_DIR: /run/user/{{ shareaccess_info.uid }}
+    XDG_RUNTIME_DIR: /run/user/{{ user_info.uid }}

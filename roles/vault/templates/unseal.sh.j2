@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+
+export VAULT_ADDR='http://0.0.0.0:8200'
+
+vault operator unseal {{ init_keys.unseal_keys_hex[0] }}
+

@@ -2,3 +2,5 @@
 container_name: "vault"
 user_account: "poduser"
 host_folder: "/opt/vault"
+fw_port:
+  - "8200/tcp"

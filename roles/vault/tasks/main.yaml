@@ -1,4 +1,24 @@
 ---
+- name: Run root tasks
+  become: true
+  become_method: sudo
+  become_user: root
+  block:
+    - name: Enable linger for {{ user_account }} user
+      ansible.builtin.command: loginctl enable-linger shareaccess
+
+    - name: Create vault folder
+      ansible.builtin.file:
+        path: "{{ host_folder }}"
+        state: directory
+        mode: '0755'
+        owner: poduser
+        group: poduser
+
+    - name: Open firewall ports
+      ansible.builtin.include_role:
+        name: eingram23.homelab.firewall
+
 - name: Copy vault config files to remote server
   ansible.builtin.copy:
     src: "{{ item }}"
@@ -6,50 +26,96 @@
     mode: '0644'
   with_fileglob: "*"
 
+- name: Check if vault container already exists
+  ansible.builtin.podman_container_info:
+    name: "{{ container_name }}"
+  register: vault_info
+
+- name: End play if vault exists
+  when: '"Error: no such container vault" not in vault_info.stderr'
+  ansible.builtin.meta: end_play
+
 - name: Create vault container
   containers.podman.podman_container:
     name: "{{ container_name }}"
-    image: docker.io/hashicorp/vault:"{{ ver }}"
-    state: started
+    image: docker.io/hashicorp/vault:{{ ver }}
+    state: stopped
     restart_policy: always
-    # env:
-    #   VAULT_ADDR: "http://127.0.0.1:8200"
-    #   VAULT_DEV_ROOT_TOKEN_ID: "{{ lookup('hashi_vault', 'secret=secret/ssh/eingram:ssh_password') }}"
+    publish:
+      - 8200:8200
+    env:
+      VAULT_ADDR: "http://127.0.0.1:8200"
     volumes:
-      - vault_data:/vault/file
+      - vault_data:/vault/file:z
       - "{{ host_folder }}:/vault/config"
     cap_add:
       - IPC_LOCK
-    entrypoint: vault server -config=/vault/config/vault.hcl
+    command: vault server -config=/vault/config/vault.hcl
     generate_systemd:
       path: /home/{{ user_account }}/.config/systemd/user
       restart_policy: always
 
-- name: Create policies
-  ansible.builtin.shell:
-    cmd: |
-      podman exec vault-0 /bin/sh -c "`cat {{ host_folder }}/ansible-policy.sh`"
-      podman exec vault-0 /bin/sh -c "`cat {{ host_folder }}/pki-policy.sh`"
-      podman exec vault-0 /bin/sh -c "`cat {{ host_folder }}/admins-policy.sh`"
+- name: Set XDG_RUNTIME_DIR env variable
+  ansible.builtin.lineinfile:
+    path: /home/{{ user_account }}/.bash_profile
+    search_string: 'export XDG_RUNTIME_DIR=/run/user/$(id -u)'
+    insertafter: '# User specific environment and startup programs'
+    line: 'export XDG_RUNTIME_DIR=/run/user/$(id -u)'
 
-# - name: Set XDG_RUNTIME_DIR env variable
-#   ansible.builtin.lineinfile:
-#     path: /home/{{ user_account }}/.bash_profile
-#     search_string: 'export XDG_RUNTIME_DIR=/run/user/$(id -u)'
-#     insertafter: '# User specific environment and startup programs'
-#     line: 'export XDG_RUNTIME_DIR=/run/user/$(id -u)'
+- name: Get {{ user_account }} info
+  ansible.builtin.user:
+    name: "{{ user_account }}"
+  register: user_info
 
-# - name: Get {{ user_account }} info
-#   ansible.builtin.user:
-#     name: "{{ user_account }}"
-#   register: user_info
+- name: Enable container-{{ container_name }} service
+  ansible.builtin.systemd:
+    name: container-{{ container_name }}
+    state: started
+    enabled: true
+    daemon_reload: true
+    scope: user
+  environment:
+    XDG_RUNTIME_DIR: /run/user/{{ user_info.uid }}
 
-# - name: Enable container-{{ container_name }} service
-#   ansible.builtin.systemd:
-#     name: container-{{ container_name }}
-#     state: started
-#     enabled: true
-#     daemon_reload: true
-#     scope: user
-#   environment:
-#     XDG_RUNTIME_DIR: /run/user/{{ user_info.uid }}
+- name: Pause 10 seconds to allow vault to start up
+  ansible.builtin.pause:
+    seconds: 10
+
+- name: Init Vault
+  containers.podman.podman_container_exec:
+    name: "{{ container_name }}"
+    command: sh /vault/config/init.sh
+
+- name: Read init-keys.json
+  ansible.builtin.slurp:
+    src: "{{ host_folder }}/init-keys.json"
+  register: init_keys_encoded
+
+- name: Decode init-keys
+  ansible.builtin.set_fact:
+    init_keys: "{{ init_keys_encoded['content'] | b64decode }}"
+
+- name: Create scripts
+  ansible.builtin.template:
+    src: "{{ item }}.j2"
+    dest: "{{ host_folder }}/{{ item }}"
+    owner: poduser
+    group: poduser
+    mode: '0644'
+  loop:
+    - unseal.sh
+    - policies.sh
+  become: true
+  become_method: sudo
+  become_user: root
+
+- name: Unseal Vault
+  containers.podman.podman_container_exec:
+    name: "{{ container_name }}"
+    command: sh /vault/config/unseal.sh
+
+- name: Run policies
+  containers.podman.podman_container_exec:
+    name: "{{ container_name }}"
+    command: sh /vault/config/policies.sh
+

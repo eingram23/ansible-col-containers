@@ -1,0 +1,13 @@
+---
+container_name: "plex_srv"
+user_account: "shareaccess"
+fw_port:
+  - "32400/tcp"
+  - "1900/udp"
+  - "5353/udp"
+  - "8324/tcp"
+  - "32410/udp"
+  - "32412/udp"
+  - "32413/udp"
+  - "32414/udp"
+  - "32469/tcp"
