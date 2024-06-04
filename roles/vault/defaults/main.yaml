@@ -1,5 +1,5 @@
 ---
-container_name: "vault"
+app_name: "vault"
 user_account: "poduser"
 host_folder: "/opt/vault"
 fw_port:

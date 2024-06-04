@@ -5,15 +5,15 @@
   become_user: root
   block:
     - name: Enable linger for {{ user_account }} user
-      ansible.builtin.command: loginctl enable-linger shareaccess
+      ansible.builtin.command: loginctl enable-linger {{ user_account }}
 
     - name: Create vault folder
       ansible.builtin.file:
         path: "{{ host_folder }}"
         state: directory
         mode: '0755'
-        owner: poduser
-        group: poduser
+        owner: "{{ user_account }}"
+        group: "{{ user_account }}"
 
     - name: Open firewall ports
       ansible.builtin.include_role:
@@ -28,7 +28,7 @@
 
 - name: Check if vault container already exists
   ansible.builtin.podman_container_info:
-    name: "{{ container_name }}"
+    name: "{{ app_name }}"
   register: vault_info
 
 - name: End play if vault exists
@@ -37,7 +37,7 @@
 
 - name: Create vault container
   containers.podman.podman_container:
-    name: "{{ container_name }}"
+    name: "{{ app_name }}"
     image: docker.io/hashicorp/vault:{{ ver }}
     state: stopped
     restart_policy: always
@@ -67,9 +67,9 @@
     name: "{{ user_account }}"
   register: user_info
 
-- name: Enable container-{{ container_name }} service
+- name: Enable container-{{ app_name }} service
   ansible.builtin.systemd:
-    name: container-{{ container_name }}
+    name: container-{{ app_name }}
     state: started
     enabled: true
     daemon_reload: true
@@ -83,7 +83,7 @@
 
 - name: Init Vault
   containers.podman.podman_container_exec:
-    name: "{{ container_name }}"
+    name: "{{ app_name }}"
     command: sh /vault/config/init.sh
 
 - name: Read init-keys.json
@@ -99,8 +99,8 @@
   ansible.builtin.template:
     src: "{{ item }}.j2"
     dest: "{{ host_folder }}/{{ item }}"
-    owner: poduser
-    group: poduser
+    owner: "{{ user_account }}"
+    group: "{{ user_account }}"
     mode: '0644'
   loop:
     - unseal.sh
@@ -111,11 +111,11 @@
 
 - name: Unseal Vault
   containers.podman.podman_container_exec:
-    name: "{{ container_name }}"
+    name: "{{ app_name }}"
     command: sh /vault/config/unseal.sh
 
 - name: Run policies
   containers.podman.podman_container_exec:
-    name: "{{ container_name }}"
+    name: "{{ app_name }}"
     command: sh /vault/config/policies.sh
 
