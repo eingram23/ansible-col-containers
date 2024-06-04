@@ -1,4 +1,3 @@
 ---
-# ver: "7.5.174"
-unifi_ver: "8.0.24-ls23"
-mongo_ver: "4.4.26"
+unifi_ver: "8.2.93-ls47"
+mongo_ver: "7.0.11"

@@ -1,4 +1,7 @@
 ---
+app_name: "unifi"
+user_account: "poduser"
+host_folder: "/opt/unifi"
 fw_port:
   - "3478/udp"
   - "10001/udp"
