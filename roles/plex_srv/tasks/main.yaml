@@ -19,14 +19,28 @@
       ansible.builtin.file:
         path: /mnt/pool0/PlexMedia
         state: directory
-        owner: {{ user_account }}
-        group: {{ user_account }}
+        owner: "{{ user_account }}"
+        group: "{{ user_account }}"
         mode: '0755'
         recurse: true
 
-- name: Create and run {{ container_name }} container
+- name: Prep for upgrade
+  when: upgrade
+  block:
+    - name: Stop systemd service for {{ app_name }} container
+      ansible.builtin.systemd:
+        name: container-{{ app_name }}
+        state: stopped
+        scope: user
+
+    - name: Remove {{ app_name }} container
+      containers.podman.podman_container:
+        name: "{{ app_name }}"
+        state: absent
+
+- name: Create and run {{ app_name }} container
   containers.podman.podman_container:
-    name: "{{ container_name }}"
+    name: "{{ app_name }}"
     image: lscr.io/linuxserver/plex:{{ ver }}
     state: stopped
     restart_policy: always
@@ -61,9 +75,9 @@
     name: "{{ user_account }}"
   register: user_info
 
-- name: Enable container-{{ container_name }} service
+- name: Enable container-{{ app_name }} service
   ansible.builtin.systemd:
-    name: container-{{ container_name }}
+    name: container-{{ app_name }}
     state: started
     enabled: true
     daemon_reload: true

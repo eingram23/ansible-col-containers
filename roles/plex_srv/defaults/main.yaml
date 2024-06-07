@@ -1,5 +1,5 @@
 ---
-container_name: "plex_srv"
+app_name: "plex_srv"
 user_account: "shareaccess"
 fw_port:
   - "32400/tcp"

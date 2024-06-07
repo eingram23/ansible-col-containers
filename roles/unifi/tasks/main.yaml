@@ -28,12 +28,13 @@
         group: "{{ user_account }}"
 
 - name: Prep for upgrade
-  when: upgrade
+  when: upgrade is defined and upgrade
   block:
     - name: Stop systemd service for {{ app_name }} pod
       ansible.builtin.systemd:
         name: pod-{{ app_name }}
         state: stopped
+        enabled: false
         scope: user
 
     - name: Remove {{ app_name }} pod
@@ -42,7 +43,7 @@
         state: absent
 
     - name: Remove mongodb volume
-      when: upgrade_mongodb
+      when: upgrade_mongodb is defined and upgrade_mongodb
       containers.podman.podman_volume:
         state: absent
         name: unifi-db-data
