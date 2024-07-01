@@ -126,16 +126,12 @@
   environment:
     XDG_RUNTIME_DIR: /run/user/{{ user_info.uid }}
 
-# - name: Hide mongo pw in init script
-#   ansible.builtin.lineinfile:
-#     path: "{{ host_folder }}/init-mongo.js"
-#     search_string: "{{ lookup('hashi_vault', 'secret=secret/ssh/eingram:ssh_password') }}"
-#     line: var pwd = ""
-#     owner: "{{ user_account }}"
-#     group: "{{ user_account }}"
-#     mode: '0644'
+- name: Hide mongo pw in init script
+  ansible.builtin.lineinfile:
+    path: "{{ host_folder }}/init-mongo.js"
+    search_string: "{{ lookup('hashi_vault', 'secret=secret/ssh/eingram:ssh_password') }}"
+    line: var pwd = ""
+    owner: "{{ user_account }}"
+    group: "{{ user_account }}"
+    mode: '0644'
 
-- name: Remove mongo init script
-  ansible.builtin.file:
-    path: /opt/unifi/init-mongo.js
-    state: absent
