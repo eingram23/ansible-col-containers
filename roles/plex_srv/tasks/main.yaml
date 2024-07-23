@@ -38,6 +38,11 @@
         name: "{{ app_name }}"
         state: absent
 
+    - name: Remove plex_srv:latest image
+      containers.podman.podman_image:
+        name: lscr.io/linuxserver/plex:latest
+        state: absent
+
 - name: Create and run {{ app_name }} container
   containers.podman.podman_container:
     name: "{{ app_name }}"
