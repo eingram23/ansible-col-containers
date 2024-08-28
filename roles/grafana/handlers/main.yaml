@@ -1,7 +1,0 @@
----
-- name: Restart grafana container
-  containers.podman.podman_container:
-    name: grafana
-    image: docker.io/grafana/grafana:{{ ver }}
-    state: started
-    restart: true

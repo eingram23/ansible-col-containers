@@ -1,13 +1,12 @@
 ---
 - name: Ensure vars are set
   ansible.builtin.assert:
-    that: 
-      - migrate == "no" or migrate == "yes"
+    that:
       - env == "dev" or env == "prod"
 
-- name: Create grafana_agent folder structure
+- name: Create {{ app_name }} folder structure
   ansible.builtin.file:
-    path: /opt/grafana_agent
+    path: /opt/{{ app_name }}
     state: directory
     mode: '0755'
 
@@ -30,15 +29,28 @@
 - name: Create agent.yaml on remote server
   ansible.builtin.template:
     src: "{{ item }}.j2"
-    dest: /opt/grafana_agent/{{ item }}
+    dest: /opt/{{ app_name }}/{{ item }}
     mode: '0644'
   loop:
     - agent.yaml
   # notify: Restart grafana_agent container
 
-- name: Run grafana_agent container
+- name: Prep for upgrade
+  when: upgrade == "yes"
+  block:
+    - name: Stop systemd service for {{ app_name }} container
+      ansible.builtin.systemd:
+        name: container-{{ app_name }}
+        state: stopped
+
+    - name: Remove {{ app_name }} container
+      containers.podman.podman_container:
+        name: "{{ app_name }}"
+        state: absent
+
+- name: Run {{ app_name }} container
   containers.podman.podman_container:
-    name: grafana_agent
+    name: "{{ app_name }}"
     image: docker.io/grafana/agent:{{ ver }}
     state: stopped
     restart_policy: always
@@ -54,16 +66,16 @@
       - /sys:/host/sys:ro,rslave
       - /proc:/host/proc:ro,rslave
       - /var/log:/var/log:ro
-      - /opt/grafana_agent:/etc/agent
-      - /opt/grafana_agent/agent.yaml:/etc/agent-config/agent.yaml
+      - /opt/{{ app_name }}:/etc/agent
+      - /opt/{{ app_name }}/agent.yaml:/etc/agent-config/agent.yaml
       - /var/run/dbus/system_bus_socket:/var/run/dbus/system_bus_socket:rw
     generate_systemd:
       path: /etc/systemd/system
       restart_policy: always
 
-- name: Enable container-grafana_agent service
+- name: Enable container-{{ app_name }} service
   ansible.builtin.systemd:
-    name: container-grafana_agent
+    name: container-{{ app_name }}
     state: started
     enabled: true
     daemon_reload: true

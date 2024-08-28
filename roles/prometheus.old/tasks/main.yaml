@@ -1,0 +1,154 @@
+---
+- name: Create prometheus folder
+  ansible.builtin.file:
+    path: /opt/prometheus
+    state: directory
+    mode: '0755'
+    owner: poduser
+    group: poduser
+  become: true
+  become_method: sudo
+  become_user: root
+
+- name: Run podman unshare
+  ansible.builtin.shell:
+    podman unshare chown -R 0:0 /opt/prometheus
+
+- name: Copy prometheus files to remote server
+  ansible.builtin.copy:
+    src: "{{ item }}"
+    dest: /opt/prometheus/
+    mode: '0644'
+    owner: poduser
+    group: poduser
+  with_fileglob: "*"
+  notify: Restart prometheus container
+
+- name: Create github key
+  ansible.builtin.template:
+    src: ssh-key-git.key.j2
+    dest: /var/tmp/ssh-key-git.key
+    mode: '0400'
+
+- name: Make sure configs folder doesn't exist
+  ansible.builtin.file:
+    path: /var/tmp/configs
+    state: absent
+
+- name: Pull down configs from git
+  ansible.builtin.git:
+    repo: 'git@github.com:eingram23/configs.git'
+    dest: /var/tmp/configs
+    clone: true
+    key_file: /var/tmp/ssh-key-git.key
+    accept_hostkey: true
+
+- name: Delete key
+  ansible.builtin.file:
+    path: /var/tmp/ssh-key-git.key
+    state: absent
+
+- name: Read prometheus.yml file
+  ansible.builtin.slurp:
+    src: "/var/tmp/configs/prometheus/prometheus.yml"
+  register: prometheus_config_enc
+
+- name: Decode remote content
+  ansible.builtin.set_fact:
+    prometheus_config: "{{ prometheus_config_enc['content'] | b64decode }}"
+
+- name: Create prometheus.yml file
+  ansible.builtin.template:
+    src: prometheus.yml.j2
+    dest: /opt/prometheus/prometheus.yml
+    mode: '0644'
+  notify: Restart prometheus container
+
+# - name: Modify prometheus.yml to change vmware target
+#   ansible.builtin.lineinfile:
+#     path: /opt/prometheus/prometheus.yml
+#     search_string: 'vmware-exporter.monitoring.svc.cluster.local:9272'
+#     line: "      - targets: ['vmware_exporter:9272']"
+
+- name: Check for tls.crt
+  ansible.builtin.stat:
+    path: /opt/prometheus/tls.crt
+  register: crt_file
+
+- name: Run cert tasks
+  when: not crt_file.stat.exists
+  block:
+    - name: Generate a certificate with an existing token
+      community.hashi_vault.vault_pki_generate_certificate:
+        role_name: "{{ vault_role }}"
+        common_name: "{{ common_name }}"
+        alt_names:
+          - "{{ common_name }}"
+        ip_sans:
+          - "{{ ip_address }}"
+        ttl: "{{ ttl }}"
+        url: https://vault.local.lan/
+        engine_mount_point: pki_int
+        auth_method: userpass
+        username: "eingram"
+        password: "{{ lookup('hashi_vault', 'secret=secret/ssh/eingram:ssh_password') }}"
+        validate_certs: false
+      register: cert_data
+      delegate_to: localhost
+      become: false
+
+    - name: Create tls.crt on host
+      ansible.builtin.template:
+        src: tls.crt.j2
+        dest: /opt/prometheus/tls.crt
+        mode: '440'
+        owner: poduser
+        group: poduser
+
+    - name: Create key on host
+      ansible.builtin.copy:
+        dest: /opt/prometheus/tls.key
+        content: "{{ cert_data.data.data.private_key }}"
+        mode: '0400'
+        owner: poduser
+        group: poduser
+
+    - name: Create rootca on host
+      ansible.builtin.copy:
+        dest: /opt/prometheus/ca.crt
+        content: "{{ cert_data.data.data.ca_chain[1] }}"
+        mode: '0440'
+        owner: poduser
+        group: poduser
+
+- name: Open firewall ports
+  ansible.builtin.include_role:
+    name: eingram23.homelab.firewall
+    apply:
+      become: true
+      become_method: sudo
+      become_user: root
+
+- name: Run podman unshare
+  ansible.builtin.shell:
+    podman unshare chown -R 65534:65534 /opt/prometheus
+
+- name: Create and run prometheus container
+  containers.podman.podman_container:
+    name: "{{ container_name }}"
+    image: docker.io/prom/prometheus:{{ ver }}
+    state: started
+    restart_policy: always
+    pod: "{{ pod_name }}"
+    command: >
+      --config.file=/etc/prometheus/prometheus.yml
+      --storage.tsdb.path=/prometheus
+      --storage.tsdb.retention.time=3d
+      --storage.tsdb.retention.size=10GB
+      --web.console.libraries=/usr/share/prometheus/console_libraries
+      --web.console.templates=/usr/share/prometheus/consoles
+      --web.external-url=http://{{ inventory_hostname }}:9091
+    volume:
+      - "{{ container_name }}-data:/prometheus"
+      - /opt/prometheus/:/etc/prometheus/
+

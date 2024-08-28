@@ -1,0 +1,6 @@
+---
+app_name: "promtail_syslog"
+user_account: "poduser"
+image: "docker.io/grafana/promtail"
+upgrade: "no"
+

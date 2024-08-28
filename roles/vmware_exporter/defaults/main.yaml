@@ -1,3 +1,6 @@
-container_name: "vmware-exporter"
+app_name: "vmware_exporter"
+user_account: "poduser"
+image: "docker.io/pryorda/vmware_exporter"
+upgrade: "no"
 fw_port:
   - "9272/tcp"

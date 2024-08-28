@@ -1,4 +1,7 @@
-container_name: "grafana"
+---
+app_name: "grafana"
+user_account: "poduser"
+image: "docker.io/grafana/grafana"
+upgrade: "no"
 fw_port:
   - "3000/tcp"
-privkey: "{{ lookup('hashi_vault', 'secret=secret/git/ssh:key') }}"

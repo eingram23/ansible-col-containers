@@ -1,6 +1,6 @@
 ---
 # NEEDED VARS: hostvar, ttl, vault_role (local-dot-lan ycdisp-dot-net)
-- name: Deploy monitoring pod and containers (prometheus, grafana, vmware_exporter, alertmanager, loki)
+- name: Deploy monitoring pod and containers
   hosts: "{{ hostvar | default([]) }}"
   gather_facts: false
   become: true
@@ -14,7 +14,12 @@
       - "9093:9093"
       - "3000:3000"
       - "9272:9272"
+      - "9115:9115"
       - "3100:3100"
+      - "9116:9116"
+      - "116:116/udp"
+      - "514:514"
+      - "514:514/udp"
 
   tasks:
 
@@ -53,3 +58,55 @@
         name: eingram23.containers.loki
       tags:
         - loki
+
+    - name: Create blackbox_exporter container
+      ansible.builtin.import_role:
+        name: eingram23.containers.blackbox_exporter
+      tags:
+        - blackbox_exporter
+
+    - name: Create snmp_exporter container
+      ansible.builtin.import_role:
+        name: eingram23.containers.snmp_exporter
+      tags:
+        - snmp_exporter
+
+    - name: Create unpoller container
+      ansible.builtin.import_role:
+        name: eingram23.containers.unpoller
+      tags:
+        - unpoller
+
+    - name: Create rsyslog container
+      ansible.builtin.import_role:
+        name: eingram23.containers.rsyslog
+      tags:
+        - rsyslog
+
+    - name: Create promtail_syslog container
+      ansible.builtin.import_role:
+        name: eingram23.containers.promtail_syslog
+      tags:
+        - promtail
+
+    - name: Get {{ user_account }} info
+      ansible.builtin.user:
+        name: "{{ user_account }}"
+      register: user_info
+
+    - name: Generate systemd units for {{ pod_name }} pod and containers
+      containers.podman.podman_generate_systemd:
+        name: "{{ pod_name }}"
+        no_header: true
+        restart_policy: always
+        dest: ~/.config/systemd/user/
+
+    - name: Enable and start pod-{{ pod_name }} service
+      ansible.builtin.systemd:
+        name: pod-{{ pod_name }}
+        state: started
+        enabled: true
+        daemon_reload: true
+        scope: user
+      environment:
+        XDG_RUNTIME_DIR: /run/user/{{ user_info.uid }}

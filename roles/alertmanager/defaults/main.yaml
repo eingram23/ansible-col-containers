@@ -1,3 +1,7 @@
-container_name: "alertmanager"
+---
+app_name: "alertmanager"
+image: "docker.io/prom/alertmanager"
+user_account: "poduser"
+upgrade: "no"
 fw_port:
   - "9093/tcp"

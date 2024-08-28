@@ -1,4 +1,7 @@
-container_name: "loki"
+---
+app_name: "loki"
+user_account: "poduser"
+image: "docker.io/grafana/loki"
+upgrade: "no"
 fw_port:
   - "3100/tcp"
-# privkey: "{{ lookup('hashi_vault', 'secret=secret/git/ssh:key') }}"

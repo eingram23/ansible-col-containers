@@ -25,7 +25,7 @@
         recurse: true
 
 - name: Prep for upgrade
-  when: upgrade
+  when: upgrade == "yes"
   block:
     - name: Stop systemd service for {{ app_name }} container
       ansible.builtin.systemd:

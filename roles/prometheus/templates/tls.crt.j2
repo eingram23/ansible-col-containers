@@ -1,2 +1,2 @@
-{{ cert_data.data.data.certificate }}
-{{ cert_data.data.data.issuing_ca }}
+{{ lookup('hashi_vault', 'secret=secret/cert/' ~ inventory_hostname_short ~ ':crt') }}
+{{ lookup('hashi_vault', 'secret=secret/cert/int:crt') }}

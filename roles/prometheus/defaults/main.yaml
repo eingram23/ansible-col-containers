@@ -1,5 +1,7 @@
-container_name: "prometheus"
+---
+app_name: "prometheus"
+user_account: "poduser"
+image: "docker.io/prom/prometheus"
+upgrade: "no"
 fw_port:
   - "9090/tcp"
-privkey: "{{ lookup('hashi_vault', 'secret=secret/git/ssh:key') }}"
-

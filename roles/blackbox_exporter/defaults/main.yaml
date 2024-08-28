@@ -1,0 +1,7 @@
+---
+app_name: "blackbox_exporter"
+user_account: "poduser"
+image: "docker.io/prom/blackbox-exporter"
+upgrade: "no"
+fw_port:
+  - "9115/tcp"

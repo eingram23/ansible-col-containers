@@ -2,7 +2,7 @@ apiVersion: 1
 datasources:
   - name: Prometheus
     type: prometheus
-    url: http://prometheus:9090
+    url: http://prom.local.lan:9090
     access: proxy
     isDefault: true
     uid: prom
@@ -11,16 +11,19 @@ datasources:
       prometheusType: 'Prometheus'
   - name: Influxdb
     type: influxdb
-    url: http://homeassistant.local.lan:8086
+    url: http://podhost1.local.lan:8086
     access: proxy
-    user: grafana
     secureJsonData:
-      password: {{ lookup('hashi_vault', 'secret=secret/ssh/eingram:ssh_password') }}
-    database: grafana
+      token: {{ lookup('hashi_vault', 'secret=secret/influxdb:token') }}
+    jsonData:
+      version: Flux
+      organization: Homelab
+      defaultBucket: HA
+      tlsSkipVerify: true
     editable: true
     uid: influx
   - name: Loki
     type: loki
-    url: http://loki:3100
+    url: http://loki.local.lan:3100
     access: proxy
     uid: loki

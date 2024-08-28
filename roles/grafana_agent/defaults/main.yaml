@@ -1,0 +1,4 @@
+---
+app_name: "grafana_agent"
+upgrade: "no"
+migrate: "no"

@@ -1,0 +1,78 @@
+---
+- name: Run root tasks
+  become: true
+  become_method: ansible.builtin.sudo
+  become_user: root
+  block:
+    - name: Enable linger for {{ user_account }} user
+      ansible.builtin.command: loginctl enable-linger {{ user_account }}
+
+    - name: Create {{ app_name }} folder
+      ansible.builtin.file:
+        path: /opt/{{ app_name }}
+        state: directory
+        mode: '0755'
+        owner: poduser
+        group: poduser
+
+    - name: Create unpoller config file on remote host
+      ansible.builtin.template:
+        src: up.conf.j2
+        dest: /opt/{{ app_name }}/up.conf
+        mode: '0644'
+        owner: poduser
+        group: poduser
+
+- name: Prep for upgrade
+  when: upgrade == "yes"
+  block:
+    # - name: Stop systemd service for {{ app_name }} container
+    #   ansible.builtin.systemd:
+    #     name: container-{{ app_name }}
+    #     state: stopped
+    #     scope: user
+
+    - name: Remove {{ app_name }} container
+      containers.podman.podman_container:
+        name: "{{ app_name }}"
+        state: absent
+
+    - name: Cleanup old image
+      containers.podman.podman_image:
+        name: "{{ image }}:{{ old_ver }}"
+        state: absent
+
+- name: Create and run {{ app_name }} container
+  containers.podman.podman_container:
+    name: "{{ app_name }}"
+    image: "{{ image }}:{{ ver }}"
+    state: stopped
+    pod: "{{ pod_name }}"
+    restart_policy: always
+    volume:
+      - /opt/{{ app_name }}/up.conf:/etc/unpoller/up.conf
+    # generate_systemd:
+    #   path: /home/{{ user_account }}/.config/systemd/user
+    #   restart_policy: always
+
+# - name: Set XDG_RUNTIME_DIR env variable
+#   ansible.builtin.lineinfile:
+#     path: /home/{{ user_account }}/.bash_profile
+#     search_string: 'export XDG_RUNTIME_DIR=/run/user/$(id -u)'
+#     insertafter: '# User specific environment and startup programs'
+#     line: 'export XDG_RUNTIME_DIR=/run/user/$(id -u)'
+
+# - name: Get {{ user_account }} info
+#   ansible.builtin.user:
+#     name: "{{ user_account }}"
+#   register: user_info
+
+# - name: Enable container-{{ app_name }} service
+#   ansible.builtin.systemd:
+#     name: container-{{ app_name }}
+#     state: started
+#     enabled: true
+#     daemon_reload: true
+#     scope: user
+#   environment:
+#     XDG_RUNTIME_DIR: /run/user/{{ user_info.uid }}

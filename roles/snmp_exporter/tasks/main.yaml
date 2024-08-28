@@ -1,0 +1,94 @@
+---
+- name: Run root tasks
+  become: true
+  become_method: ansible.builtin.sudo
+  become_user: root
+  block:
+    - name: Enable linger for {{ user_account }} user
+      ansible.builtin.command: loginctl enable-linger {{ user_account }}
+
+    - name: Open firewall port
+      ansible.builtin.include_role:
+        name: eingram23.homelab.firewall
+
+    - name: Create {{ app_name }} folder
+      ansible.builtin.file:
+        path: /opt/{{ app_name }}
+        state: directory
+        mode: '0755'
+        owner: poduser
+        group: poduser
+
+    - name: Enable low rootless port
+      ansible.posix.sysctl:
+        name: net.ipv4.ip_unprivileged_port_start
+        value: '116'
+
+- name: Copy snmp_exporter files to remote server
+  ansible.builtin.copy:
+    src: "{{ item }}"
+    dest: /opt/{{ app_name }}/{{ item }}
+    mode: '0644'
+    owner: poduser
+    group: poduser
+  loop:
+    - snmp.yml
+
+- name: Prep for upgrade
+  when: upgrade == "yes"
+  block:
+    # - name: Stop systemd service for {{ app_name }} container
+    #   ansible.builtin.systemd:
+    #     name: container-{{ app_name }}
+    #     state: stopped
+    #     scope: user
+
+    - name: Remove {{ app_name }} container
+      containers.podman.podman_container:
+        name: "{{ app_name }}"
+        state: absent
+
+    - name: Cleanup old image
+      containers.podman.podman_image:
+        name: "{{ image }}:{{ old_ver }}"
+        state: absent
+
+- name: Create and run {{ app_name }} container
+  containers.podman.podman_container:
+    name: "{{ app_name }}"
+    image: "{{ image }}:{{ ver }}"
+    state: stopped
+    restart_policy: always
+    pod: "{{ pod_name }}"
+    # publish:
+    #   - "9116:9116"
+    #   - "116:116/udp"
+    command: >
+      --config.file=/etc/snmp_exporter/snmp.yml
+    volume:
+      - /opt/{{ app_name }}:/etc/snmp_exporter
+#     generate_systemd:
+#       path: /home/{{ user_account }}/.config/systemd/user
+#       restart_policy: always
+
+# - name: Set XDG_RUNTIME_DIR env variable
+#   ansible.builtin.lineinfile:
+#     path: /home/{{ user_account }}/.bash_profile
+#     search_string: 'export XDG_RUNTIME_DIR=/run/user/$(id -u)'
+#     insertafter: '# User specific environment and startup programs'
+#     line: 'export XDG_RUNTIME_DIR=/run/user/$(id -u)'
+
+# - name: Get {{ user_account }} info
+#   ansible.builtin.user:
+#     name: "{{ user_account }}"
+#   register: user_info
+
+# - name: Enable container-{{ app_name }} service
+#   ansible.builtin.systemd:
+#     name: container-{{ app_name }}
+#     state: started
+#     enabled: true
+#     daemon_reload: true
+#     scope: user
+#   environment:
+#     XDG_RUNTIME_DIR: /run/user/{{ user_info.uid }}

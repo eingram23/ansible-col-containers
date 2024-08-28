@@ -1,0 +1,1784 @@
+{
+  "annotations": {
+    "list": [
+      {
+        "builtIn": 1,
+        "datasource": {
+          "type": "datasource",
+          "uid": "grafana"
+        },
+        "enable": true,
+        "hide": true,
+        "iconColor": "rgba(0, 211, 255, 1)",
+        "name": "Annotations & Alerts",
+        "target": {
+          "limit": 100,
+          "matchAny": false,
+          "tags": [],
+          "type": "dashboard"
+        },
+        "type": "dashboard"
+      }
+    ]
+  },
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 0,
+  "links": [],
+  "liveNow": false,
+  "panels": [
+    {
+      "datasource": {
+        "type": "influxdb",
+        "uid": "influx"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [],
+          "max": 100,
+          "min": 30,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "blue",
+                "value": 73
+              },
+              {
+                "color": "red",
+                "value": 78
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 2,
+        "x": 0,
+        "y": 0
+      },
+      "id": 25,
+      "options": {
+        "minVizHeight": 75,
+        "minVizWidth": 75,
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showThresholdLabels": false,
+        "showThresholdMarkers": true,
+        "sizing": "auto"
+      },
+      "pluginVersion": "11.0.0",
+      "targets": [
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "influx"
+          },
+          "query": "timestart = uint(v: v.timeRangeStart)\ntimestop = uint(v: v.timeRangeStop)\nduration = duration(v:timestop - timestart)\n\nfrom(bucket: \"HA\")\n  |> range(start: 0)\n  |> filter(fn: (r) => r._measurement == \"°F\")\n  |> filter(fn: (r) => r._field == \"value\")\n  |> filter(fn: (r) => r.entity_id == \"upstairs_temperature\")\n  |> last()\n\n",
+          "rawQuery": true,
+          "refId": "A",
+          "resultFormat": "time_series"
+        }
+      ],
+      "title": "Upstairs Temp",
+      "type": "gauge"
+    },
+    {
+      "datasource": {
+        "type": "influxdb",
+        "uid": "influx"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [],
+          "max": 100,
+          "min": 30,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "blue",
+                "value": 73
+              },
+              {
+                "color": "red",
+                "value": 78
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 2,
+        "x": 2,
+        "y": 0
+      },
+      "id": 24,
+      "options": {
+        "minVizHeight": 75,
+        "minVizWidth": 75,
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showThresholdLabels": false,
+        "showThresholdMarkers": true,
+        "sizing": "auto"
+      },
+      "pluginVersion": "11.0.0",
+      "targets": [
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "influx"
+          },
+          "query": "timestart = uint(v: v.timeRangeStart)\ntimestop = uint(v: v.timeRangeStop)\nduration = duration(v:timestop - timestart)\n\nfrom(bucket: \"HA\")\n  |> range(start: 0)\n  |> filter(fn: (r) => r._measurement == \"°F\")\n  |> filter(fn: (r) => r._field == \"value\")\n  |> filter(fn: (r) => r.entity_id == \"master_bedroom_temperature\")\n  |> last()\n",
+          "rawQuery": true,
+          "refId": "A",
+          "resultFormat": "time_series"
+        }
+      ],
+      "title": "Master Bedroom Temp",
+      "type": "gauge"
+    },
+    {
+      "datasource": {
+        "type": "influxdb",
+        "uid": "influx"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [],
+          "max": 100,
+          "min": 30,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "blue",
+                "value": 73
+              },
+              {
+                "color": "red",
+                "value": 78
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 2,
+        "x": 4,
+        "y": 0
+      },
+      "id": 27,
+      "options": {
+        "minVizHeight": 75,
+        "minVizWidth": 75,
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showThresholdLabels": false,
+        "showThresholdMarkers": true,
+        "sizing": "auto"
+      },
+      "pluginVersion": "11.0.0",
+      "targets": [
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "influx"
+          },
+          "query": "timestart = uint(v: v.timeRangeStart)\ntimestop = uint(v: v.timeRangeStop)\nduration = duration(v:timestop - timestart)\n\nfrom(bucket: \"HA\")\n  |> range(start: 0)\n  |> filter(fn: (r) => r._measurement == \"°F\")\n  |> filter(fn: (r) => r._field == \"value\")\n  |> filter(fn: (r) => r.entity_id == \"office_temperature\")\n  |> last()",
+          "rawQuery": true,
+          "refId": "A",
+          "resultFormat": "time_series"
+        }
+      ],
+      "title": "Office Temp",
+      "type": "gauge"
+    },
+    {
+      "datasource": {
+        "type": "influxdb",
+        "uid": "influx"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [],
+          "max": 100,
+          "min": 30,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "blue",
+                "value": 73
+              },
+              {
+                "color": "red",
+                "value": 78
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 2,
+        "x": 6,
+        "y": 0
+      },
+      "id": 26,
+      "options": {
+        "minVizHeight": 75,
+        "minVizWidth": 75,
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showThresholdLabels": false,
+        "showThresholdMarkers": true,
+        "sizing": "auto"
+      },
+      "pluginVersion": "11.0.0",
+      "targets": [
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "influx"
+          },
+          "query": "timestart = uint(v: v.timeRangeStart)\ntimestop = uint(v: v.timeRangeStop)\nduration = duration(v:timestop - timestart)\n\nfrom(bucket: \"HA\")\n  |> range(start: 0)\n  |> filter(fn: (r) => r._measurement == \"°F\")\n  |> filter(fn: (r) => r._field == \"value\")\n  |> filter(fn: (r) => r.entity_id == \"charlizes_room_temperature\")\n  |> last()",
+          "rawQuery": true,
+          "refId": "A",
+          "resultFormat": "time_series"
+        }
+      ],
+      "title": "Charlize's Room Temp",
+      "type": "gauge"
+    },
+    {
+      "datasource": {
+        "type": "influxdb",
+        "uid": "influx"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [],
+          "max": 100,
+          "min": 30,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "blue",
+                "value": 73
+              },
+              {
+                "color": "red",
+                "value": 78
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 2,
+        "x": 8,
+        "y": 0
+      },
+      "id": 28,
+      "options": {
+        "minVizHeight": 75,
+        "minVizWidth": 75,
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showThresholdLabels": false,
+        "showThresholdMarkers": true,
+        "sizing": "auto"
+      },
+      "pluginVersion": "11.0.0",
+      "targets": [
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "influx"
+          },
+          "query": "timestart = uint(v: v.timeRangeStart)\ntimestop = uint(v: v.timeRangeStop)\nduration = duration(v:timestop - timestart)\n\nfrom(bucket: \"HA\")\n  |> range(start: 0)\n  |> filter(fn: (r) => r._measurement == \"°F\")\n  |> filter(fn: (r) => r._field == \"value\")\n  |> filter(fn: (r) => r.entity_id == \"bos_room_temperature\")\n  |> last()",
+          "rawQuery": true,
+          "refId": "A",
+          "resultFormat": "time_series"
+        }
+      ],
+      "title": "Bo's Room Temp",
+      "type": "gauge"
+    },
+    {
+      "datasource": {
+        "type": "influxdb",
+        "uid": "influx"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [],
+          "max": 100,
+          "min": 0,
+          "thresholds": {
+            "mode": "percentage",
+            "steps": [
+              {
+                "color": "yellow",
+                "value": null
+              },
+              {
+                "color": "blue",
+                "value": 50
+              },
+              {
+                "color": "red",
+                "value": 60
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 2,
+        "x": 10,
+        "y": 0
+      },
+      "id": 17,
+      "options": {
+        "minVizHeight": 75,
+        "minVizWidth": 75,
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showThresholdLabels": false,
+        "showThresholdMarkers": true,
+        "sizing": "auto"
+      },
+      "pluginVersion": "11.0.0",
+      "targets": [
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "influx"
+          },
+          "query": "timestart = uint(v: v.timeRangeStart)\ntimestop = uint(v: v.timeRangeStop)\nduration = duration(v:timestop - timestart)\n\nfrom(bucket: \"HA\")\n  |> range(start: 0)\n  |> filter(fn: (r) => r._measurement == \"%\")\n  |> filter(fn: (r) => r._field == \"value\")\n  |> filter(fn: (r) => r.entity_id == \"upstairs_humidity\")\n  |> last()",
+          "rawQuery": true,
+          "refId": "A",
+          "resultFormat": "time_series"
+        }
+      ],
+      "title": "Upstairs Humidity",
+      "type": "gauge"
+    },
+    {
+      "datasource": {
+        "type": "influxdb",
+        "uid": "influx"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 13,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "value {domain=\"sensor\", entity_id=\"main_floor_humidity\", friendly_name=\"Main Floor Humidity\", source=\"HA\"}"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "Main Floor Humidity"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "value {domain=\"sensor\", entity_id=\"pirateweather_humidity\", friendly_name=\"PirateWeather Humidity\", source=\"HA\"}"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "Outside Humidity"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "value {domain=\"sensor\", entity_id=\"upstairs_humidity\", friendly_name=\"Upstairs Humidity\", source=\"HA\"}"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "Upstairs Humidity"
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 0
+      },
+      "id": 10,
+      "options": {
+        "legend": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "maxHeight": 600,
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "targets": [
+        {
+          "alias": "Main Floor",
+          "datasource": {
+            "type": "influxdb",
+            "uid": "influx"
+          },
+          "groupBy": [
+            {
+              "params": [
+                "$__interval"
+              ],
+              "type": "time"
+            },
+            {
+              "params": [
+                "previous"
+              ],
+              "type": "fill"
+            }
+          ],
+          "measurement": "%",
+          "orderByTime": "ASC",
+          "policy": "default",
+          "query": "timestart = uint(v: v.timeRangeStart)\ntimestop = uint(v: v.timeRangeStop)\nduration = duration(v:timestop - timestart)\n\nfrom(bucket: \"HA\")\n  |> range(start: 0)\n  |> filter(fn: (r) => r._measurement == \"%\")\n  |> filter(fn: (r) => r._field == \"value\")\n  |> filter(fn: (r) => r.entity_id == \"upstairs_humidity\" or r.entity_id == \"main_floor_humidity\" or r.entity_id == \"pirateweather_humidity\")\n  |> aggregateWindow(every: 15m, fn: mean, createEmpty: false)\n",
+          "rawQuery": true,
+          "refId": "A",
+          "resultFormat": "time_series",
+          "select": [
+            [
+              {
+                "params": [
+                  "value"
+                ],
+                "type": "field"
+              },
+              {
+                "params": [],
+                "type": "mean"
+              }
+            ]
+          ],
+          "tags": [
+            {
+              "key": "entity_id",
+              "operator": "=",
+              "value": "main_floor_humidity"
+            }
+          ]
+        },
+        {
+          "alias": "Upstairs",
+          "datasource": {
+            "type": "influxdb",
+            "uid": "influx"
+          },
+          "groupBy": [
+            {
+              "params": [
+                "$__interval"
+              ],
+              "type": "time"
+            },
+            {
+              "params": [
+                "previous"
+              ],
+              "type": "fill"
+            }
+          ],
+          "hide": false,
+          "measurement": "%",
+          "orderByTime": "ASC",
+          "policy": "default",
+          "refId": "B",
+          "resultFormat": "time_series",
+          "select": [
+            [
+              {
+                "params": [
+                  "value"
+                ],
+                "type": "field"
+              },
+              {
+                "params": [],
+                "type": "mean"
+              }
+            ]
+          ],
+          "tags": [
+            {
+              "key": "entity_id",
+              "operator": "=",
+              "value": "upstairs_humidity"
+            }
+          ]
+        }
+      ],
+      "title": "Humidity",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "influxdb",
+        "uid": "influx"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [],
+          "max": 100,
+          "min": 30,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "blue",
+                "value": 73
+              },
+              {
+                "color": "red",
+                "value": 78
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 2,
+        "x": 0,
+        "y": 4
+      },
+      "id": 22,
+      "options": {
+        "minVizHeight": 75,
+        "minVizWidth": 75,
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showThresholdLabels": false,
+        "showThresholdMarkers": true,
+        "sizing": "auto"
+      },
+      "pluginVersion": "11.0.0",
+      "targets": [
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "influx"
+          },
+          "query": "timestart = uint(v: v.timeRangeStart)\ntimestop = uint(v: v.timeRangeStop)\nduration = duration(v:timestop - timestart)\n\nfrom(bucket: \"HA\")\n  |> range(start: 0)\n  |> filter(fn: (r) => r._measurement == \"°F\")\n  |> filter(fn: (r) => r._field == \"value\")\n  |> filter(fn: (r) => r.entity_id == \"main_floor_temperature\")\n  |> last()",
+          "rawQuery": true,
+          "refId": "A",
+          "resultFormat": "time_series"
+        }
+      ],
+      "title": "Main Floor Temp",
+      "type": "gauge"
+    },
+    {
+      "datasource": {
+        "type": "influxdb",
+        "uid": "influx"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [],
+          "max": 100,
+          "min": 30,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "blue",
+                "value": 73
+              },
+              {
+                "color": "red",
+                "value": 78
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 2,
+        "x": 2,
+        "y": 4
+      },
+      "id": 21,
+      "options": {
+        "minVizHeight": 75,
+        "minVizWidth": 75,
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showThresholdLabels": false,
+        "showThresholdMarkers": true,
+        "sizing": "auto"
+      },
+      "pluginVersion": "11.0.0",
+      "targets": [
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "influx"
+          },
+          "query": "timestart = uint(v: v.timeRangeStart)\ntimestop = uint(v: v.timeRangeStop)\nduration = duration(v:timestop - timestart)\n\nfrom(bucket: \"HA\")\n  |> range(start: 0)\n  |> filter(fn: (r) => r._measurement == \"°F\")\n  |> filter(fn: (r) => r._field == \"value\")\n  |> filter(fn: (r) => r.entity_id == \"family_room_ecobee_sensor_temperature\")\n  |> last()",
+          "rawQuery": true,
+          "refId": "A",
+          "resultFormat": "time_series"
+        }
+      ],
+      "title": "Family Room Temp",
+      "type": "gauge"
+    },
+    {
+      "datasource": {
+        "type": "influxdb",
+        "uid": "influx"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [],
+          "max": 100,
+          "min": 30,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "blue",
+                "value": 73
+              },
+              {
+                "color": "red",
+                "value": 78
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 2,
+        "x": 4,
+        "y": 4
+      },
+      "id": 23,
+      "options": {
+        "minVizHeight": 75,
+        "minVizWidth": 75,
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showThresholdLabels": false,
+        "showThresholdMarkers": true,
+        "sizing": "auto"
+      },
+      "pluginVersion": "11.0.0",
+      "targets": [
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "influx"
+          },
+          "query": "timestart = uint(v: v.timeRangeStart)\ntimestop = uint(v: v.timeRangeStop)\nduration = duration(v:timestop - timestart)\n\nfrom(bucket: \"HA\")\n  |> range(start: 0)\n  |> filter(fn: (r) => r._measurement == \"°F\")\n  |> filter(fn: (r) => r._field == \"value\")\n  |> filter(fn: (r) => r.entity_id == \"living_room_ecobee_sensor_temperature\")\n  |> last()",
+          "rawQuery": true,
+          "refId": "A",
+          "resultFormat": "time_series"
+        }
+      ],
+      "title": "Living Room Temp",
+      "type": "gauge"
+    },
+    {
+      "datasource": {
+        "type": "influxdb",
+        "uid": "influx"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [],
+          "max": 100,
+          "min": 30,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "blue",
+                "value": 73
+              },
+              {
+                "color": "red",
+                "value": 78
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 2,
+        "x": 6,
+        "y": 4
+      },
+      "id": 19,
+      "options": {
+        "minVizHeight": 75,
+        "minVizWidth": 75,
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showThresholdLabels": false,
+        "showThresholdMarkers": true,
+        "sizing": "auto"
+      },
+      "pluginVersion": "11.0.0",
+      "targets": [
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "influx"
+          },
+          "query": "timestart = uint(v: v.timeRangeStart)\ntimestop = uint(v: v.timeRangeStop)\nduration = duration(v:timestop - timestart)\n\nfrom(bucket: \"HA\")\n  |> range(start: 0)\n  |> filter(fn: (r) => r._measurement == \"°F\")\n  |> filter(fn: (r) => r._field == \"value\")\n  |> filter(fn: (r) => r.entity_id == \"suite_temperature\")\n  |> last()",
+          "rawQuery": true,
+          "refId": "A",
+          "resultFormat": "time_series"
+        }
+      ],
+      "title": "Suite Temp",
+      "type": "gauge"
+    },
+    {
+      "datasource": {
+        "type": "influxdb",
+        "uid": "influx"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [],
+          "max": 100,
+          "min": 30,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "blue",
+                "value": 73
+              },
+              {
+                "color": "red",
+                "value": 78
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 2,
+        "x": 8,
+        "y": 4
+      },
+      "id": 20,
+      "options": {
+        "minVizHeight": 75,
+        "minVizWidth": 75,
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showThresholdLabels": false,
+        "showThresholdMarkers": true,
+        "sizing": "auto"
+      },
+      "pluginVersion": "11.0.0",
+      "targets": [
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "influx"
+          },
+          "query": "timestart = uint(v: v.timeRangeStart)\ntimestop = uint(v: v.timeRangeStop)\nduration = duration(v:timestop - timestart)\n\nfrom(bucket: \"HA\")\n  |> range(start: 0)\n  |> filter(fn: (r) => r._measurement == \"°F\")\n  |> filter(fn: (r) => r._field == \"value\")\n  |> filter(fn: (r) => r.entity_id == \"kitchen_temperature\")\n  |> last()",
+          "rawQuery": true,
+          "refId": "A",
+          "resultFormat": "time_series"
+        }
+      ],
+      "title": "Kitchen Temp",
+      "type": "gauge"
+    },
+    {
+      "datasource": {
+        "type": "influxdb",
+        "uid": "influx"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [],
+          "max": 100,
+          "min": 0,
+          "thresholds": {
+            "mode": "percentage",
+            "steps": [
+              {
+                "color": "yellow",
+                "value": null
+              },
+              {
+                "color": "blue",
+                "value": 50
+              },
+              {
+                "color": "red",
+                "value": 60
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 2,
+        "x": 10,
+        "y": 4
+      },
+      "id": 16,
+      "options": {
+        "minVizHeight": 75,
+        "minVizWidth": 75,
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showThresholdLabels": false,
+        "showThresholdMarkers": true,
+        "sizing": "auto"
+      },
+      "pluginVersion": "11.0.0",
+      "targets": [
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "influx"
+          },
+          "query": "timestart = uint(v: v.timeRangeStart)\ntimestop = uint(v: v.timeRangeStop)\nduration = duration(v:timestop - timestart)\n\nfrom(bucket: \"HA\")\n  |> range(start: 0)\n  |> filter(fn: (r) => r._measurement == \"%\")\n  |> filter(fn: (r) => r._field == \"value\")\n  |> filter(fn: (r) => r.entity_id == \"main_floor_humidity\")\n  |> last()",
+          "rawQuery": true,
+          "refId": "A",
+          "resultFormat": "time_series"
+        }
+      ],
+      "title": "Main Floor Humidity",
+      "type": "gauge"
+    },
+    {
+      "datasource": {
+        "type": "influxdb",
+        "uid": "influx"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 10,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "smooth",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "never",
+            "spanNulls": true,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "links": [],
+          "mappings": [],
+          "max": 85,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "short"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "HVAC Cooling"
+            },
+            "properties": [
+              {
+                "id": "min",
+                "value": 0
+              },
+              {
+                "id": "max",
+                "value": 10
+              },
+              {
+                "id": "custom.drawStyle",
+                "value": "bars"
+              },
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "blue",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "HVAC Heating"
+            },
+            "properties": [
+              {
+                "id": "min",
+                "value": 0
+              },
+              {
+                "id": "max",
+                "value": 10
+              },
+              {
+                "id": "custom.drawStyle",
+                "value": "bars"
+              },
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "red",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "value {domain=\"sensor\", entity_id=\"bos_room_temperature\", friendly_name=\"Bos Room Ecobee Sensor Temperature\", source=\"HA\"}"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "Bo's Room Temp"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "value {domain=\"sensor\", entity_id=\"charlizes_room_temperature\", friendly_name=\"Charlizes Room Ecobee Sensor Temperature\", source=\"HA\"}"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "Charlize's Room Temp"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "value {domain=\"sensor\", entity_id=\"master_bedroom_temperature\", friendly_name=\"Master Bedroom Ecobee Sensor Temperature\", source=\"HA\"}"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "Master Bedroom Temp"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "value {domain=\"sensor\", entity_id=\"office_temperature\", friendly_name=\"Office Ecobee Sensor Temperature\", source=\"HA\"}"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "Office Temp"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "value {domain=\"sensor\", entity_id=\"upstairs_temperature\", friendly_name=\"Upstairs Ecobee Temperature\", source=\"HA\"}"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "Upstairs Temp"
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 24,
+        "x": 0,
+        "y": 8
+      },
+      "id": 4,
+      "options": {
+        "legend": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "maxHeight": 600,
+          "mode": "multi",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "8.5.5",
+      "targets": [
+        {
+          "alias": "Bo's Room",
+          "datasource": {
+            "type": "influxdb",
+            "uid": "influx"
+          },
+          "groupBy": [
+            {
+              "params": [
+                "1h"
+              ],
+              "type": "time"
+            },
+            {
+              "params": [
+                "previous"
+              ],
+              "type": "fill"
+            }
+          ],
+          "measurement": "°F",
+          "orderByTime": "ASC",
+          "policy": "default",
+          "query": "timestart = uint(v: v.timeRangeStart)\ntimestop = uint(v: v.timeRangeStop)\nduration = duration(v:timestop - timestart)\n\nfrom(bucket: \"HA\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"°F\")\n  |> filter(fn: (r) => r._field == \"value\")\n  |> filter(fn: (r) => r.entity_id == \"upstairs_temperature\" or r.entity_id == \"bos_room_temperature\" or r.entity_id == \"charlizes_room_temperature\" or r.entity_id == \"master_bedroom_temperature\" or r.entity_id == \"office_temperature\")\n  |> aggregateWindow(every: 15m, fn: mean, createEmpty: false)\n",
+          "rawQuery": true,
+          "refId": "A",
+          "resultFormat": "time_series",
+          "select": [
+            [
+              {
+                "params": [
+                  "value"
+                ],
+                "type": "field"
+              },
+              {
+                "params": [],
+                "type": "mean"
+              }
+            ]
+          ],
+          "tags": [
+            {
+              "key": "entity_id",
+              "operator": "=",
+              "value": "bos_room_temperature"
+            }
+          ]
+        }
+      ],
+      "title": "Upstairs Temps",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "influxdb",
+        "uid": "influx"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 10,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "smooth",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "never",
+            "spanNulls": true,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "links": [],
+          "mappings": [],
+          "max": 85,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "short"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "°F value {domain=\"sensor\", entity_id=\"kitchen_temperature\", friendly_name=\"Kitchen Ecobee Sensor Temperature\", source=\"HA\"}"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "Kitchen Temp"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "°F value {domain=\"sensor\", entity_id=\"living_room_ecobee_sensor_temperature\", friendly_name=\"Living Room Ecobee Sensor Temperature\", source=\"HA\"}"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "Living Room Temp"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "°F value {domain=\"sensor\", entity_id=\"main_floor_temperature\", friendly_name=\"Main Floor Ecobee Temperature\", source=\"HA\"}"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "Main Floor Temp"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "°F value {domain=\"sensor\", entity_id=\"suite_temperature\", friendly_name=\"Suite Ecobee Sensor Temperature\", source=\"HA\"}"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "Suite Temp"
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 24,
+        "x": 0,
+        "y": 16
+      },
+      "id": 6,
+      "options": {
+        "legend": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "maxHeight": 600,
+          "mode": "multi",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "8.5.5",
+      "targets": [
+        {
+          "alias": "Suite",
+          "datasource": {
+            "type": "influxdb",
+            "uid": "influx"
+          },
+          "groupBy": [
+            {
+              "params": [
+                "1h"
+              ],
+              "type": "time"
+            },
+            {
+              "params": [
+                "previous"
+              ],
+              "type": "fill"
+            }
+          ],
+          "measurement": "°F",
+          "orderByTime": "ASC",
+          "policy": "default",
+          "query": "timestart = uint(v: v.timeRangeStart)\ntimestop = uint(v: v.timeRangeStop)\nduration = duration(v:timestop - timestart)\n\nfrom(bucket: \"HA\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"°F\")\n  |> filter(fn: (r) => r._field == \"value\")\n  |> filter(fn: (r) => r.entity_id == \"main_floor_temperature\" or r.entity_id == \"main\" or r.entity_id == \"kitchen_temperature\" or r.entity_id == \"suite_temperature\" or r.entity_id == \"living_room_ecobee_sensor_temperature\")\n  |> aggregateWindow(every: 15m, fn: mean, createEmpty: false)",
+          "rawQuery": true,
+          "refId": "A",
+          "resultFormat": "time_series",
+          "select": [
+            [
+              {
+                "params": [
+                  "value"
+                ],
+                "type": "field"
+              },
+              {
+                "params": [],
+                "type": "mean"
+              }
+            ]
+          ],
+          "tags": [
+            {
+              "key": "entity_id",
+              "operator": "=",
+              "value": "suite_temperature"
+            }
+          ]
+        }
+      ],
+      "title": "Main Floor Temps",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "influxdb",
+        "uid": "influx"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "fixed"
+          },
+          "custom": {
+            "fillOpacity": 100,
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineWidth": 0,
+            "spanNulls": false
+          },
+          "displayName": "ON/OFF",
+          "mappings": [
+            {
+              "options": {
+                "0": {
+                  "color": "transparent",
+                  "index": 1,
+                  "text": "Off"
+                },
+                "1": {
+                  "color": "dark-blue",
+                  "index": 0,
+                  "text": "On"
+                }
+              },
+              "type": "value"
+            }
+          ],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "transparent",
+                "value": null
+              }
+            ]
+          },
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 24,
+        "x": 0,
+        "y": 24
+      },
+      "id": 12,
+      "options": {
+        "alignValue": "left",
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": false
+        },
+        "mergeValues": true,
+        "rowHeight": 1,
+        "showValue": "never",
+        "tooltip": {
+          "maxHeight": 600,
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "targets": [
+        {
+          "alias": "",
+          "datasource": {
+            "type": "influxdb",
+            "uid": "influx"
+          },
+          "groupBy": [
+            {
+              "params": [
+                "$__interval"
+              ],
+              "type": "time"
+            },
+            {
+              "params": [
+                "null"
+              ],
+              "type": "fill"
+            }
+          ],
+          "orderByTime": "ASC",
+          "policy": "default",
+          "query": "timestart = uint(v: v.timeRangeStart)\ntimestop = uint(v: v.timeRangeStop)\nduration = duration(v:timestop - timestart)\n\nfrom(bucket: \"HA\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r.entity_id == \"upstairs_hvac_cooling\" or r.entity_id == \"upstairs_hvac_heating\")\n  |> filter(fn: (r) => r[\"_field\"] == \"value\")",
+          "rawQuery": true,
+          "refId": "A",
+          "resultFormat": "time_series",
+          "select": [
+            [
+              {
+                "params": [
+                  "value"
+                ],
+                "type": "field"
+              },
+              {
+                "params": [],
+                "type": "mean"
+              }
+            ]
+          ],
+          "tags": [
+            {
+              "key": "entity_id",
+              "operator": "=",
+              "value": "select tag value"
+            }
+          ]
+        }
+      ],
+      "title": "Upstairs HVAC Cooling/Heating Duration",
+      "type": "state-timeline"
+    },
+    {
+      "datasource": {
+        "type": "influxdb",
+        "uid": "influx"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "continuous-GrYlRd"
+          },
+          "custom": {
+            "fillOpacity": 100,
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineWidth": 0,
+            "spanNulls": false
+          },
+          "displayName": "ON/OFF",
+          "mappings": [
+            {
+              "options": {
+                "0": {
+                  "color": "transparent",
+                  "index": 0,
+                  "text": "Off"
+                },
+                "1": {
+                  "color": "dark-blue",
+                  "index": 1,
+                  "text": "On"
+                }
+              },
+              "type": "value"
+            }
+          ],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          },
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 24,
+        "x": 0,
+        "y": 28
+      },
+      "id": 14,
+      "options": {
+        "alignValue": "left",
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "mergeValues": true,
+        "rowHeight": 1,
+        "showValue": "never",
+        "tooltip": {
+          "maxHeight": 600,
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "influx"
+          },
+          "query": "timestart = uint(v: v.timeRangeStart)\ntimestop = uint(v: v.timeRangeStop)\nduration = duration(v:timestop - timestart)\n\nfrom(bucket: \"HA\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r.entity_id == \"main_floor_hvac_cooling\" or r.entity_id == \"main_floor_hvac_heating\")\n  |> filter(fn: (r) => r[\"_field\"] == \"value\")",
+          "rawQuery": true,
+          "refId": "A",
+          "resultFormat": "time_series"
+        }
+      ],
+      "title": "Main Floor HVAC Cooling/Heating Duration",
+      "type": "state-timeline"
+    }
+  ],
+  "refresh": "10s",
+  "schemaVersion": 39,
+  "tags": [],
+  "templating": {
+    "list": []
+  },
+  "time": {
+    "from": "now-2d",
+    "to": "now"
+  },
+  "timeRangeUpdatedDuringEditOrView": false,
+  "timepicker": {
+    "refresh_intervals": [
+      "10s"
+    ]
+  },
+  "timezone": "",
+  "title": "Climate",
+  "uid": "rgb5fPGMz",
+  "version": 1,
+  "weekStart": ""
+}

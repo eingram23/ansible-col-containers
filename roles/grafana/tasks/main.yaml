@@ -1,88 +1,121 @@
 ---
-- name: Create grafana folders
-  ansible.builtin.file:
-    path: "{{ item }}"
-    state: directory
-    mode: '0755'
-    owner: poduser
-    group: poduser
-    recurse: true
-  loop:
-    # - /opt/grafana
-    - /opt/grafana/dashboards
-    # - /opt/grafana/dashboardfiles
-    - /opt/grafana/datasources
+- name: Run root tasks
   become: true
   become_method: sudo
   become_user: root
+  block:
+    - name: Enable linger for {{ user_account }} user
+      ansible.builtin.command: loginctl enable-linger {{ user_account }}
 
-- name: Create github key
-  ansible.builtin.template:
-    src: ssh-key-git.key.j2
-    dest: /var/tmp/ssh-key-git.key
-    mode: '0400'
+    - name: Open firewall port
+      ansible.builtin.include_role:
+        name: eingram23.homelab.firewall
 
-- name: Pull down configs from git
-  ansible.builtin.git:
-    repo: 'git@github.com:eingram23/configs.git'
-    dest: /var/tmp/configs
-    clone: true
-    key_file: /var/tmp/ssh-key-git.key
-    accept_hostkey: true
+    - name: Create {{ app_name }} root folder
+      ansible.builtin.file:
+        path: /opt/{{ app_name }}
+        state: directory
+        mode: '0755'
+        owner: poduser
+        group: poduser
 
-- name: Delete key
-  ansible.builtin.file:
-    path: /var/tmp/ssh-key-git.key
-    state: absent
+    - name: Create {{ app_name }} dashboards folder
+      ansible.builtin.file:
+        path: /opt/{{ app_name }}/dashboards
+        state: directory
+        mode: '0755'
+        owner: poduser
+        group: poduser
 
-- name: Create grafana datasource provisioning file on remote server
+    - name: Create {{ app_name }} datasources folder
+      ansible.builtin.file:
+        path: /opt/{{ app_name }}/datasources
+        state: directory
+        mode: '0755'
+        owner: poduser
+        group: poduser
+
+- name: Copy grafana dashboard json files to remote server
+  ansible.builtin.copy:
+    src: "{{ item }}"
+    dest: /opt/{{ app_name }}/dashboards/
+    mode: '0644'
+    owner: poduser
+    group: poduser
+  with_fileglob: "*.json"
+
+- name: Copy grafana dashboard config to remote server
+  ansible.builtin.copy:
+    src: dashboards.yaml
+    dest: /opt/{{ app_name }}/dashboards/
+    mode: '0644'
+    owner: poduser
+    group: poduser
+
+- name: Create grafana datasource config on remote server
   ansible.builtin.template:
     src: datasources.yaml.j2
-    dest: /opt/grafana/datasources/datasources.yaml
-    mode: '0644'
+    dest: /opt/{{ app_name }}/datasources/datasources.yaml
     owner: poduser
     group: poduser
 
-- name: Open firewall ports
-  ansible.builtin.include_role:
-    name: eingram23.homelab.firewall
-    apply:
-      become: true
-      become_method: sudo
-      become_user: root
+- name: Prep for upgrade
+  when: upgrade == "yes"
+  block:
+    # - name: Stop systemd service for {{ app_name }} container
+    #   ansible.builtin.systemd:
+    #     name: container-{{ app_name }}
+    #     state: stopped
+    #     scope: user
 
-- name: Create and run grafana container
+    - name: Remove {{ app_name }} container
+      containers.podman.podman_container:
+        name: "{{ app_name }}"
+        state: absent
+
+    - name: Cleanup old image
+      containers.podman.podman_image:
+        name: "{{ image }}:{{ old_ver }}"
+        state: absent
+
+- name: Create and run {{ app_name }} container
   containers.podman.podman_container:
-    name: "{{ container_name }}"
-    image: docker.io/grafana/grafana:{{ ver }}
-    state: started
+    name: "{{ app_name }}"
+    image: "{{ image }}:{{ ver }}"
+    state: stopped
     restart_policy: always
+    user: 472
     pod: "{{ pod_name }}"
+    # publish:
+    #   - "3000:3000"
     env:
-      GF_PLUGINS_ALLOW_LOADING_UNSIGNED_PLUGINS: true
-      GF_INSTALL_PLUGINS: https://github.com/flant/grafana-statusmap/releases/download/v0.5.1/flant-statusmap-panel-0.5.1.zip;flant-statusmap-panel
+      GF_INSTALL_PLUGINS: "grafana-clock-panel, flant-statusmap-panel, marcusolsson-treemap-panel"
     volume:
-      # - "{{ container_name }}_config:/etc/grafana"
-      # - "{{ container_name }}_data:/var/lib/grafana"
-      - "/opt/grafana/dashboards:/etc/grafana/provisioning/dashboards"
-      # - "/opt/grafana/dashboardfiles:/var/lib/grafana/dashboards"
-      - "/opt/grafana/datasources:/etc/grafana/provisioning/datasources"
+      - /opt/{{ app_name }}/dashboards:/etc/grafana/provisioning/dashboards
+      - /opt/{{ app_name }}/datasources:/etc/grafana/provisioning/datasources
+      - grafana_data:/var/lib/grafana
+    # generate_systemd:
+    #   path: /home/{{ user_account }}/.config/systemd/user
+    #   restart_policy: always
 
-- name: Find dashboards on remote server
-  ansible.builtin.find:
-    paths:
-      - "/var/tmp/configs/grafana/dashboards/"
-    patterns:
-      - "*"
-  register: dashboards
+# - name: Set XDG_RUNTIME_DIR env variable
+#   ansible.builtin.lineinfile:
+#     path: /home/{{ user_account }}/.bash_profile
+#     search_string: 'export XDG_RUNTIME_DIR=/run/user/$(id -u)'
+#     insertafter: '# User specific environment and startup programs'
+#     line: 'export XDG_RUNTIME_DIR=/run/user/$(id -u)'
 
-- name: Copy grafana dashboards to remote server
-  ansible.builtin.copy:
-    src: "{{ item.path }}"
-    dest: /opt/grafana/dashboards
-    mode: '0644'
-    owner: poduser
-    group: poduser
-    remote_src: true
-  loop: "{{ dashboards.files }}"
-  notify: Restart grafana container
+# - name: Get {{ user_account }} info
+#   ansible.builtin.user:
+#     name: "{{ user_account }}"
+#   register: user_info
+
+# - name: Enable container-{{ app_name }} service
+#   ansible.builtin.systemd:
+#     name: container-{{ app_name }}
+#     state: started
+#     enabled: true
+#     daemon_reload: true
+#     scope: user
+#   environment:
+#     XDG_RUNTIME_DIR: /run/user/{{ user_info.uid }}

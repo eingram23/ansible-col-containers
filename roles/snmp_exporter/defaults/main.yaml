@@ -1,0 +1,8 @@
+---
+app_name: "snmp_exporter"
+user_account: "poduser"
+image: "quay.io/prometheus/snmp-exporter"
+upgrade: "no"
+fw_port:
+  - 9116/tcp
+  - 116/udp

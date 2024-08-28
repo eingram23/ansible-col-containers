@@ -1,0 +1,13 @@
+---
+- name: Deploy grafana container
+  hosts: "{{ hostvar | default([]) }}"
+  gather_facts: false
+  become: true
+  become_method: sudo
+  become_user: poduser
+
+  tasks:
+
+    - name: Run grafana role
+      ansible.builtin.include_role:
+        name: eingram23.containers.grafana
