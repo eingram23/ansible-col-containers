@@ -15,7 +15,7 @@
 
 - name: Open firewall ports
   ansible.builtin.include_role:
-    name: eingram23.homelab.firewall
+    name: eingram23.linux.firewall
     apply:
       become: true
       become_method: sudo

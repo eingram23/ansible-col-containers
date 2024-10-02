@@ -16,7 +16,7 @@
 
     - name: Open firewall port for postgres/phpmyadmin
       ansible.builtin.include_role:
-        name: eingram23.homelab.firewall
+        name: eingram23.linux.firewall
       vars:
         fw_port:
           - "5432/tcp"

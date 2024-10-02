@@ -9,7 +9,7 @@
 
     - name: Open firewall port
       ansible.builtin.include_role:
-        name: eingram23.homelab.firewall
+        name: eingram23.linux.firewall
 
     - name: Create {{ app_name }} root folder
       ansible.builtin.file:

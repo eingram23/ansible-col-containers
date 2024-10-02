@@ -17,7 +17,7 @@
 
     - name: Open firewall ports
       ansible.builtin.include_role:
-        name: eingram23.homelab.firewall
+        name: eingram23.linux.firewall
 
 - name: Copy vault config files to remote server
   ansible.builtin.copy:

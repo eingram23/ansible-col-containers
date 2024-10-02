@@ -13,7 +13,7 @@
 
     - name: Open firewall port
       ansible.builtin.include_role:
-        name: eingram23.homelab.firewall
+        name: eingram23.linux.firewall
 
     - name: Change user/owner of Plex files to {{ user_account }}
       ansible.builtin.file:

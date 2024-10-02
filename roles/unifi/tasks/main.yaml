@@ -6,7 +6,7 @@
   block:
     - name: Open firewall ports
       ansible.builtin.include_role:
-        name: eingram23.homelab.firewall
+        name: eingram23.linux.firewall
 
     - name: Create unifi folder
       ansible.builtin.file:

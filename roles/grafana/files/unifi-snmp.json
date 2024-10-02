@@ -1,0 +1,889 @@
+{
+    "annotations": {
+      "list": [
+        {
+          "builtIn": 1,
+          "datasource": {
+            "type": "datasource",
+            "uid": "grafana"
+          },
+          "enable": true,
+          "hide": true,
+          "iconColor": "rgba(0, 211, 255, 1)",
+          "limit": 100,
+          "name": "Annotations & Alerts",
+          "showIn": 0,
+          "type": "dashboard"
+        }
+      ]
+    },
+    "description": "Custom Prometheus Unifi Wifi Overview by LTP using SNMP Exporter.",
+    "editable": true,
+    "fiscalYearStartMonth": 0,
+    "gnetId": 21187,
+    "graphTooltip": 1,
+    "id": 31,
+    "links": [],
+    "panels": [
+      {
+        "datasource": {
+          "type": "prometheus",
+          "uid": "prom"
+        },
+        "fieldConfig": {
+          "defaults": {
+            "color": {
+              "mode": "palette-classic"
+            },
+            "custom": {
+              "align": "auto",
+              "cellOptions": {
+                "type": "color-text"
+              },
+              "inspect": false
+            },
+            "fieldMinMax": false,
+            "mappings": [],
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {
+                  "color": "green",
+                  "value": null
+                },
+                {
+                  "color": "red",
+                  "value": 80
+                }
+              ]
+            }
+          },
+          "overrides": [
+            {
+              "matcher": {
+                "id": "byName",
+                "options": "Name"
+              },
+              "properties": [
+                {
+                  "id": "custom.width",
+                  "value": 72
+                }
+              ]
+            },
+            {
+              "matcher": {
+                "id": "byName",
+                "options": "ESSID"
+              },
+              "properties": [
+                {
+                  "id": "custom.width",
+                  "value": 183
+                }
+              ]
+            }
+          ]
+        },
+        "gridPos": {
+          "h": 7,
+          "w": 7,
+          "x": 0,
+          "y": 0
+        },
+        "id": 6,
+        "maxDataPoints": 100,
+        "options": {
+          "cellHeight": "sm",
+          "footer": {
+            "countRows": false,
+            "fields": "",
+            "reducer": [
+              "sum"
+            ],
+            "show": false
+          },
+          "showHeader": true,
+          "sortBy": []
+        },
+        "pluginVersion": "11.1.4",
+        "targets": [
+          {
+            "datasource": {
+              "type": "prometheus",
+              "uid": "prom"
+            },
+            "editorMode": "code",
+            "exemplar": false,
+            "expr": "unifiVapBssId{type=\"unifi-wifi\"}",
+            "format": "table",
+            "instant": true,
+            "intervalFactor": 1,
+            "legendFormat": "",
+            "range": false,
+            "refId": "A"
+          }
+        ],
+        "title": "AP Interfaces",
+        "transformations": [
+          {
+            "id": "groupBy",
+            "options": {
+              "fields": {
+                "hostname": {
+                  "aggregations": []
+                },
+                "instance": {
+                  "aggregations": []
+                },
+                "type": {
+                  "aggregations": []
+                },
+                "unifiVapBssId": {
+                  "aggregations": [
+                    "last"
+                  ],
+                  "operation": "aggregate"
+                },
+                "unifiVapEssId": {
+                  "aggregations": [
+                    "last"
+                  ],
+                  "operation": "aggregate"
+                },
+                "unifiVapIndex": {
+                  "aggregations": [
+                    "last"
+                  ],
+                  "operation": "groupby"
+                },
+                "unifiVapName": {
+                  "aggregations": [
+                    "last"
+                  ],
+                  "operation": "aggregate"
+                }
+              }
+            }
+          },
+          {
+            "id": "organize",
+            "options": {
+              "excludeByName": {
+                "unifiVapIndex": true
+              },
+              "includeByName": {},
+              "indexByName": {
+                "unifiVapBssId (last)": 3,
+                "unifiVapEssId (last)": 2,
+                "unifiVapIndex": 0,
+                "unifiVapName (last)": 1
+              },
+              "renameByName": {
+                "unifiVapBssId": "BSSID",
+                "unifiVapBssId (last)": "BSSID",
+                "unifiVapEssId": "ESSID",
+                "unifiVapEssId (last)": "ESSID",
+                "unifiVapIndex": "",
+                "unifiVapName": "Name",
+                "unifiVapName (last)": "Name"
+              }
+            }
+          }
+        ],
+        "type": "table"
+      },
+      {
+        "datasource": {
+          "type": "prometheus",
+          "uid": "prom"
+        },
+        "fieldConfig": {
+          "defaults": {
+            "mappings": [],
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {
+                  "color": "green",
+                  "value": null
+                }
+              ]
+            },
+            "unit": "percent"
+          },
+          "overrides": [
+            {
+              "matcher": {
+                "id": "byName",
+                "options": "Error Rate"
+              },
+              "properties": [
+                {
+                  "id": "thresholds",
+                  "value": {
+                    "mode": "absolute",
+                    "steps": [
+                      {
+                        "color": "green",
+                        "value": null
+                      },
+                      {
+                        "color": "#EAB839",
+                        "value": 0.1
+                      },
+                      {
+                        "color": "red",
+                        "value": 0.5
+                      }
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "matcher": {
+                "id": "byName",
+                "options": "Drop Rate"
+              },
+              "properties": [
+                {
+                  "id": "thresholds",
+                  "value": {
+                    "mode": "absolute",
+                    "steps": [
+                      {
+                        "color": "green",
+                        "value": null
+                      },
+                      {
+                        "color": "#EAB839",
+                        "value": 0.001
+                      },
+                      {
+                        "color": "red",
+                        "value": 0.005
+                      }
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "matcher": {
+                "id": "byName",
+                "options": "Retry Rate"
+              },
+              "properties": [
+                {
+                  "id": "thresholds",
+                  "value": {
+                    "mode": "absolute",
+                    "steps": [
+                      {
+                        "color": "green",
+                        "value": null
+                      },
+                      {
+                        "color": "#EAB839",
+                        "value": 0.3
+                      },
+                      {
+                        "color": "red",
+                        "value": 1.5
+                      }
+                    ]
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        "gridPos": {
+          "h": 6,
+          "w": 8,
+          "x": 7,
+          "y": 0
+        },
+        "id": 27,
+        "options": {
+          "colorMode": "value",
+          "graphMode": "area",
+          "justifyMode": "auto",
+          "orientation": "auto",
+          "percentChangeColorMode": "standard",
+          "reduceOptions": {
+            "calcs": [
+              "lastNotNull"
+            ],
+            "fields": "",
+            "values": false
+          },
+          "showPercentChange": false,
+          "textMode": "auto",
+          "wideLayout": true
+        },
+        "pluginVersion": "11.1.4",
+        "targets": [
+          {
+            "datasource": {
+              "type": "prometheus",
+              "uid": "prom"
+            },
+            "disableTextWrap": false,
+            "editorMode": "code",
+            "expr": "sum(unifiVapRxErrors + unifiVapTxErrors) * 100/ sum(unifiVapRxPackets+unifiVapTxPackets)",
+            "fullMetaSearch": false,
+            "includeNullMetadata": false,
+            "instant": false,
+            "legendFormat": "Error Rate",
+            "range": true,
+            "refId": "A",
+            "useBackend": false
+          },
+          {
+            "datasource": {
+              "type": "prometheus",
+              "uid": "prom"
+            },
+            "disableTextWrap": false,
+            "editorMode": "code",
+            "expr": "sum(unifiVapRxDropped + unifiVapTxDropped) * 100/ sum(unifiVapRxPackets+unifiVapTxPackets)",
+            "fullMetaSearch": false,
+            "hide": false,
+            "includeNullMetadata": false,
+            "instant": false,
+            "legendFormat": "Drop Rate",
+            "range": true,
+            "refId": "B",
+            "useBackend": false
+          },
+          {
+            "datasource": {
+              "type": "prometheus",
+              "uid": "prom"
+            },
+            "disableTextWrap": false,
+            "editorMode": "code",
+            "expr": "sum(unifiVapTxRetries) * 100/ sum(unifiVapRxPackets+unifiVapTxPackets)",
+            "fullMetaSearch": false,
+            "hide": false,
+            "includeNullMetadata": false,
+            "instant": false,
+            "legendFormat": "Retry Rate",
+            "range": true,
+            "refId": "C",
+            "useBackend": false
+          }
+        ],
+        "title": "Network Efficiency",
+        "type": "stat"
+      },
+      {
+        "datasource": {
+          "type": "prometheus",
+          "uid": "prom"
+        },
+        "description": "",
+        "fieldConfig": {
+          "defaults": {
+            "color": {
+              "mode": "continuous-GrYlRd"
+            },
+            "mappings": [],
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {
+                  "color": "blue",
+                  "value": null
+                },
+                {
+                  "color": "red",
+                  "value": 100
+                }
+              ]
+            }
+          },
+          "overrides": []
+        },
+        "gridPos": {
+          "h": 6,
+          "w": 9,
+          "x": 15,
+          "y": 0
+        },
+        "id": 25,
+        "maxDataPoints": 100,
+        "options": {
+          "displayMode": "lcd",
+          "maxVizHeight": 300,
+          "minVizHeight": 16,
+          "minVizWidth": 8,
+          "namePlacement": "left",
+          "orientation": "horizontal",
+          "reduceOptions": {
+            "calcs": [],
+            "fields": "",
+            "values": true
+          },
+          "showUnfilled": true,
+          "sizing": "auto",
+          "text": {
+            "titleSize": 16
+          },
+          "valueMode": "color"
+        },
+        "pluginVersion": "11.1.4",
+        "targets": [
+          {
+            "datasource": {
+              "type": "prometheus",
+              "uid": "prom"
+            },
+            "disableTextWrap": false,
+            "editorMode": "code",
+            "exemplar": false,
+            "expr": "sum by(unifiVapEssId) (unifiVapNumStations{hostname=~\"$hostname\"})",
+            "format": "table",
+            "fullMetaSearch": false,
+            "includeNullMetadata": true,
+            "instant": true,
+            "intervalFactor": 1,
+            "legendFormat": "__auto",
+            "range": false,
+            "refId": "A",
+            "useBackend": false
+          }
+        ],
+        "title": "Connecting Clients by ESSID",
+        "type": "bargauge"
+      },
+      {
+        "datasource": {
+          "type": "prometheus",
+          "uid": "prom"
+        },
+        "fieldConfig": {
+          "defaults": {
+            "color": {
+              "mode": "palette-classic"
+            },
+            "custom": {
+              "axisBorderShow": false,
+              "axisCenteredZero": false,
+              "axisColorMode": "text",
+              "axisLabel": "",
+              "axisPlacement": "auto",
+              "barAlignment": 0,
+              "drawStyle": "line",
+              "fillOpacity": 10,
+              "gradientMode": "opacity",
+              "hideFrom": {
+                "legend": false,
+                "tooltip": false,
+                "viz": false
+              },
+              "insertNulls": false,
+              "lineInterpolation": "linear",
+              "lineWidth": 1,
+              "pointSize": 5,
+              "scaleDistribution": {
+                "type": "linear"
+              },
+              "showPoints": "never",
+              "spanNulls": false,
+              "stacking": {
+                "group": "A",
+                "mode": "none"
+              },
+              "thresholdsStyle": {
+                "mode": "off"
+              }
+            },
+            "links": [],
+            "mappings": [],
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {
+                  "color": "green",
+                  "value": null
+                },
+                {
+                  "color": "red",
+                  "value": 80
+                }
+              ]
+            },
+            "unit": "bytes"
+          },
+          "overrides": []
+        },
+        "gridPos": {
+          "h": 11,
+          "w": 11,
+          "x": 7,
+          "y": 6
+        },
+        "id": 8,
+        "options": {
+          "legend": {
+            "calcs": [
+              "lastNotNull",
+              "max"
+            ],
+            "displayMode": "table",
+            "placement": "right",
+            "showLegend": true,
+            "sortBy": "Max",
+            "sortDesc": true
+          },
+          "tooltip": {
+            "maxHeight": 600,
+            "mode": "multi",
+            "sort": "desc"
+          }
+        },
+        "pluginVersion": "10.4.3",
+        "targets": [
+          {
+            "datasource": {
+              "type": "prometheus",
+              "uid": "prom"
+            },
+            "disableTextWrap": false,
+            "editorMode": "code",
+            "expr": "sum by(hostname) (unifiVapRxBytes{hostname=~\"$hostname\"} != 0)",
+            "fullMetaSearch": false,
+            "hide": false,
+            "includeNullMetadata": true,
+            "instant": false,
+            "legendFormat": "Rx {{hostname}}",
+            "range": true,
+            "refId": "A",
+            "useBackend": false
+          },
+          {
+            "datasource": {
+              "type": "prometheus",
+              "uid": "prom"
+            },
+            "disableTextWrap": false,
+            "editorMode": "builder",
+            "expr": "sum by(hostname) (unifiVapTxBytes{hostname=~\"$hostname\"} != 0)",
+            "fullMetaSearch": false,
+            "hide": false,
+            "includeNullMetadata": true,
+            "instant": false,
+            "legendFormat": "Tx {{hostname}}",
+            "range": true,
+            "refId": "B",
+            "useBackend": false
+          }
+        ],
+        "title": "Read/Transfer Traffics",
+        "type": "timeseries"
+      },
+      {
+        "datasource": {
+          "type": "prometheus",
+          "uid": "prom"
+        },
+        "description": "",
+        "fieldConfig": {
+          "defaults": {
+            "color": {
+              "mode": "thresholds"
+            },
+            "mappings": [],
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {
+                  "color": "green",
+                  "value": null
+                },
+                {
+                  "color": "#EAB839",
+                  "value": 20
+                },
+                {
+                  "color": "red",
+                  "value": 50
+                }
+              ]
+            },
+            "unit": "short"
+          },
+          "overrides": []
+        },
+        "gridPos": {
+          "h": 11,
+          "w": 6,
+          "x": 18,
+          "y": 6
+        },
+        "id": 26,
+        "maxDataPoints": 100,
+        "options": {
+          "colorMode": "value",
+          "graphMode": "area",
+          "justifyMode": "auto",
+          "orientation": "auto",
+          "percentChangeColorMode": "standard",
+          "reduceOptions": {
+            "calcs": [
+              "lastNotNull"
+            ],
+            "fields": "",
+            "values": false
+          },
+          "showPercentChange": false,
+          "textMode": "auto",
+          "wideLayout": true
+        },
+        "pluginVersion": "11.1.4",
+        "targets": [
+          {
+            "datasource": {
+              "type": "prometheus",
+              "uid": "prom"
+            },
+            "disableTextWrap": false,
+            "editorMode": "code",
+            "exemplar": false,
+            "expr": "sum by(hostname) (unifiVapNumStations{hostname=~\"$hostname\"} != 0)",
+            "format": "time_series",
+            "fullMetaSearch": false,
+            "includeNullMetadata": true,
+            "instant": false,
+            "intervalFactor": 1,
+            "legendFormat": "__auto",
+            "range": true,
+            "refId": "A",
+            "useBackend": false
+          }
+        ],
+        "title": "Connecting Clients by AP",
+        "type": "stat"
+      },
+      {
+        "datasource": {
+          "type": "prometheus",
+          "uid": "prom"
+        },
+        "fieldConfig": {
+          "defaults": {
+            "color": {
+              "mode": "palette-classic-by-name"
+            },
+            "custom": {
+              "align": "auto",
+              "cellOptions": {
+                "type": "color-text"
+              },
+              "filterable": true,
+              "inspect": false
+            },
+            "mappings": [
+              {
+                "options": {
+                  "match": "null",
+                  "result": {
+                    "text": "N/A"
+                  }
+                },
+                "type": "special"
+              }
+            ],
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {
+                  "color": "#299c46",
+                  "value": null
+                },
+                {
+                  "color": "rgba(237, 129, 40, 0.89)",
+                  "value": 50
+                },
+                {
+                  "color": "#d44a3a",
+                  "value": 80
+                }
+              ]
+            }
+          },
+          "overrides": [
+            {
+              "matcher": {
+                "id": "byName",
+                "options": "IP"
+              },
+              "properties": [
+                {
+                  "id": "custom.width",
+                  "value": 121
+                }
+              ]
+            },
+            {
+              "matcher": {
+                "id": "byName",
+                "options": "AP Name"
+              },
+              "properties": [
+                {
+                  "id": "custom.width",
+                  "value": 131
+                }
+              ]
+            }
+          ]
+        },
+        "gridPos": {
+          "h": 10,
+          "w": 7,
+          "x": 0,
+          "y": 7
+        },
+        "id": 20,
+        "maxDataPoints": 100,
+        "options": {
+          "cellHeight": "sm",
+          "footer": {
+            "countRows": false,
+            "fields": "",
+            "reducer": [
+              "sum"
+            ],
+            "show": false
+          },
+          "frameIndex": 1,
+          "showHeader": true,
+          "sortBy": []
+        },
+        "pluginVersion": "11.1.4",
+        "targets": [
+          {
+            "datasource": {
+              "type": "prometheus",
+              "uid": "prom"
+            },
+            "editorMode": "code",
+            "exemplar": false,
+            "expr": "unifiApSystemModel{hostname=~\"$hostname\"}",
+            "format": "table",
+            "instant": true,
+            "intervalFactor": 1,
+            "legendFormat": "",
+            "range": false,
+            "refId": "A"
+          }
+        ],
+        "title": "AP Information",
+        "transformations": [
+          {
+            "id": "organize",
+            "options": {
+              "excludeByName": {
+                "Time": true,
+                "Value": true,
+                "__name__": true,
+                "job": true,
+                "type": true
+              },
+              "includeByName": {},
+              "indexByName": {},
+              "renameByName": {
+                "hostname": "AP Name",
+                "instance": "IP",
+                "unifiApSystemModel": "Model"
+              }
+            }
+          }
+        ],
+        "type": "table"
+      }
+    ],
+    "refresh": "5s",
+    "schemaVersion": 39,
+    "tags": [
+      "prometheus",
+      "snmp",
+      "unifi"
+    ],
+    "templating": {
+      "list": [
+        {
+          "current": {
+            "isNone": true,
+            "selected": false,
+            "text": "None",
+            "value": ""
+          },
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prom"
+          },
+          "definition": "label_values(unifiApSystemModel,hostname)",
+          "hide": 0,
+          "includeAll": false,
+          "label": "AP Host",
+          "multi": true,
+          "name": "hostname",
+          "options": [],
+          "query": {
+            "qryType": 1,
+            "query": "label_values(unifiApSystemModel,hostname)",
+            "refId": "PrometheusVariableQueryEditor-VariableQuery"
+          },
+          "refresh": 1,
+          "regex": "",
+          "skipUrlSync": false,
+          "sort": 0,
+          "tagValuesQuery": "",
+          "tagsQuery": "",
+          "type": "query",
+          "useTags": false
+        }
+      ]
+    },
+    "time": {
+      "from": "now-15m",
+      "to": "now"
+    },
+    "timepicker": {
+      "hidden": false,
+      "nowDelay": "15m",
+      "refresh_intervals": [
+        "5s",
+        "10s",
+        "30s",
+        "1m",
+        "5m",
+        "15m",
+        "30m",
+        "1h",
+        "2h",
+        "1d"
+      ],
+      "time_options": [
+        "5m",
+        "15m",
+        "1h",
+        "6h",
+        "12h",
+        "24h",
+        "2d",
+        "7d",
+        "30d"
+      ]
+    },
+    "timezone": "",
+    "title": "Unifi Wifi SNMP Overview",
+    "uid": "gkijansh",
+    "version": 1,
+    "weekStart": ""
+  }
