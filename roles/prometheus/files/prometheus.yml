@@ -148,3 +148,8 @@ scrape_configs:
     scrape_interval: 30s
     static_configs:
     - targets: ['unpoller:9130']
+  - job_name: 'smartctl'
+    scrape_interval: 60s
+    static_configs:
+    - targets: 
+       - homenas.local.lan:9633
