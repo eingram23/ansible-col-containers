@@ -1,0 +1,6 @@
+---
+app_name: "smartctl_exporter"
+image: "docker.io/prometheuscommunity/smartctl-exporter"
+upgrade: "no"
+fw_port:
+  - 9633/tcp

@@ -1,0 +1,13 @@
+---
+# NEEDED VARS: hostvar
+- name: Deploy smartctl_exporter
+  hosts: "{{ hostvar | default([]) }}"
+  become: true
+  become_method: sudo
+  gather_facts: false
+
+  tasks:
+
+    - name: Deploy smartctl_exporter container
+      ansible.builtin.import_role:
+        name: eingram23.containers.smartctl_exporter
