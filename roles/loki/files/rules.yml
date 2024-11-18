@@ -39,7 +39,7 @@ groups:
       description: "Tiger Bridge No Such File Error"
   - alert: IOError
     expr: |
-      sum(rate({env="prod"} |= `uncorrectable I/O failure` [5m] )) > 0
+      sum(rate({env="prod"} |= "uncorrectable I/O failure" != "level=info" [5m] )) > 0
     for: 0m
     labels:
       severity: critical
@@ -48,7 +48,7 @@ groups:
       description: "Uncorrectable I/O failure"
   - alert: Test
     expr: |
-      sum(rate({host="Veeam.local.lan"} |= `TestTest` | pattern `<message>` [5m])) by (message) > 0
+      sum(rate({host="Veeam.local.lan"} |= "TestTest" | pattern "<message>" [5m])) by (message) > 0
     for: 0m
     labels:
       severity: critical
