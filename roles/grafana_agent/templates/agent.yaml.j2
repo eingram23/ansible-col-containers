@@ -17,18 +17,18 @@ logs:
     positions:
       filename: /tmp/positions.yaml
     scrape_configs:
-      - job_name: varlogs
-        static_configs:
-          - targets: [localhost]
-            labels:
-              job: varlogs
-              __path__: /var/log/*log
-      - job_name: messages
-        static_configs:
-          - targets: [localhost]
-            labels:
-              job: messages
-              __path__: /var/log/messages
+      # - job_name: varlogs
+      #   static_configs:
+      #     - targets: [localhost]
+      #       labels:
+      #         job: varlogs
+      #         __path__: /var/log/*log
+      # - job_name: messages
+      #   static_configs:
+      #     - targets: [localhost]
+      #       labels:
+      #         job: messages
+      #         __path__: /var/log/messages
       - job_name: journal
         journal:
           json: false
@@ -40,6 +40,8 @@ logs:
         relabel_configs:
           - source_labels: ['__journal__systemd_unit']
             target_label: 'unit'
+          - source_labels: ['__journal__hostname']
+          target_label: 'hostname'
     clients:
       - url: http://loki.local.lan:3100/loki/api/v1/push
         external_labels:
