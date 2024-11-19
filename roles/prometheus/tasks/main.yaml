@@ -48,7 +48,7 @@
   ansible.builtin.template:
     src: tls.key.j2
     dest: /opt/{{ app_name }}/tls.key
-    mode: '0400'
+    mode: '0444'
     owner: poduser
     group: poduser
 
