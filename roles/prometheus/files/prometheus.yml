@@ -147,9 +147,14 @@ scrape_configs:
   - job_name: 'unifipoller'
     scrape_interval: 30s
     static_configs:
-    - targets: ['unpoller:9130']
+      - targets: ['unpoller:9130']
   - job_name: 'smartctl'
     scrape_interval: 60s
     static_configs:
-    - targets: 
-       - homenas.local.lan:9633
+      - targets: 
+        - homenas.local.lan:9633
+    relabel_configs:
+      - source_labels: [__address__]
+        target_label: __param_target
+      - source_labels: [__param_target]
+        target_label: instance
