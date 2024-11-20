@@ -1,4 +1,8 @@
 ---
+- name: Open firewall ports
+  ansible.builtin.include_role:
+    name: eingram23.linux.firewall
+
 - name: Ensure vars are set
   ansible.builtin.assert:
     that:
@@ -51,12 +55,14 @@
 - name: Run {{ app_name }} container
   containers.podman.podman_container:
     name: "{{ app_name }}"
-    image: docker.io/grafana/agent:{{ ver }}
+    image: "{{ image }}:{{ ver }}"
     state: stopped
     restart_policy: always
     privileged: true
     network: host
     pid: host
+    publish:
+      - "12345:12345"
     cap_add:
       - SYS_TIME
     command: >
