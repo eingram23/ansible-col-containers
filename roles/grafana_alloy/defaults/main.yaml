@@ -1,0 +1,7 @@
+---
+app_name: "grafana_alloy"
+image: "docker.io/grafana/alloy"
+upgrade: "no"
+migrate: "no"
+fw_port:
+  - "12345/tcp"
