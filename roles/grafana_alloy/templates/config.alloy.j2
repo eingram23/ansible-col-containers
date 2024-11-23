@@ -52,6 +52,7 @@ prometheus.scrape "integrations_agent" {
 prometheus.remote_write "integrations" {
 	external_labels = {
 		env = "{{ env }}",
+		hostname = "{{ inventory_hostname }}",
 	}
 
 	endpoint {
