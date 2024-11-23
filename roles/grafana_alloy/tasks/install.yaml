@@ -46,14 +46,14 @@
         name: container-{{ app_name }}
         state: stopped
 
-    - name: Cleanup old image
-      containers.podman.podman_image:
-        name: "{{ image }}:{{ old_ver }}"
-        state: absent
-
     - name: Remove {{ app_name }} container
       containers.podman.podman_container:
         name: "{{ app_name }}"
+        state: absent
+
+    - name: Cleanup old image
+      containers.podman.podman_image:
+        name: "{{ image }}:{{ old_ver }}"
         state: absent
 
 - name: Run {{ app_name }} container
@@ -63,14 +63,14 @@
     state: stopped
     restart_policy: always
     privileged: true
-    network: host
-    pid: host
+    # network: host
+    # pid: host
     publish:
       - "12345:12345"
     cap_add:
       - SYS_TIME
     command: >
-      --server.http.listen-addr=0.0.0.0:12345
+      run --server.http.listen-addr=0.0.0.0:12345
       --storage.path=/var/lib/alloy/data
       /etc/alloy/config.alloy
     volume:
@@ -78,9 +78,9 @@
       - /sys:/host/sys:ro,rslave
       - /proc:/host/proc:ro,rslave
       - /var/log:/var/log:ro
-      - /opt/{{ app_name }}:/etc/agent
-      - /opt/{{ app_name }}/agent.yaml:/etc/agent-config/agent.yaml
-      - /var/run/dbus/system_bus_socket:/var/run/dbus/system_bus_socket:rw
+      - /opt/{{ app_name }}:/etc/alloy
+      # - /opt/{{ app_name }}/agent.yaml:/etc/agent-config/agent.yaml
+      # - /var/run/dbus/system_bus_socket:/var/run/dbus/system_bus_socket:rw
     generate_systemd:
       path: /etc/systemd/system
       restart_policy: always
