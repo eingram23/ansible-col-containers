@@ -5,11 +5,6 @@ discovery.relabel "logs_default_journal" {
 		source_labels = ["__journal__systemd_unit"]
 		target_label  = "unit"
 	}
-
-	rule {
-		source_labels = ["__journal__hostname"]
-		target_label  = "hostname"
-	}
 }
 
 loki.source.journal "logs_default_journal" {
