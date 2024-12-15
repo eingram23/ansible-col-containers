@@ -1,3 +1,8 @@
+logging {
+  level  = "info"
+  format = "logfmt"
+}
+
 discovery.relabel "logs_default_journal" {
 	targets = []
 
@@ -72,6 +77,10 @@ discovery.relabel "integrations_node_exporter" {
 	rule {
 		target_label = "job"
 		replacement  = "integrations/node_exporter"
+	}
+	rule {
+		target_label = "instance"
+		replacement  = "{{ inventory_hostname}}"
 	}
 }
 
