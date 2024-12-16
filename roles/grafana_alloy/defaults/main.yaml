@@ -5,3 +5,5 @@ upgrade: "no"
 migrate: "no"
 fw_port:
   - "12345/tcp"
+loki_host: "http://loki.local.lan:3100"
+prom_host: "http://prom.local.lan:9090"

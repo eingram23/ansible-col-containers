@@ -30,6 +30,12 @@
     state: directory
     mode: '0644'
 
+- name: Modify loki and prom hosts if deploying to external hosts
+  when: inventory_hostname == "yc-appsrv1.ycdisp.net"
+  ansible.builtin.set_fact:
+    loki_host: "http://yandchome.duckdns.org:3100"
+    prom_host: "http://yandchome.duckdns.org:9090"
+
 - name: Create config.alloy on remote server
   ansible.builtin.template:
     src: "{{ item }}.j2"

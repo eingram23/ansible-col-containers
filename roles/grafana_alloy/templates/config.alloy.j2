@@ -24,7 +24,7 @@ loki.source.journal "logs_default_journal" {
 
 loki.write "logs_default" {
 	endpoint {
-		url = "http://loki.local.lan:3100/loki/api/v1/push"
+		url = "{{ loki_host }}/loki/api/v1/push"
 	}
 	external_labels = {
 		env      = "{{ env }}",
@@ -60,7 +60,7 @@ prometheus.remote_write "integrations" {
 	}
 
 	endpoint {
-		url = "http://prom.local.lan:9090/api/v1/write"
+		url = "{{ prom_host }}/api/v1/write"
 
 		queue_config { }
 
