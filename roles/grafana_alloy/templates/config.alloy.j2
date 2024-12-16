@@ -41,6 +41,10 @@ discovery.relabel "integrations_agent" {
 		target_label = "job"
 		replacement  = "integrations/agent"
 	}
+	rule {
+		target_label = "instance"
+		replacement  = "{{ inventory_hostname}}"
+	}
 }
 
 prometheus.scrape "integrations_agent" {
@@ -104,6 +108,10 @@ discovery.relabel "integrations_process_exporter" {
 	rule {
 		target_label = "job"
 		replacement  = "integrations/process_exporter"
+	}
+	rule {
+		target_label = "instance"
+		replacement  = "{{ inventory_hostname}}"
 	}
 }
 

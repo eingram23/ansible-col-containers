@@ -38,6 +38,22 @@
   loop:
     - config.alloy
 
+- name: Check if node-exporter or promtail containers exist
+  ansible.builtin.include_tasks:
+    file: migrate.yaml
+
+- name: Check if grafana_agent container exists
+  containers.podman.podman_container_info:
+    name: grafana_agent
+  register: grafana_agent_info
+  ignore_errors: true
+
+- name: Remove grafana_agent container if found
+  when: grafana_agent_info.containers|length > 0
+  ansible.builtin.include_role:
+    name: eingram23.containers.grafana_agent
+    tasks_from: uninstall
+
 - name: Prep for upgrade
   when: upgrade == "yes"
   block:

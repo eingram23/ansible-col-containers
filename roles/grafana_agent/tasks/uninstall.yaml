@@ -1,31 +1,47 @@
-- name: Stop systemd service for {{ app_name }} container
-  ansible.builtin.systemd:
-    name: container-{{ app_name }}
-    state: stopped
-
-- name: Remove {{ app_name }} container
-  containers.podman.podman_container:
+- name: Get {{ app_name }} container info
+  containers.podman.podman_container_info:
     name: "{{ app_name }}"
-    state: absent
+  register: app_info
+  ignore_errors: true
 
-- name: Cleanup image
-  containers.podman.podman_image:
-    name: "{{ image }}:{{ ver }}"
-    state: absent
 
-- name: Remove {{ app_name }} container
-  containers.podman.podman_container:
-    name: "{{ app_name }}"
-    state: absent
+- name: Remove {{ app_name }} container if found
+  when: app_info.containers|length > 0
+  block:
+    - name: Stop systemd service for {{ app_name }} container
+      ansible.builtin.systemd:
+        name: container-{{ app_name }}
+        state: stopped
 
-- name: Disable container-{{ app_name }} service
-  ansible.builtin.systemd:
-    name: container-{{ app_name }}
-    state: stopped
-    enabled: false
-    daemon_reload: true
+    - name: Remove {{ app_name }} container
+      containers.podman.podman_container:
+        name: "{{ app_name }}"
+        state: absent
 
-- name: Delete firewall rules
-  ansible.builtin.include_role:
-    name: eingram23.linux.firewall
-    tasks_from: delete
+    # - name: Cleanup image
+    #   containers.podman.podman_image:
+    #     name: "{{ image }}:{{ ver }}"
+    #     state: absent
+
+    - name: Remove {{ app_name }} images
+      containers.podman.podman_image:
+        name: "{{ item.Image }}"
+        state: absent
+      loop: "{{ app_info.containers }}"
+
+    - name: Remove {{ app_name }} container
+      containers.podman.podman_container:
+        name: "{{ app_name }}"
+        state: absent
+
+    - name: Disable container-{{ app_name }} service
+      ansible.builtin.systemd:
+        name: container-{{ app_name }}
+        state: stopped
+        enabled: false
+        daemon_reload: true
+
+    - name: Delete firewall rules
+      ansible.builtin.include_role:
+        name: eingram23.linux.firewall
+        tasks_from: delete
