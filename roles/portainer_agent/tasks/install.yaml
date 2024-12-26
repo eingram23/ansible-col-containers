@@ -1,0 +1,163 @@
+---
+- name: Set rootless variables
+  ansible.builtin.set_fact:
+    "{{ item.key }}": "{{ item.value }}"
+  loop:
+    - { key: 'fw_port', value: ['9002/tcp'] }
+    - { key: 'user_account', value: 'poduser' }
+    - { key: 'publish_port', value: ['9002:9001'] }
+  when: mode == "rootless"
+
+- name: Run root tasks
+  become: true
+  block:
+    - name: Open firewall ports
+      ansible.builtin.include_role:
+        name: eingram23.linux.firewall
+
+    - name: Make sure podman env is installed
+      ansible.builtin.package:
+        name: "{{ podman_items }}"
+        state: present
+      loop_control:
+        loop_var: podman_items
+      loop:
+        - podman
+        - podman-compose
+        - podman-plugins
+        - podman-remote
+
+- name: Run rootful portainer tasks
+  become: true
+  when: mode == "rootful"
+  block:
+    - name: Enable and start podman.socket {{ mode }}
+      ansible.builtin.systemd:
+        name: podman.socket
+        state: started
+        enabled: true
+
+    - name: Prep for upgrade {{ mode }}
+      when: upgrade == "yes"
+      block:
+        - name: Stop systemd service for {{ app_name }} container {{ mode }}
+          ansible.builtin.systemd:
+            name: container-{{ app_name }}
+            state: stopped
+
+        - name: Remove {{ app_name }} container {{ mode }}
+          containers.podman.podman_container:
+            name: "{{ app_name }}"
+            state: absent
+
+        - name: Cleanup image {{ mode }}
+          containers.podman.podman_image:
+            name: "{{ image }}:{{ ver }}"
+            state: absent
+
+        - name: Remove {{ app_name }} container {{ mode }}
+          containers.podman.podman_container:
+            name: "{{ app_name }}"
+            state: absent
+
+        - name: Disable container-{{ app_name }} service {{ mode }}
+          ansible.builtin.systemd:
+            name: container-{{ app_name }}
+            state: stopped
+            enabled: false
+            daemon_reload: true
+
+    - name: Run {{ app_name }} container {{ mode }}
+      containers.podman.podman_container:
+        name: "{{ app_name }}"
+        image: "{{ image }}:{{ ver }}"
+        state: stopped
+        restart_policy: always
+        privileged: true
+        publish: "{{ publish_port }}"
+        volume:
+          - /run/podman/podman.sock:/var/run/docker.sock
+          - /var/lib/containers/storage:/var/lib/docker/volumes
+        generate_systemd:
+          path: /etc/systemd/system
+          restart_policy: always
+
+
+- name: Run rootless portainer tasks
+  become: true
+  become_user: "{{ user_account }}"
+  become_method: sudo
+  when: mode == "rootless"
+  block:
+
+    - name: Enable and start podman.socket {{ mode }}
+      ansible.builtin.systemd:
+        name: podman.socket
+        state: started
+        scope: user
+        enabled: true
+
+    - name: Prep for upgrade {{ mode }}
+      when: upgrade == "yes"
+      block:
+        - name: Stop systemd service for {{ app_name }} container {{ mode }}
+          ansible.builtin.systemd:
+            name: container-{{ app_name }}
+            state: stopped
+            scope: user
+
+        - name: Remove {{ app_name }} container {{ mode }}
+          containers.podman.podman_container:
+            name: "{{ app_name }}"
+            state: absent
+
+        - name: Cleanup old image {{ mode }}
+          containers.podman.podman_image:
+            name: "{{ image }}:{{ old_ver }}"
+            state: absent
+
+    - name: Get {{ user_account }} info {{ mode }}
+      ansible.builtin.user:
+        name: "{{ user_account }}"
+      register: user_info
+
+    - name: Set group_id fact {{ mode }}
+      ansible.builtin.set_fact:
+        group_id: "{{ user_info.group }}"
+
+    - name: Run {{ app_name }} container {{ mode }}
+      containers.podman.podman_container:
+        name: "{{ app_name }}"
+        image: "{{ image }}:{{ ver }}"
+        state: stopped
+        restart_policy: always
+        privileged: true
+        publish: "{{ publish_port }}"
+        volume:
+          - /run/user/{{ group_id }}/podman/podman.sock:/var/run/docker.sock
+          - /home/{{ user_account }}/.local/share/containers/storage:/var/lib/docker/volumes
+        generate_systemd:
+          path: /home/{{ user_account }}/.config/systemd/user
+          restart_policy: always
+
+    - name: Set XDG_RUNTIME_DIR env variable {{ mode }}
+      ansible.builtin.lineinfile:
+        path: /home/{{ user_account }}/.bash_profile
+        search_string: 'export XDG_RUNTIME_DIR=/run/user/$(id -u)'
+        insertafter: '# User specific environment and startup programs'
+        line: 'export XDG_RUNTIME_DIR=/run/user/$(id -u)'
+
+    - name: Get {{ user_account }} info {{ mode }}
+      ansible.builtin.user:
+        name: "{{ user_account }}"
+      register: user_info
+
+    - name: Enable container-{{ app_name }} service {{ mode }}
+      ansible.builtin.systemd:
+        name: container-{{ app_name }}
+        state: started
+        enabled: true
+        daemon_reload: true
+        scope: user
+      environment:
+        XDG_RUNTIME_DIR: /run/user/{{ user_info.uid }}

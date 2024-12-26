@@ -1,0 +1,13 @@
+---
+- name: Deploy porainter_srv container
+  hosts: "{{ hostvar | default([]) }}"
+  become: true
+  become_method: sudo
+  gather_facts: false
+
+  tasks:
+
+    - name: Portainer service - {{ task }}
+      ansible.builtin.import_role:
+        name: eingram23.containers.portainer_srv
+        tasks_from: "{{ task }}"

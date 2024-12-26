@@ -1,0 +1,34 @@
+---
+- name: Add Podman Agent environment to Portainer
+  block:
+    - name: Login to Portainer API
+      uri:
+        url: "{{ portainer_url }}/api/auth"
+        method: POST
+        body_format: json
+        body:
+          username: "admin"
+          password: "temppassword"
+        status_code: 200
+      register: auth_response
+
+    - name: Add Podman Agent environment
+      uri:
+        url: "{{ portainer_url }}/api/endpoints"
+        method: POST
+        headers:
+          Authorization: "Bearer {{ auth_response.json.jwt }}"
+        body_format: form-urlencoded
+        body:
+          Name: "test"
+          EndpointCreationType: 2
+          URL: "{{ agent_endpoint }}"
+          TLS: "true"
+          TLSSkipVerify: "true"
+          TLSSkipClientVerify: "true"
+        status_code: 200
+      register: environment_response
+
+    - name: Store agent environment ID
+      set_fact:
+        agent_environment_id: "{{ environment_response.json.Id }}"

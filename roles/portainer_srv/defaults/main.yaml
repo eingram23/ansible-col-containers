@@ -1,0 +1,12 @@
+---
+app_name: "portainer_srv"
+image: "docker.io/portainer/portainer-ce"
+upgrade: "no"
+fw_port:
+  - "8000/tcp"
+  - "9000/tcp"
+  - "9443/tcp"
+publish_port:
+  - "8000:8000"
+  - "9000:9000"
+  - "9443:9443"

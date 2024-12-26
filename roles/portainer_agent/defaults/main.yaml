@@ -1,0 +1,9 @@
+---
+app_name: "portainer_agent"
+image: "docker.io/portainer/agent"
+upgrade: "no"
+fw_port:
+  - "9001/tcp"
+mode: "rootful"
+portainer_url: "http://podhost-dev.local.lan:9000"
+agent_endpoint: "tcp://podhost-dev.local.lan:9002"

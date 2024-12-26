@@ -1,0 +1,68 @@
+- name: Change fw_port if running rootless
+  ansible.builtin.set_fact:
+    fw_port:
+      - "9002/tcp"
+  when: mode == "rootless"
+
+- name: Delete firewall rules
+  ansible.builtin.include_role:
+    name: eingram23.linux.firewall
+    tasks_from: delete
+    apply:
+      become: true
+
+- name: Uninstall {{ app_name }} container in rootful mode
+  when: mode == "rootful"
+  block:
+    - name: Stop systemd service for {{ app_name }} container
+      ansible.builtin.systemd:
+        name: container-{{ app_name }}
+        state: stopped
+
+    - name: Remove {{ app_name }} container
+      containers.podman.podman_container:
+        name: "{{ app_name }}"
+        state: absent
+
+    - name: Cleanup image
+      containers.podman.podman_image:
+        name: "{{ image }}:{{ ver }}"
+        state: absent
+
+    - name: Disable container-{{ app_name }} service
+      ansible.builtin.systemd:
+        name: container-{{ app_name }}
+        state: stopped
+        enabled: false
+        daemon_reload: true
+
+- name: Uninstall {{ app_name }} container in rootless mode
+  become: true
+  become_user: poduser
+  become_method: sudo
+  when: mode == "rootless"
+  block:
+    - name: Stop systemd service for {{ app_name }} container
+      ansible.builtin.systemd:
+        name: container-{{ app_name }}
+        state: stopped
+        scope: user
+
+    - name: Remove {{ app_name }} container
+      containers.podman.podman_container:
+        name: "{{ app_name }}"
+        state: absent
+
+    - name: Cleanup image
+      containers.podman.podman_image:
+        name: "{{ image }}:{{ ver }}"
+        state: absent
+
+    - name: Disable container-{{ app_name }} service
+      ansible.builtin.systemd:
+        name: container-{{ app_name }}
+        state: stopped
+        enabled: false
+        daemon_reload: true
+        scope: user
+

@@ -1,0 +1,13 @@
+---
+# NEEDED VARS: hostvar
+- name: Deploy portainer_srv container
+  hosts: "{{ hostvar | default([]) }}"
+  become: false
+  gather_facts: false
+
+  tasks:
+
+    - name: Portainer Agent - {{ task }}
+      ansible.builtin.import_role:
+        name: eingram23.containers.portainer_agent
+        tasks_from: "{{ task }}"
