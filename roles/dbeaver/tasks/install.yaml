@@ -67,7 +67,7 @@
       CB_ADMIN_PASSWORD: "{{ lookup('hashi_vault', 'secret=secret/ssh/eingram:ssh_password') }}"
       CB_SERVER_URL: http://{{ inventory_hostname }}:8978/
     volume:
-      - "dbeaver-data:/opt/dbeaver"
+      - "{{ app_name }}-data:/opt/dbeaver"
       - "/opt/{{ app_name }}/data-sources.json:/opt/cloudbeaver/workspace/GlobalConfiguration/.dbeaver/data-sources.json"
     state: stopped
     restart_policy: always

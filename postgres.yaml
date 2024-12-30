@@ -1,37 +1,25 @@
 ---
-- name: Create postgres and dbeaver containers
+- name: Deploy postgres container
   hosts: "{{ hostvar | default([]) }}"
   gather_facts: false
-  become: true
-  become_method: sudo
-  become_user: poduser
+  become: false
 
   tasks:
 
-    # - name: Create postgres container
-    #   ansible.builtin.include_role:
-    #     name: eingram23.containers.postgres
+    - name: Create postgres container
+      when: task == "install"
+      ansible.builtin.import_role:
+        name: eingram23.containers.postgres
+        tasks_from: install
+      become: true
+      become_method: sudo
+      become_user: "{{ user_account }}"
 
-    - name: Create dbeaver container
-      ansible.builtin.include_role:
-        name: eingram23.containers.dbeaver
-
-    # - name: Install software req
-    #   ansible.builtin.dnf:
-    #     name: "{{ package_item }}"
-    #     state: present
-    #     disable_gpg_check: true
-    #   loop:
-    #     - 'https://download.postgresql.org/pub/repos/yum/reporpms/EL-8-x86_64/pgdg-redhat-repo-latest.noarch.rpm'
-    #     - python3-psycopg2
-    #   loop_control:
-    #     loop_var: package_item
-
-    # - name: Disable default postgresql repo
-    #   command: dnf -qy module disable postgresql
-
-    # - name: Install postgresql
-    #   ansible.builtin.dnf:
-    #     name: postgresql13
-    #     state: present
-
+    - name: Create postgres container
+      when: task == "uninstall"
+      ansible.builtin.import_role:
+        name: eingram23.containers.postgres
+        tasks_from: uninstall
+      become: true
+      become_method: sudo
+      become_user: "{{ user_account }}"

@@ -54,7 +54,7 @@
     publish: "{{ publish_port }}"
     volume:
       - /run/podman/podman.sock:/var/run/docker.sock
-      - portainer_data:/data
+      - "{{ app_name }}_data:/data"
     generate_systemd:
       path: /etc/systemd/system
       restart_policy: always

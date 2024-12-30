@@ -1,9 +1,36 @@
 ---
+- name: Assert that needed vars are set
+  assert:
+    that:
+      - app_name is defined
+      - pg_port is defined
+      - user_account is defined
+
+- name: Set fw_port
+  set_fact:
+    fw_port: 
+      - "{{ pg_port }}/tcp"
+
+- name: Set publish_port
+  set_fact:
+    publish_port: "{{ pg_port }}:5432"
+
 - name: Run root tasks
   become: true
   become_method: sudo
   become_user: root
   block:
+    - name: Check if user account exists
+      ansible.builtin.getent:
+        database: passwd
+        key: "{{ user_account }}"
+      register: user_account_exists
+
+    - name: Fail if user account does not exist
+      ansible.builtin.fail:
+        msg: "User account {{ user_account }} does not exist."
+      when: user_account_exists is not defined
+
     - name: Make sure podman is installed
       ansible.builtin.package:
         name: podman
@@ -58,7 +85,8 @@
       - "{{ app_name }}-data:/var/lib/postgresql/data"
     state: stopped
     restart_policy: always
-    publish: "{{ publish_port }}"
+    publish:
+      - "{{ publish_port }}"
     generate_systemd:
       path: /home/{{ user_account }}/.config/systemd/user
       restart_policy: always
