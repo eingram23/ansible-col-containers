@@ -3,7 +3,7 @@
     name: container-{{ app_name }}
     state: stopped
 
-- name: Remove  container - {{ app_name }}
+- name: Remove container - {{ app_name }}
   containers.podman.podman_container:
     name: "{{ app_name }}"
     state: absent
@@ -13,7 +13,7 @@
     name: "{{ image }}:{{ ver }}"
     state: absent
 
-- name: Remove container - {{ app_name }}
+- name: Remove  container - {{ app_name }}
   containers.podman.podman_container:
     name: "{{ app_name }}"
     state: absent

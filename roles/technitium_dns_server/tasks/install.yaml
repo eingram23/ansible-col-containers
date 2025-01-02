@@ -29,7 +29,7 @@
 - name: Prep for upgrade
   when: upgrade == "yes"
   block:
-    - name: Stop systemd service for container - {{ app_name }}
+    - name: Stop systemd service for container-{{ app_name }}
       ansible.builtin.systemd:
         name: container-{{ app_name }}
         state: stopped
@@ -50,11 +50,11 @@
     image: "{{ image }}:{{ ver }}"
     state: stopped
     restart_policy: always
-    privileged: true
     publish: "{{ publish_port }}"
     volume:
-      - /run/podman/podman.sock:/var/run/docker.sock
-      - "{{ app_name }}_data:/data"
+      - "{{ app_name }}_data:/etc/dns"
+    sysctls:
+      - net.ipv4.ip_local_port_range=1024 65000
     generate_systemd:
       path: /etc/systemd/system
       restart_policy: always

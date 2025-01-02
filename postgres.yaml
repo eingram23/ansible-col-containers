@@ -7,19 +7,9 @@
   tasks:
 
     - name: Create postgres container
-      when: task == "install"
       ansible.builtin.import_role:
         name: eingram23.containers.postgres
-        tasks_from: install
-      become: true
-      become_method: sudo
-      become_user: "{{ user_account }}"
-
-    - name: Create postgres container
-      when: task == "uninstall"
-      ansible.builtin.import_role:
-        name: eingram23.containers.postgres
-        tasks_from: uninstall
+        tasks_from: "{{ task }}"
       become: true
       become_method: sudo
       become_user: "{{ user_account }}"

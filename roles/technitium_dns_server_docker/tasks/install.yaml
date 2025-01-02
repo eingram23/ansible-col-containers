@@ -1,0 +1,77 @@
+---
+- name: Make sure docker env is installed
+  ansible.builtin.package:
+    name: "{{ docker_items }}"
+    state: present
+    update_cache: true
+  loop_control:
+    loop_var: docker_items
+  loop:
+    - docker
+    - docker-compose
+
+- name: Install python modules
+  ansible.builtin.pip:
+    name: "{{ pip_items }}"
+  loop_control:
+    loop_var: pip_items
+  loop:
+    - requests
+    - docker
+
+- name: Install openssh-client for scp access
+  ansible.builtin.apt:
+    name: openssh-client
+    state: present
+
+- name: Enable and start docker service
+  ansible.builtin.systemd:
+    name: docker
+    state: started
+    enabled: true
+
+- name: Prep for upgrade
+  when: upgrade == "yes"
+  block:
+    - name: Remove container - {{ app_name }}
+      community.docker.docker_container:
+        name: "{{ app_name }}"
+        state: absent
+
+    - name: Cleanup old image
+      community.docker.docker_image:
+        name: "{{ image }}:{{ old_ver }}"
+        state: absent
+
+- name: Run container (dns + dhcp) - {{ app_name }}
+  when: dhcp == "yes"
+  community.docker.docker_container:
+    name: "{{ app_name }}"
+    image: "{{ image }}:{{ ver }}"
+    state: started
+    restart_policy: always
+    network_mode: host
+    env:
+      DNS_SERVER_DOMAIN: "{{ inventory_hostname }}"
+      DNS_SERVER_ADMIN_PASSWORD: "{{ lookup('hashi_vault', 'secret=secret/ssh/eingram:ssh_password') }}"
+    volumes:
+      - "{{ app_name }}_data:/etc/dns"
+    timeout: 300
+
+- name: Run container (dns) - {{ app_name }}
+  when: dhcp == "no"
+  community.docker.docker_container:
+    name: "{{ app_name }}"
+    image: "{{ image }}:{{ ver }}"
+    state: started
+    restart_policy: always
+    published_ports: "{{ publish_port }}"
+    env:
+      DNS_SERVER_DOMAIN: "{{ inventory_hostname }}"
+      DNS_SERVER_ADMIN_PASSWORD: "{{ lookup('hashi_vault', 'secret=secret/ssh/eingram:ssh_password') }}"
+    volumes:
+      - "{{ app_name }}_data:/etc/dns"
+    sysctls:
+      net.ipv4.ip_local_port_range: "1024 65000"
+    timeout: 300
+

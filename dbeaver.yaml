@@ -9,13 +9,6 @@
   tasks:
 
     - name: Create dbeaver container
-      when: task == "install"
       ansible.builtin.include_role:
         name: eingram23.containers.dbeaver
-        tasks_from: install
-
-    - name: Create dbeaver container
-      when: task == "uninstall"
-      ansible.builtin.include_role:
-        name: eingram23.containers.dbeaver
-        tasks_from: uninstall
+        tasks_from: "{{ task }}"

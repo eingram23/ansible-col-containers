@@ -35,14 +35,23 @@
         owner: poduser
         group: poduser
 
-- name: Copy grafana dashboard json files to remote server
-  ansible.builtin.copy:
-    src: "{{ item }}"
+- name: Pull Grafana dashboard configs from Google Storage bucket
+  google.cloud.gcp_storage_object:
+    bucket: ycdisp-configs
     dest: /opt/{{ app_name }}/dashboards/
-    mode: '0644'
-    owner: poduser
-    group: poduser
-  with_fileglob: "*.json"
+    object: /grafana/dashboards/*.json
+    mode: download
+    project: proj-yc-srv1
+    service_account_file: "{{ lookup('template', 'gcp-creds.json.j2') }}"
+
+# - name: Copy grafana dashboard json files to remote server
+#   ansible.builtin.copy:
+#     src: "{{ item }}"
+#     dest: /opt/{{ app_name }}/dashboards/
+#     mode: '0644'
+#     owner: poduser
+#     group: poduser
+#   with_fileglob: "*.json"
 
 - name: Copy grafana dashboard config to remote server
   ansible.builtin.copy:
