@@ -1,0 +1,46 @@
+---
+- name: Install env for {{ app_name }}
+  ansible.builtin.include_role:
+    name: eingram23.containers.common
+    tasks_from: create_env
+
+- name: Run tasks as {{ user_account }}
+  become: true
+  become_method: ansible.builtin.sudo
+  become_user: "{{ user_account }}"
+  block:
+    - name: Run podman unshare
+      ansible.builtin.shell:
+        podman unshare chown -R 1000:1000 /opt/{{ app_name }}
+
+    - name: Prep for upgrade
+      when: upgrade == "yes"
+      ansible.builtin.include_role:
+        name: eingram23.containers.common
+        tasks_from: upgrade
+
+    - name: Create container for {{ app_name }}
+      containers.podman.podman_container:
+        name: "{{ app_name }}"
+        image: "{{ image }}:{{ ver }}"
+        state: stopped
+        restart_policy: unless-stopped
+        env:
+          DOCKER_INFLUXDB_INIT_MODE=setup
+          DOCKER_INFLUXDB_INIT_USERNAME=admin
+          DOCKER_INFLUXDB_INIT_PASSWORD={{ lookup('hashi_vault', 'secret=secret/ssh/eingram:ssh_password') }}
+          DOCKER_INFLUXDB_INIT_ORG=Homelab
+          DOCKER_INFLUXDB_INIT_BUCKET=HA
+        publish:
+          - "8086:8086"
+        volumes:
+          - "{{ app_name}}-data:/var/lib/influxdb2"
+          - /opt/{{ app_name }}:/etc/influxdb2:z
+        generate_systemd:
+          path: /home/{{ user_account }}/.config/systemd/user
+          restart_policy: always
+
+    - name: Enable service for {{ app_name }}
+      ansible.builtin.include_role:
+        name: eingram23.containers.common
+        tasks_from: enable_sysd

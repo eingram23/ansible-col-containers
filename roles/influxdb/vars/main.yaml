@@ -1,2 +1,3 @@
 ---
-influxdb_ver: "2.7.5-alpine"
+old_ver: "2.7.5-alpine"
+ver: "2.7.11-alpine"

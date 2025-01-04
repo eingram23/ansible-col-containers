@@ -1,26 +1,14 @@
 ---
-- name: Run root tasks
+- name: Install env for {{ app_name }}
+  ansible.builtin.include_role:
+    name: eingram23.containers.common
+    tasks_from: create_env
+
+- name: Run tasks as {{ user_account }}
   become: true
-  become_method: sudo
-  become_user: root
+  become_method: ansible.builtin.sudo
+  become_user: "{{ user_account }}"
   block:
-    - name: Enable linger for user {{ user_account }}
-      ansible.builtin.command: loginctl enable-linger {{ user_account }}
-      args:
-        creates: /var/lib/systemd/linger/{{ user_account }}
-
-    - name: Open firewall port
-      ansible.builtin.include_role:
-        name: eingram23.linux.firewall
-
-    - name: Create folder for {{ app_name }}
-      ansible.builtin.file:
-        path: /opt/{{ app_name }}
-        state: directory
-        mode: '0755'
-        owner: poduser
-        group: poduser
-
     - name: Run podman unshare to allow container access to folder
       ansible.builtin.shell:
         podman unshare chown -R 0:0 /opt/{{ app_name }}
@@ -44,62 +32,31 @@
       become_user: "{{ user_account }}"
       become_method: sudo
 
-- name: Prep for upgrade
-  when: upgrade == "yes"
-  block:
-    - name: Stop systemd service for {{ app_name }} container
-      ansible.builtin.systemd:
-        name: container-{{ app_name }}
-        state: stopped
-        scope: user
+    - name: Prep for upgrade
+      when: upgrade == "yes"
+      ansible.builtin.include_role:
+        name: eingram23.containers.common
+        tasks_from: upgrade
 
-    - name: Remove container for {{ app_name }}
+    - name: Create and run container for {{ app_name }}
       containers.podman.podman_container:
         name: "{{ app_name }}"
-        state: absent
+        image: "{{ image }}:{{ ver }}"
+        state: stopped
+        restart_policy: always
+        publish:
+          - "3100:3100"
+        command: >
+          -config.file=/etc/loki/local-config.yaml
+        volume:
+          - /opt/{{ app_name }}/local-config.yaml:/etc/loki/local-config.yaml
+          - /opt/{{ app_name }}/rules.yml:/tmp/loki/rules/fake/rules.yml
+          - "{{ app_name }}-data:/loki"
+        generate_systemd:
+          path: /home/{{ user_account }}/.config/systemd/user
+          restart_policy: always
 
-    - name: Cleanup old image
-      containers.podman.podman_image:
-        name: "{{ image }}:{{ old_ver }}"
-        state: absent
-
-- name: Create and run {{ app_name }} container
-  containers.podman.podman_container:
-    name: "{{ app_name }}"
-    image: "{{ image }}:{{ ver }}"
-    state: stopped
-    restart_policy: always
-    pod: "{{ pod_name }}"
-    # publish:
-    #   - "3100:3100"
-    command: >
-      -config.file=/etc/loki/local-config.yaml
-    volume:
-      - /opt/{{ app_name }}/local-config.yaml:/etc/loki/local-config.yaml
-      - /opt/{{ app_name }}/rules.yml:/tmp/loki/rules/fake/rules.yml
-      - loki_data:/loki
-#     generate_systemd:
-#       path: /home/{{ user_account }}/.config/systemd/user
-#       restart_policy: always
-
-# - name: Set XDG_RUNTIME_DIR env variable
-#   ansible.builtin.lineinfile:
-#     path: /home/{{ user_account }}/.bash_profile
-#     search_string: 'export XDG_RUNTIME_DIR=/run/user/$(id -u)'
-#     insertafter: '# User specific environment and startup programs'
-#     line: 'export XDG_RUNTIME_DIR=/run/user/$(id -u)'
-
-# - name: Get {{ user_account }} info
-#   ansible.builtin.user:
-#     name: "{{ user_account }}"
-#   register: user_info
-
-# - name: Enable container-{{ app_name }} service
-#   ansible.builtin.systemd:
-#     name: container-{{ app_name }}
-#     state: started
-#     enabled: true
-#     daemon_reload: true
-#     scope: user
-#   environment:
-#     XDG_RUNTIME_DIR: /run/user/{{ user_info.uid }}
+    - name: Enable service for {{ app_name }}
+      ansible.builtin.include_role:
+        name: eingram23.containers.common
+        tasks_from: enable_sysd

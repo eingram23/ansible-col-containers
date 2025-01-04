@@ -2,12 +2,11 @@
 - name: Deploy influxdb container
   hosts: "{{ hostvar | default('homenas.local.lan') }}"
   gather_facts: false
-  become: true
-  become_method: sudo
-  become_user: poduser
+  become: false
 
   tasks:
 
     - name: Run influxdb container role
       ansible.builtin.import_role:
         name: eingram23.containers.influxdb
+        tasks_from: "{{ task }}"
