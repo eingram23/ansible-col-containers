@@ -7,9 +7,28 @@
       become_method: sudo
       become_user: root
 
-- name: Create obico_ml_ha container
+- name: Prep for upgrade
+  when: upgrade == "yes"
+  block:
+    - name: Stop systemd service for container - {{ app_name }}
+      ansible.builtin.systemd:
+        name: container-{{ app_name }}
+        state: stopped
+        scope: user
+
+    - name: Remove container - {{ app_name }}
+      containers.podman.podman_container:
+        name: "{{ app_name }}"
+        state: absent
+
+    - name: Remove image for {{ app_name }}
+      containers.podman.podman_image:
+        name: lscr.io/linuxserver/plex:latest
+        state: absent
+
+- name: Create container - {{ app_name }}
   containers.podman.podman_container:
-    name: obico_ml_ha
+    name: "{{ app_name }}"
     image: docker.io/nberk/ha_bambu_lab_p1_spaghetti_detection_standalone:{{ obico_ml_ver }}
     state: stopped
     restart_policy: unless-stopped
@@ -34,16 +53,16 @@
     name: poduser
   register: poduser_info
 
-- name: Generate systemd units for obico_ml_ha container
+- name: Generate systemd units for container - {{ app_name }}
   containers.podman.podman_generate_systemd:
-    name: obico_ml_ha
+    name: "{{ app_name }}"
     no_header: true
     restart_policy: always
     dest: ~/.config/systemd/user/
 
-- name: Enable and start container-obico_ml_ha service
+- name: Enable and start service - container-{{ app_name }}
   ansible.builtin.systemd:
-    name: container-obico_ml_ha
+    name: container-{{ app_name }}
     state: started
     enabled: true
     daemon_reload: true

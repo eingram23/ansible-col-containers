@@ -1,6 +1,7 @@
 ---
 app_name: "plex_srv"
 user_account: "shareaccess"
+image: "docker.io/linuxserver/plex"
 fw_port:
   - "32400/tcp"
   - "1900/udp"
@@ -11,3 +12,4 @@ fw_port:
   - "32413/udp"
   - "32414/udp"
   - "32469/tcp"
+upgrade: "no"

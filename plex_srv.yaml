@@ -8,5 +8,7 @@
 
   tasks:
 
-    - ansible.builtin.include_role:
+    - name: Deploy plex_srv container
+      ansible.builtin.include_role:
         name: eingram23.containers.plex_srv
+        tasks_from: "{{ task }}"

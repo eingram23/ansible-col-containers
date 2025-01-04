@@ -10,6 +10,7 @@
     - name: Stop systemd service for container - {{ app_name }}
       ansible.builtin.systemd:
         name: container-{{ app_name }}
+        scope: user
         state: stopped
 
     - name: Remove container - {{ app_name }}
@@ -27,6 +28,7 @@
       ansible.builtin.systemd:
         name: container-{{ app_name }}
         state: stopped
+        scope: user
         enabled: false
         daemon_reload: true
 

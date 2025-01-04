@@ -11,15 +11,15 @@
     apply:
       become: true
 
-- name: Uninstall {{ app_name }} container in rootful mode
+- name: Uninstall {{ app_name }} container in {{ mode }}
   when: mode == "rootful"
   block:
-    - name: Stop systemd service for {{ app_name }} container
+    - name: Stop systemd service for container - {{ app_name }}
       ansible.builtin.systemd:
         name: container-{{ app_name }}
         state: stopped
 
-    - name: Remove {{ app_name }} container
+    - name: Remove container - {{ app_name }}
       containers.podman.podman_container:
         name: "{{ app_name }}"
         state: absent
@@ -29,26 +29,26 @@
         name: "{{ image }}:{{ ver }}"
         state: absent
 
-    - name: Disable container-{{ app_name }} service
+    - name: Disable service - container-{{ app_name }}
       ansible.builtin.systemd:
         name: container-{{ app_name }}
         state: stopped
         enabled: false
         daemon_reload: true
 
-- name: Uninstall {{ app_name }} container in rootless mode
+- name: Uninstall {{ app_name }} container {{ mode }}
   become: true
   become_user: poduser
   become_method: sudo
   when: mode == "rootless"
   block:
-    - name: Stop systemd service for {{ app_name }} container
+    - name: Stop systemd service for container-{{ app_name }}
       ansible.builtin.systemd:
         name: container-{{ app_name }}
         state: stopped
         scope: user
 
-    - name: Remove {{ app_name }} container
+    - name: Remove container - {{ app_name }}
       containers.podman.podman_container:
         name: "{{ app_name }}"
         state: absent
@@ -58,11 +58,10 @@
         name: "{{ image }}:{{ ver }}"
         state: absent
 
-    - name: Disable container-{{ app_name }} service
+    - name: Disable service - container-{{ app_name }}
       ansible.builtin.systemd:
         name: container-{{ app_name }}
         state: stopped
         enabled: false
         daemon_reload: true
         scope: user
-

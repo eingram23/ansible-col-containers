@@ -11,6 +11,7 @@
       ansible.builtin.systemd:
         name: container-{{ app_name }}
         state: stopped
+        scope: user
 
     - name: Remove container - {{ app_name }}
       containers.podman.podman_container:
@@ -27,6 +28,7 @@
       ansible.builtin.systemd:
         name: container-{{ app_name }}
         state: stopped
+        scope: user
         enabled: false
         daemon_reload: true
 

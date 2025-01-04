@@ -1,3 +1,4 @@
 ---
+app_name: "obico_ml"
 fw_port:
   - "3333/tcp"

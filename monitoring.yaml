@@ -1,5 +1,4 @@
 ---
-# NEEDED VARS: hostvar, ttl, vault_role (local-dot-lan ycdisp-dot-net)
 - name: Deploy monitoring pod and containers
   hosts: "{{ hostvar | default([]) }}"
   gather_facts: false

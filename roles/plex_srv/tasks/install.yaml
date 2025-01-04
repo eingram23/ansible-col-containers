@@ -27,26 +27,26 @@
 - name: Prep for upgrade
   when: upgrade == "yes"
   block:
-    - name: Stop systemd service for {{ app_name }} container
+    - name: Stop systemd service for container - {{ app_name }}
       ansible.builtin.systemd:
         name: container-{{ app_name }}
         state: stopped
         scope: user
 
-    - name: Remove {{ app_name }} container
+    - name: Remove container - {{ app_name }}
       containers.podman.podman_container:
         name: "{{ app_name }}"
         state: absent
 
-    - name: Remove plex_srv:latest image
+    - name: Remove image for {{ app_name }}
       containers.podman.podman_image:
         name: lscr.io/linuxserver/plex:latest
         state: absent
 
-- name: Create and run {{ app_name }} container
+- name: Create and run container - {{ app_name }}
   containers.podman.podman_container:
     name: "{{ app_name }}"
-    image: lscr.io/linuxserver/plex:{{ ver }}
+    image: "{{ image }}:{{ ver }}"
     state: stopped
     restart_policy: always
     env:
@@ -75,12 +75,12 @@
     insertafter: '# User specific environment and startup programs'
     line: 'export XDG_RUNTIME_DIR=/run/user/$(id -u)'
 
-- name: Get {{ user_account }} info
+- name: Get info for {{ user_account }}
   ansible.builtin.user:
     name: "{{ user_account }}"
   register: user_info
 
-- name: Enable container-{{ app_name }} service
+- name: Enable service - container-{{ app_name }}
   ansible.builtin.systemd:
     name: container-{{ app_name }}
     state: started

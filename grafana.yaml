@@ -9,5 +9,6 @@
   tasks:
 
     - name: Run grafana role
-      ansible.builtin.include_role:
+      ansible.builtin.import_role:
         name: eingram23.containers.grafana
+        tasks_from: "{{ task }}"
