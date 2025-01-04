@@ -1,38 +1,4 @@
-- name: Get container info for {{ app_name }}
-  containers.podman.podman_container_info:
-    name: "{{ app_name }}"
-  register: app_info
-  ignore_errors: true
-
-- name: Remove container if found - {{ app_name }}
-  when: app_info.containers|length > 0
-  block:
-    - name: Stop systemd service for container - {{ app_name }}
-      ansible.builtin.systemd:
-        name: container-{{ app_name }}
-        state: stopped
-        scope: user
-
-    - name: Remove container - {{ app_name }}
-      containers.podman.podman_container:
-        name: "{{ app_name }}"
-        state: absent
-
-    - name: Remove images for {{ app_name }}
-      containers.podman.podman_image:
-        name: "{{ item.Image }}"
-        state: absent
-      loop: "{{ app_info.containers }}"
-
-    - name: Disable service - container-{{ app_name }}
-      ansible.builtin.systemd:
-        name: container-{{ app_name }}
-        state: stopped
-        scope: user
-        enabled: false
-        daemon_reload: true
-
-    - name: Delete firewall rules
-      ansible.builtin.include_role:
-        name: eingram23.linux.firewall
-        tasks_from: delete
+- name: Uninstall {{ app_name }}
+  ansible.builtin.include_role:
+    name: eingram23.containers.common
+    tasks_from: remove_all

@@ -1,0 +1,15 @@
+- name: Stop systemd service for container-{{ app_name }}
+  ansible.builtin.systemd:
+    name: container-{{ app_name }}
+    state: stopped
+    scope: "{{ 'user' if user_account != 'root' else omit }}"
+
+- name: Remove container for {{ app_name }}
+  containers.podman.podman_container:
+    name: "{{ app_name }}"
+    state: absent
+
+- name: Cleanup old image
+  containers.podman.podman_image:
+    name: "{{ image }}:{{ old_ver }}"
+    state: absent

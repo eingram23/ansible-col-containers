@@ -1,115 +1,76 @@
 ---
-- name: Open firewall ports
+- name: Install env for {{ app_name }}
   ansible.builtin.include_role:
-    name: eingram23.linux.firewall
+    name: eingram23.containers.common
+    tasks_from: create_env
 
-- name: Ensure vars are set
-  ansible.builtin.assert:
-    that:
-      - env == "dev" or env == "prod"
-
-- name: Create {{ app_name }} folder structure
-  ansible.builtin.file:
-    path: /opt/{{ app_name }}
-    state: directory
-    mode: '0755'
-
-- name: Make sure podman is installed
-  ansible.builtin.package:
-    name: podman
-    state: present
-
-- name: Install podman-plugins
-  ansible.builtin.package:
-    name: podman-plugins
-    state: present
-
-- name: Enable persistent storage for journalctl
-  ansible.builtin.file:
-    path: /var/log/journal
-    state: directory
-    mode: '0644'
-
-# - name: Modify loki and prom hosts if deploying to external hosts
-#   when: inventory_hostname == "yc-appsrv1.ycdisp.net"
-#   ansible.builtin.set_fact:
-#     loki_host: "http://yandchome.duckdns.org:3100"
-#     prom_host: "http://yandchome.duckdns.org:9090"
-
-- name: Create config.alloy on remote server
-  ansible.builtin.template:
-    src: "{{ item }}.j2"
-    dest: /opt/{{ app_name }}/{{ item }}
-    mode: '0644'
-  loop:
-    - config.alloy
-
-- name: Check if node-exporter or promtail containers exist
-  ansible.builtin.include_tasks:
-    file: migrate.yaml
-
-- name: Check if grafana_agent container exists
-  containers.podman.podman_container_info:
-    name: grafana_agent
-  register: grafana_agent_info
-  ignore_errors: true
-
-- name: Remove grafana_agent container if found
-  when: grafana_agent_info.containers|length > 0
-  ansible.builtin.include_role:
-    name: eingram23.containers.grafana_agent
-    tasks_from: uninstall
-
-- name: Prep for upgrade
-  when: upgrade == "yes"
+- name: Run tasks as {{ user_account }}
+  become: true
+  become_method: ansible.builtin.sudo
+  become_user: "{{ user_account }}"
   block:
-    - name: Stop systemd service for {{ app_name }} container
-      ansible.builtin.systemd:
-        name: container-{{ app_name }}
-        state: stopped
+    - name: Enable persistent storage for journalctl
+      ansible.builtin.file:
+        path: /var/log/journal
+        state: directory
+        mode: '0644'
 
-    - name: Remove {{ app_name }} container
+    - name: Create config.alloy on remote server
+      ansible.builtin.template:
+        src: "{{ item }}.j2"
+        dest: /opt/{{ app_name }}/{{ item }}
+        mode: '0644'
+      loop:
+        - config.alloy
+
+    - name: Check if node-exporter or promtail containers exist
+      ansible.builtin.include_tasks:
+        file: migrate.yaml
+
+    - name: Check if grafana_agent container exists
+      containers.podman.podman_container_info:
+        name: grafana_agent
+      register: grafana_agent_info
+      ignore_errors: true
+
+    - name: Remove grafana_agent container if found
+      when: grafana_agent_info.containers|length > 0
+      ansible.builtin.include_role:
+        name: eingram23.containers.grafana_agent
+        tasks_from: uninstall
+
+    - name: Prep for upgrade
+      when: upgrade == "yes"
+      ansible.builtin.include_role:
+        name: eingram23.containers.common
+        tasks_from: upgrade
+
+    - name: Run container for {{ app_name }}
       containers.podman.podman_container:
         name: "{{ app_name }}"
-        state: absent
+        image: "{{ image }}:{{ ver }}"
+        state: stopped
+        restart_policy: always
+        privileged: true
+        publish:
+          - "12345:12345"
+        cap_add:
+          - SYS_TIME
+        command: >
+          run --server.http.listen-addr=0.0.0.0:12345
+          --storage.path=/var/lib/alloy/data
+          /etc/alloy/config.alloy
+        volume:
+          - /:/host/root:ro,rslave
+          - /sys:/host/sys:ro,rslave
+          - /proc:/host/proc:ro,rslave
+          - /var/log:/var/log:ro
+          - /opt/{{ app_name }}:/etc/alloy
+        generate_systemd:
+          path: /etc/systemd/system
+          restart_policy: always
 
-    - name: Cleanup old image
-      containers.podman.podman_image:
-        name: "{{ image }}:{{ old_ver }}"
-        state: absent
-
-- name: Run {{ app_name }} container
-  containers.podman.podman_container:
-    name: "{{ app_name }}"
-    image: "{{ image }}:{{ ver }}"
-    state: stopped
-    restart_policy: always
-    privileged: true
-    # network: host
-    # pid: host
-    publish:
-      - "12345:12345"
-    cap_add:
-      - SYS_TIME
-    command: >
-      run --server.http.listen-addr=0.0.0.0:12345
-      --storage.path=/var/lib/alloy/data
-      /etc/alloy/config.alloy
-    volume:
-      - /:/host/root:ro,rslave
-      - /sys:/host/sys:ro,rslave
-      - /proc:/host/proc:ro,rslave
-      - /var/log:/var/log:ro
-      - /opt/{{ app_name }}:/etc/alloy
-      # - /opt/{{ app_name }}/agent.yaml:/etc/agent-config/agent.yaml
-      # - /var/run/dbus/system_bus_socket:/var/run/dbus/system_bus_socket:rw
-    generate_systemd:
-      path: /etc/systemd/system
-      restart_policy: always
-
-- name: Enable container-{{ app_name }} service
-  ansible.builtin.systemd:
-    name: container-{{ app_name }}
-    state: started
-    enabled: true
-    daemon_reload: true
+    - name: Enable service for {{ app_name }}
+      ansible.builtin.include_role:
+        name: eingram23.containers.common
+        tasks_from: enable_sysd

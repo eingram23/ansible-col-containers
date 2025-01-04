@@ -4,14 +4,16 @@
   become_method: sudo
   become_user: root
   block:
-    - name: Enable linger for {{ user_account }} user
+    - name: Enable linger for user {{ user_account }}
       ansible.builtin.command: loginctl enable-linger {{ user_account }}
+      args:
+        creates: /var/lib/systemd/linger/{{ user_account }}
 
     - name: Open firewall port
       ansible.builtin.include_role:
         name: eingram23.linux.firewall
 
-    - name: Create {{ app_name }} folder
+    - name: Create folder for {{ app_name }}
       ansible.builtin.file:
         path: /opt/{{ app_name }}
         state: directory
@@ -21,7 +23,7 @@
 
     - name: Run podman unshare to allow container access to folder
       ansible.builtin.shell:
-        podman unshare chown -R 0:0 /opt/loki
+        podman unshare chown -R 0:0 /opt/{{ app_name }}
       become_user: "{{ user_account }}"
       become_method: sudo
 
@@ -45,13 +47,13 @@
 - name: Prep for upgrade
   when: upgrade == "yes"
   block:
-    # - name: Stop systemd service for {{ app_name }} container
-    #   ansible.builtin.systemd:
-    #     name: container-{{ app_name }}
-    #     state: stopped
-    #     scope: user
+    - name: Stop systemd service for {{ app_name }} container
+      ansible.builtin.systemd:
+        name: container-{{ app_name }}
+        state: stopped
+        scope: user
 
-    - name: Remove {{ app_name }} container
+    - name: Remove container for {{ app_name }}
       containers.podman.podman_container:
         name: "{{ app_name }}"
         state: absent

@@ -2,12 +2,11 @@
 - name: Deploy blackbox_exporter container
   hosts: "{{ hostvar | default([]) }}"
   gather_facts: false
-  become: true
-  become_method: sudo
-  become_user: poduser
+  become: false
 
   tasks:
 
     - name: Run blackbox_exporter role
-      ansible.builtin.include_role:
+      ansible.builtin.import_role:
         name: eingram23.containers.blackbox_exporter
+        tasks_from: "{{ task  }}"

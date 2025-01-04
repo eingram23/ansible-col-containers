@@ -5,3 +5,4 @@ upgrade: "no"
 migrate: "no"
 fw_port:
   - "12345/tcp"
+user_account: "root"

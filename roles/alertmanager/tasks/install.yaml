@@ -9,10 +9,10 @@
   become_method: ansible.builtin.sudo
   become_user: "{{ user_account }}"
   block:
-    - name: Copy data-sources.json file
-      ansible.builtin.copy:
-        src: data-sources.json
-        dest: /opt/{{ app_name }}/data-sources.json
+    - name: Create alertmanager.yml on remote server
+      ansible.builtin.template:
+        src: alertmanager.yml.j2
+        dest: /opt/{{ app_name }}/alertmanager.yml
         mode: '0644'
         owner: "{{ user_account }}"
         group: "{{ user_account }}"
@@ -23,22 +23,21 @@
         name: eingram23.containers.common
         tasks_from: upgrade
 
-    - name: Pull dbeaver image and start container
+    - name: Create and run container - {{ app_name }}
       containers.podman.podman_container:
         name: "{{ app_name }}"
-        image: docker.io/dbeaver/cloudbeaver:{{ ver }}
-        network: host
-        env:
-          CB_SERVER_NAME: "dbeaver"
-          CB_ADMIN_NAME: "cbadmin"
-          CB_ADMIN_PASSWORD: "{{ lookup('hashi_vault', 'secret=secret/ssh/eingram:ssh_password') }}"
-          CB_SERVER_URL: http://{{ inventory_hostname }}:8978/
-        volume:
-          - "{{ app_name }}-data:/opt/dbeaver"
-          - "/opt/{{ app_name }}/data-sources.json:/opt/cloudbeaver/workspace/GlobalConfiguration/.dbeaver/data-sources.json"
+        image: "{{ image }}:{{ ver }}"
         state: stopped
         restart_policy: always
-        publish: "{{ publish_port }}"
+        publish:
+          - "9093:9093"
+        command: >
+          --config.file=/etc/alertmanager/alertmanager.yml
+          --storage.path=/alertmanager
+          --web.external-url=http://{{ inventory_hostname }}:9093
+        volume:
+          - "{{ app_name }}-data:/alertmanager"
+          - /opt/{{ app_name }}/alertmanager.yml:/etc/alertmanager/alertmanager.yml
         generate_systemd:
           path: /home/{{ user_account }}/.config/systemd/user
           restart_policy: always

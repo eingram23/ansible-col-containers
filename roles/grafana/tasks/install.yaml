@@ -1,140 +1,91 @@
 ---
-- name: Run root tasks
+- name: Install env for {{ app_name }}
+  ansible.builtin.include_role:
+    name: eingram23.containers.common
+    tasks_from: create_env
+
+- name: Run tasks as {{ user_account }}
   become: true
-  become_method: sudo
-  become_user: root
+  become_method: ansible.builtin.sudo
+  become_user: "{{ user_account }}"
   block:
-    - name: Enable linger for user - {{ user_account }}
-      ansible.builtin.command: loginctl enable-linger {{ user_account }}
-
-    - name: Open firewall port
-      ansible.builtin.include_role:
-        name: eingram23.linux.firewall
-
-    - name: Create folder structure for {{ app_name }}
-      ansible.builtin.file:
-        path: /opt/{{ app_name }}/{{ folder_item }}
-        state: directory
-        mode: '0755'
-        recurse: true
-        owner: poduser
-        group: poduser
-      loop:
-        - dashboards
-        - datasources
-      loop_control:
-        loop_var: folder_item
-
-- name: Pull Grafana dashboard json from Google Storage bucket
-  delegate_to: localhost
-  become: true
-  become_method: sudo
-  become_user: root
-  block:
-    - name: Create gcp-creds.json
+    - name: Create github key
       ansible.builtin.template:
-        src: gcp-creds.json.j2
-        dest: "/var/tmp/gcp-creds.json"
+        src: ssh-key-git.key.j2
+        dest: /var/tmp/ssh-key-git.key
         mode: '0400'
 
-    - name: Download grafana dashboard json files from Google Storage bucket
-      google.cloud.gcp_storage_object:
-        bucket: ycdisp-configs
-        dest: /var/tmp/test.json
-        src: grafana/dashboards/alertmanager.json
-        action: download
-        auth_kind: serviceaccount
-        project: proj-yc-srv1
-        service_account_file: "/var/tmp/gcp-creds.json"
+    - name: Pull down configs repo from git
+      ansible.builtin.git:
+        repo: 'git@github.com:eingram23/configs.git'
+        dest: /var/tmp/configs
+        key_file: /var/tmp/ssh-key-git.key
+        accept_hostkey: true
+        force: true
 
-- meta: end_play
+    - name: Delete github key
+      ansible.builtin.file:
+        path: /var/tmp/ssh-key-git.key
+        state: absent
 
-- name: Copy grafana dashboard json files to remote server
-  ansible.builtin.copy:
-    src: "/var/tmp/{{ item }}"
-    dest: /opt/{{ app_name }}/dashboards/
-    mode: '0644'
-    owner: poduser
-    group: poduser
-  with_fileglob: "*.json"
+    - name: Copy grafana dashboard json files to remote server
+      ansible.builtin.copy:
+        src: /var/tmp/configs/grafana/{{ item }}
+        dest: /opt/{{ app_name }}/dashboards/
+        mode: '0644'
+        remote_src: true
+      with_fileglob: "*.json"
 
-- name: Copy grafana config to remote server
-  ansible.builtin.copy:
-    src: dashboards.yaml
-    dest: /opt/{{ app_name }}/dashboards/
-    mode: '0644'
-    owner: poduser
-    group: poduser
+    - name: Remove configs repo
+      ansible.builtin.file:
+        path: /var/tmp/configs
+        state: absent
 
-- name: Create grafana datasource config on remote server
-  ansible.builtin.template:
-    src: datasources.yaml.j2
-    dest: /opt/{{ app_name }}/datasources/datasources.yaml
-    owner: poduser
-    group: poduser
+    - name: Copy grafana dashboard json files to remote server
+      ansible.builtin.copy:
+        src: /var/tmp/{{ item }}
+        dest: /opt/{{ app_name }}/dashboards/
+        mode: '0644'
+      with_fileglob: "*.json"
 
-- name: Prep for upgrade
-  when: upgrade == "yes"
-  block:
-    - name: Stop systemd service for container {{ app_name }}
-      ansible.builtin.systemd:
-        name: container-{{ app_name }}
-        state: stopped
-        scope: user
+    - name: Copy grafana config to remote server
+      ansible.builtin.copy:
+        src: dashboards.yaml
+        dest: /opt/{{ app_name }}/dashboards/
+        mode: '0644'
 
-    - name: Remove container {{ app_name }}
+    - name: Create grafana datasource config on remote server
+      ansible.builtin.template:
+        src: datasources.yaml.j2
+        dest: /opt/{{ app_name }}/datasources/datasources.yaml
+        mode: '0644'
+
+    - name: Prep for upgrade
+      when: upgrade == "yes"
+      ansible.builtin.include_role:
+        name: eingram23.containers.common
+        tasks_from: upgrade
+
+    - name: Create and run container {{ app_name }}
       containers.podman.podman_container:
         name: "{{ app_name }}"
-        state: absent
+        image: "{{ image }}:{{ ver }}"
+        state: stopped
+        restart_policy: always
+        user: 472
+        publish:
+          - "3000:3000"
+        env:
+          GF_INSTALL_PLUGINS: "grafana-clock-panel, flant-statusmap-panel, marcusolsson-treemap-panel"
+        volume:
+          - /opt/{{ app_name }}/dashboards:/etc/grafana/provisioning/dashboards
+          - /opt/{{ app_name }}/datasources:/etc/grafana/provisioning/datasources
+          - "{{ app_name }}-data:/var/lib/grafana"
+        generate_systemd:
+          path: /home/{{ user_account }}/.config/systemd/user
+          restart_policy: always
 
-    - name: Remove volumes for {{ app_name }}
-      containers.podman.podman_volume:
-        name: "{{ app_name }}_data"
-        state: absent
-
-    - name: Cleanup old image
-      containers.podman.podman_image:
-        name: "{{ image }}:{{ old_ver }}"
-        state: absent
-
-- name: Create and run container {{ app_name }}
-  containers.podman.podman_container:
-    name: "{{ app_name }}"
-    image: "{{ image }}:{{ ver }}"
-    state: stopped
-    restart_policy: always
-    user: 472
-    pod: "{{ pod_name }}"
-    publish:
-      - "3000:3000"
-    env:
-      GF_INSTALL_PLUGINS: "grafana-clock-panel, flant-statusmap-panel, marcusolsson-treemap-panel"
-    volume:
-      - /opt/{{ app_name }}/dashboards:/etc/grafana/provisioning/dashboards
-      - /opt/{{ app_name }}/datasources:/etc/grafana/provisioning/datasources
-      - "{{ app name }}_data:/var/lib/grafana"
-    generate_systemd:
-      path: /home/{{ user_account }}/.config/systemd/user
-      restart_policy: always
-
-- name: Set XDG_RUNTIME_DIR env variable
-  ansible.builtin.lineinfile:
-    path: /home/{{ user_account }}/.bash_profile
-    search_string: 'export XDG_RUNTIME_DIR=/run/user/$(id -u)'
-    insertafter: '# User specific environment and startup programs'
-    line: 'export XDG_RUNTIME_DIR=/run/user/$(id -u)'
-
-- name: Get info for {{ user_account }}
-  ansible.builtin.user:
-    name: "{{ user_account }}"
-  register: user_info
-
-- name: Enable service - container-{{ app_name }}
-  ansible.builtin.systemd:
-    name: container-{{ app_name }}
-    state: started
-    enabled: true
-    daemon_reload: true
-    scope: user
-  environment:
-    XDG_RUNTIME_DIR: /run/user/{{ user_info.uid }}
+    - name: Enable service for {{ app_name }}
+      ansible.builtin.include_role:
+        name: eingram23.containers.common
+        tasks_from: enable_sysd
