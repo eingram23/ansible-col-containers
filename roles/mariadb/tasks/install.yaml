@@ -19,6 +19,7 @@
           - "{{ app_name }}-data:/var/lib/mysql"
         state: stopped
         restart_policy: always
+        publish: "{{ publish_port }}"
         generate_systemd:
           path: "{{ '/home/' + user_account + '/.config/systemd/user' if user_account != 'root' else '/etc/systemd/system' }}"
           restart_policy: always

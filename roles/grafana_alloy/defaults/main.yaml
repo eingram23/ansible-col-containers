@@ -8,3 +8,5 @@ fw_port:
 loki_host: "http://loki.local.lan:3100"
 prom_host: "http://prom.local.lan:9090"
 user_account: "root"
+publish_port:
+  - "12345:12345"

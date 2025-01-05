@@ -31,13 +31,12 @@
           DOCKER_INFLUXDB_INIT_PASSWORD={{ lookup('hashi_vault', 'secret=secret/ssh/eingram:ssh_password') }}
           DOCKER_INFLUXDB_INIT_ORG=Homelab
           DOCKER_INFLUXDB_INIT_BUCKET=HA
-        publish:
-          - "8086:8086"
+        publish: "{{ publish_port }}"
         volumes:
           - "{{ app_name}}-data:/var/lib/influxdb2"
           - /opt/{{ app_name }}:/etc/influxdb2:z
         generate_systemd:
-          path: /home/{{ user_account }}/.config/systemd/user
+          path: "{{ '/home/' + user_account + '/.config/systemd/user' if user_account != 'root' else '/etc/systemd/system' }}"
           restart_policy: always
 
     - name: Enable service for {{ app_name }}

@@ -73,8 +73,7 @@
         state: stopped
         restart_policy: always
         user: 472
-        publish:
-          - "3000:3000"
+        publish: "{{ publish_port }}"
         env:
           GF_INSTALL_PLUGINS: "grafana-clock-panel, flant-statusmap-panel, marcusolsson-treemap-panel"
         volume:
@@ -82,7 +81,7 @@
           - /opt/{{ app_name }}/datasources:/etc/grafana/provisioning/datasources
           - "{{ app_name }}-data:/var/lib/grafana"
         generate_systemd:
-          path: /home/{{ user_account }}/.config/systemd/user
+          path: "{{ '/home/' + user_account + '/.config/systemd/user' if user_account != 'root' else '/etc/systemd/system' }}"
           restart_policy: always
 
     - name: Enable service for {{ app_name }}

@@ -5,3 +5,5 @@ upgrade: "no"
 user_account: "poduser"
 fw_port:
   - "3306/tcp"
+publish_port:
+  - "3306:3306"

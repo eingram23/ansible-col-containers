@@ -44,8 +44,7 @@
         image: "{{ image }}:{{ ver }}"
         state: stopped
         restart_policy: always
-        publish:
-          - "3100:3100"
+        publish: "{{ publish_port }}"
         command: >
           -config.file=/etc/loki/local-config.yaml
         volume:
@@ -53,7 +52,7 @@
           - /opt/{{ app_name }}/rules.yml:/tmp/loki/rules/fake/rules.yml
           - "{{ app_name }}-data:/loki"
         generate_systemd:
-          path: /home/{{ user_account }}/.config/systemd/user
+          path: "{{ '/home/' + user_account + '/.config/systemd/user' if user_account != 'root' else '/etc/systemd/system' }}"
           restart_policy: always
 
     - name: Enable service for {{ app_name }}

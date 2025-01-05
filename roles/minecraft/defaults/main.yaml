@@ -1,4 +1,8 @@
-pod_name: "minecraft"
-publish_ports:
+app_name: "minecraft"
+publish_port:
    - "25565:25565"
-mc_port: "25565"
+user_account: "poduser"
+upgrade: "no"
+image: "docker.io/itzg/minecraft-server"
+fw_port:
+   - "25565/tcp"

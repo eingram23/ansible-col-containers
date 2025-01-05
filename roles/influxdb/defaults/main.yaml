@@ -5,3 +5,5 @@ upgrade: "no"
 user_account: "poduser"
 fw_port:
   - "8086/tcp"
+publish_port:
+  - "8086:8086"
