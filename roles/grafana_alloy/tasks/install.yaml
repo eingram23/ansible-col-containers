@@ -67,7 +67,7 @@
           - /var/log:/var/log:ro
           - /opt/{{ app_name }}:/etc/alloy
         generate_systemd:
-          path: /etc/systemd/system
+          path: /etc/systemd/system{{ '/user' if user_account != 'root' else '' }}
           restart_policy: always
 
     - name: Enable service for {{ app_name }}

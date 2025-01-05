@@ -1,0 +1,7 @@
+---
+app_name: "mariadb"
+image: "docker.io/mariadb"
+upgrade: "no"
+user_account: "poduser"
+fw_port:
+  - "3306/tcp"

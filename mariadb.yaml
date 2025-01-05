@@ -1,0 +1,32 @@
+---
+- name: Create mariadb container
+  hosts: "{{ hostvar | default([]) }}"
+  gather_facts: false
+  become: false
+
+  tasks:
+
+    - name: Create mariadb container
+      ansible.builtin.import_role:
+        name: eingram23.containers.mariadb
+        tasks_from: "{{ task }}"
+
+    # - name: Install software req
+    #   ansible.builtin.package:
+    #     name: "{{ package_item }}"
+    #     state: present
+    #   loop:
+    #     - python3-mysql
+    #     - mysql
+    #   loop_control:
+    #     loop_var: package_item
+
+    # - name: Create mariadb superuser
+    #   become: false
+    #   ansible.builtin.include_role:
+    #     name: eingram23.database.mariadb
+    #     tasks_from: create_new_user
+    #   vars:
+    #     mariadb_user: eingram
+    #     mariadb_user_pw: "{{ lookup('hashi_vault', 'secret=secret/ssh/eingram:ssh_password') }}"
+    #     mariadb_user_priv: '*.*:ALL,GRANT'
