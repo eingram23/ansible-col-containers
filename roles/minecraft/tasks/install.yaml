@@ -22,6 +22,12 @@
         dest: /opt/{{ app_name }}/plugins/MultiVerse-Core-4.3.14.jar
         mode: '0644'
 
+    - name: Prep for upgrade
+      when: upgrade == "yes"
+      ansible.builtin.include_role:
+        name: eingram23.containers.common
+        tasks_from: upgrade
+
     - name: Create and run container for {{ app_name }}
       containers.podman.podman_container:
         name: "{{ app_name }}"

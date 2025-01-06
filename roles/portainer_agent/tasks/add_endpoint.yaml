@@ -2,25 +2,25 @@
 - name: Add Podman Agent environment to Portainer
   block:
     - name: Login to Portainer API
-      uri:
+      ansible.builtin.uri:
         url: "{{ portainer_url }}/api/auth"
         method: POST
         body_format: json
         body:
           username: "admin"
-          password: "temppassword"
+          password: "{{ lookup('hashi_vault', 'secret=secret/portainer:password') }}"
         status_code: 200
       register: auth_response
 
     - name: Add Podman Agent environment
-      uri:
+      ansible.builtin.uri:
         url: "{{ portainer_url }}/api/endpoints"
         method: POST
         headers:
           Authorization: "Bearer {{ auth_response.json.jwt }}"
         body_format: form-urlencoded
         body:
-          Name: "test"
+          Name: "{{ inventory_hostname }} - {{ user_account }}"
           EndpointCreationType: 2
           URL: "{{ agent_endpoint }}"
           TLS: "true"

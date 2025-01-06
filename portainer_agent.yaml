@@ -7,7 +7,7 @@
 
   tasks:
 
-    - name: Portainer Agent - {{ task }}
+    - name: Deploy portainer Agent
       ansible.builtin.import_role:
         name: eingram23.containers.portainer_agent
         tasks_from: "{{ task }}"

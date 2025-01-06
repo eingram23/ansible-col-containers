@@ -1,114 +1,49 @@
 ---
 - name: Assert that needed vars are set
-  assert:
+  ansible.builtin.assert:
     that:
       - app_name is defined
       - pg_port is defined
-      - user_account is defined
 
 - name: Set fw_port
-  set_fact:
-    fw_port: 
+  ansible.builtin.set_fact:
+    fw_port:
       - "{{ pg_port }}/tcp"
+    publish_port:
+      - "{{ pg_port }}:5432"
 
-- name: Set publish_port
-  set_fact:
-    publish_port: "{{ pg_port }}:5432"
+- name: Install env for {{ app_name }}
+  ansible.builtin.include_role:
+    name: eingram23.containers.common
+    tasks_from: create_env
 
-- name: Run root tasks
+- name: Run tasks as {{ user_account }}
   become: true
-  become_method: sudo
-  become_user: root
+  become_method: ansible.builtin.sudo
+  become_user: "{{ user_account }}"
   block:
-    - name: Check if user account exists
-      ansible.builtin.getent:
-        database: passwd
-        key: "{{ user_account }}"
-      register: user_account_exists
-
-    - name: Fail if user account does not exist
-      ansible.builtin.fail:
-        msg: "User account {{ user_account }} does not exist."
-      when: user_account_exists is not defined
-
-    - name: Make sure podman is installed
-      ansible.builtin.package:
-        name: podman
-        state: present
-
-    - name: Install podman-plugins
-      ansible.builtin.package:
-        name: podman-plugins
-        state: present
-
-    - name: Enable linger for {{ user_account }}
-      ansible.builtin.command: loginctl enable-linger {{ user_account }}
-
-    - name: Open firewall port
+    - name: Prep for upgrade
+      when: upgrade == "yes"
       ansible.builtin.include_role:
-        name: eingram23.linux.firewall
+        name: eingram23.containers.common
+        tasks_from: upgrade
 
-    - name: Create folder for {{ app_name }}
-      ansible.builtin.file:
-        path: /opt/{{ app_name }}
-        state: directory
-        mode: '0755'
-        owner: "{{ user_account }}"
-        group: "{{ user_account }}"
-
-- name: Prep for upgrade
-  when: upgrade == "yes"
-  block:
-    - name: Stop systemd service for container - {{ app_name }}
-      ansible.builtin.systemd:
-        name: container-{{ app_name }}
-        state: stopped
-        scope: user
-
-    - name: Remove container - {{ app_name }}
+    - name: Run container - {{ app_name }}
       containers.podman.podman_container:
         name: "{{ app_name }}"
-        state: absent
+        image: "{{ image }}:{{ ver }}"
+        env:
+          POSTGRES_PASSWORD: "{{ lookup('hashi_vault', 'secret=secret/ssh/eingram:ssh_password') }}"
+        volume:
+          - "{{ app_name }}-data:/var/lib/postgresql/data"
+        state: stopped
+        restart_policy: always
+        publish: "{{ publish_port }}"
+        generate_systemd:
+          path: "{{ '/home/' + user_account + '/.config/systemd/user' if user_account != 'root' else '/etc/systemd/system' }}"
+          restart_policy: always
 
-    - name: Cleanup old image
-      containers.podman.podman_image:
-        name: "{{ image }}:{{ old_ver }}"
-        state: absent
-
-- name: Run container - {{ app_name }}
-  containers.podman.podman_container:
-    name: "{{ app_name }}"
-    image: docker.io/postgres:{{ ver }}
-    env:
-      POSTGRES_PASSWORD: "{{ lookup('hashi_vault', 'secret=secret/ssh/eingram:ssh_password') }}"
-    volume:
-      - "{{ app_name }}-data:/var/lib/postgresql/data"
-    state: stopped
-    restart_policy: always
-    publish:
-      - "{{ publish_port }}"
-    generate_systemd:
-      path: /home/{{ user_account }}/.config/systemd/user
-      restart_policy: always
-
-- name: Set XDG_RUNTIME_DIR env variable
-  ansible.builtin.lineinfile:
-    path: /home/{{ user_account }}/.bash_profile
-    search_string: 'export XDG_RUNTIME_DIR=/run/user/$(id -u)'
-    insertafter: '# User specific environment and startup programs'
-    line: 'export XDG_RUNTIME_DIR=/run/user/$(id -u)'
-
-- name: Get info - {{ user_account }}
-  ansible.builtin.user:
-    name: "{{ user_account }}"
-  register: user_info
-
-- name: Enable service - container-{{ app_name }}
-  ansible.builtin.systemd:
-    name: container-{{ app_name }}
-    state: started
-    enabled: true
-    daemon_reload: true
-    scope: user
-  environment:
-    XDG_RUNTIME_DIR: /run/user/{{ user_info.uid }}
+    - name: Enable service for {{ app_name }}
+      ansible.builtin.include_role:
+        name: eingram23.containers.common
+        tasks_from: enable_sysd

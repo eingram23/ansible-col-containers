@@ -1,67 +1,29 @@
-- name: Change fw_port if running rootless
-  ansible.builtin.set_fact:
-    fw_port:
-      - "9002/tcp"
-  when: mode == "rootless"
+- name: Assert that user_account is 'defined'
+  ansible.builtin.assert:
+    that:
+      - user_account is defined
+    fail_msg: "user_account is not defined"
+    success_msg: "user_account is defined"
 
-- name: Delete firewall rules
+- name: Set rootless vars
+  when: user_account != "root"
+  block:
+    - name: Get user info for {{ user_account }}
+      ansible.builtin.getent:
+        database: passwd
+        key: "{{ user_account }}"
+
+    - name: Obtain new port for accessing portainer agent
+      ansible.builtin.set_fact:
+        new_port: "{{ ((getent_passwd[user_account][1] | int) + 8000) | string }}"
+
+    - name: Set new ports for portainer agent
+      ansible.builtin.set_fact:
+        "{{ item.key }}": "{{ item.value }}"
+      loop:
+        - { key: 'fw_port', value: ["{{ new_port }}/tcp"] }
+
+- name: Uninstall {{ app_name }}
   ansible.builtin.include_role:
-    name: eingram23.linux.firewall
-    tasks_from: delete
-    apply:
-      become: true
-
-- name: Uninstall {{ app_name }} container in {{ mode }}
-  when: mode == "rootful"
-  block:
-    - name: Stop systemd service for container - {{ app_name }}
-      ansible.builtin.systemd:
-        name: container-{{ app_name }}
-        state: stopped
-
-    - name: Remove container - {{ app_name }}
-      containers.podman.podman_container:
-        name: "{{ app_name }}"
-        state: absent
-
-    - name: Cleanup image
-      containers.podman.podman_image:
-        name: "{{ image }}:{{ ver }}"
-        state: absent
-
-    - name: Disable service - container-{{ app_name }}
-      ansible.builtin.systemd:
-        name: container-{{ app_name }}
-        state: stopped
-        enabled: false
-        daemon_reload: true
-
-- name: Uninstall {{ app_name }} container {{ mode }}
-  become: true
-  become_user: poduser
-  become_method: sudo
-  when: mode == "rootless"
-  block:
-    - name: Stop systemd service for container-{{ app_name }}
-      ansible.builtin.systemd:
-        name: container-{{ app_name }}
-        state: stopped
-        scope: user
-
-    - name: Remove container - {{ app_name }}
-      containers.podman.podman_container:
-        name: "{{ app_name }}"
-        state: absent
-
-    - name: Cleanup image
-      containers.podman.podman_image:
-        name: "{{ image }}:{{ ver }}"
-        state: absent
-
-    - name: Disable service - container-{{ app_name }}
-      ansible.builtin.systemd:
-        name: container-{{ app_name }}
-        state: stopped
-        enabled: false
-        daemon_reload: true
-        scope: user
+    name: eingram23.containers.common
+    tasks_from: remove_all

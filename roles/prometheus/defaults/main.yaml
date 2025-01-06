@@ -5,3 +5,5 @@ image: "docker.io/prom/prometheus"
 upgrade: "no"
 fw_port:
   - "9090/tcp"
+publish_port:
+  - "9090:9090"

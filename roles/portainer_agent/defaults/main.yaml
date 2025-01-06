@@ -5,5 +5,9 @@ upgrade: "no"
 fw_port:
   - "9001/tcp"
 mode: "rootful"
-portainer_url: "http://podhost-dev.local.lan:9000"
-agent_endpoint: "tcp://podhost-dev.local.lan:9002"
+portainer_url: "http://portainer.local.lan:9000"
+# agent_endpoint: "tcp://podhost-dev.local.lan:9002"
+publish_port:
+  - "9001:9001"
+# user_account: "poduser"
+

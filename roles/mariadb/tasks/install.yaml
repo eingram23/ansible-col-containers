@@ -9,6 +9,12 @@
   become_method: ansible.builtin.sudo
   become_user: "{{ user_account }}"
   block:
+    - name: Prep for upgrade
+      when: upgrade == "yes"
+      ansible.builtin.include_role:
+        name: eingram23.containers.common
+        tasks_from: upgrade
+
     - name: Pull mariadb image and start container
       containers.podman.podman_container:
         name: "{{ app_name }}"

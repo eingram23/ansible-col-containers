@@ -10,6 +10,4 @@
       ansible.builtin.import_role:
         name: eingram23.containers.postgres
         tasks_from: "{{ task }}"
-      become: true
-      become_method: sudo
-      become_user: "{{ user_account }}"
+

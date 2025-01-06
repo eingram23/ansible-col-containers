@@ -4,6 +4,5 @@ image: "docker.io/postgres"
 upgrade: "no"
 # fw_port:
 #   - "5432/tcp"
-# user_account: "poduser"
-# pg_port:
-#   - "5432:5432"
+user_account: "poduser"
+# pg_port: 5432
