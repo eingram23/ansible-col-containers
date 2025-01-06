@@ -4,3 +4,6 @@ image: "docker.io/prometheuscommunity/smartctl-exporter"
 upgrade: "no"
 fw_port:
   - 9633/tcp
+user_account: "root"
+publish_port:
+  - 9633:9633

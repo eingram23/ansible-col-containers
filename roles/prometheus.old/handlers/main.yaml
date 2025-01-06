@@ -1,7 +1,0 @@
----
-- name: Restart prometheus container
-  containers.podman.podman_container:
-    name: prometheus
-    image: prom/prometheus:{{ ver }}
-    state: started
-    restart: true

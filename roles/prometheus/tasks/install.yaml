@@ -28,13 +28,20 @@
         path: /var/tmp/ssh-key-git.key
         state: absent
 
-    - name: Copy prometheus rules to remote server
+    - name: Register rules file names
+      ansible.builtin.find: 
+        paths: /var/tmp/configs/prometheus/rules
+        recurse: false
+        patterns: "*.rules"
+      register: files_to_copy
+
+    - name: Copy rules files
       ansible.builtin.copy:
-        src: /var/tmp/configs/prometheus/rules/{{ item }}
-        dest: /opt/{{ app_name }}/
+        src: "{{ item.path }}"
+        dest: /opt/{{ app_name }}
         mode: '0644'
         remote_src: true
-      with_fileglob: "*.rules"
+      with_items: "{{ files_to_copy.files }}"
 
     - name: Copy prometheus config to remote server
       ansible.builtin.copy:
@@ -47,12 +54,6 @@
       ansible.builtin.file:
         path: /var/tmp/configs
         state: absent
-    - name: Copy prometheus files to remote server
-      ansible.builtin.copy:
-        src: "{{ item }}"
-        dest: /opt/{{ app_name }}/
-        mode: '0644'
-      with_fileglob: "*"
 
     # - name: Create ca.crt on remote server
     #   ansible.builtin.template:
@@ -90,7 +91,8 @@
         image: "{{ image }}:{{ ver }}"
         state: stopped
         restart_policy: always
-        publish: "{{ publish_port }}"
+        # publish: "{{ publish_port }}"
+        network: host
         command: >
           --config.file=/etc/prometheus/prometheus.yml
           --storage.tsdb.path=/prometheus

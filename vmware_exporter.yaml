@@ -1,0 +1,11 @@
+---
+- name: Deploy vmware_exporter container
+  hosts: "{{ hostvar | default([]) }}"
+  become: false
+
+  tasks:
+
+    - name: Deploy vmware_exporter container
+      ansible.builtin.import_role:
+        name: eingram23.containers.vmware_exporter
+        tasks_from: "{{ task }}"

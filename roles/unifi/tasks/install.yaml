@@ -1,28 +1,28 @@
 ---
-- name: Run root tasks
-  become: true
-  become_method: sudo
-  become_user: root
-  block:
-    - name: Open firewall ports
-      ansible.builtin.include_role:
-        name: eingram23.linux.firewall
+- name: Install env for {{ app_name }}
+  ansible.builtin.include_role:
+    name: eingram23.containers.common
+    tasks_from: create_env
 
-    - name: Create unifi folder
+- name: Run tasks as {{ user_account }}
+  become: true
+  become_method: ansible.builtin.sudo
+  become_user: "{{ user_account }}"
+  block:
+    - name: Create unifi config folder
       ansible.builtin.file:
         path: "{{ item }}"
         state: directory
         mode: '0755'
         owner: "{{ user_account }}"
         group: "{{ user_account }}"
-        recurse: true
       loop:
         - /opt/{{ app_name }}/config
 
     - name: Create mongodb init on host
       ansible.builtin.template:
         src: init-mongo.js.j2
-        dest: "{{ host_folder }}/init-mongo.js"
+        dest: "/opt/{{ app_name }}/init-mongo.js"
         mode: '0755'
         owner: "{{ user_account }}"
         group: "{{ user_account }}"
@@ -30,14 +30,14 @@
 - name: Prep for upgrade
   when: upgrade is defined and upgrade
   block:
-    - name: Stop systemd service for {{ app_name }} pod
+    - name: Stop systemd service for pod-{{ app_name }}
       ansible.builtin.systemd:
         name: pod-{{ app_name }}
         state: stopped
         enabled: false
         scope: user
 
-    - name: Remove {{ app_name }} pod
+    - name: Remove pod - {{ app_name }}
       containers.podman.podman_pod:
         name: "{{ app_name }}"
         state: absent
@@ -81,7 +81,7 @@
       MEM_LIMIT=1024
       MEM_STARTUP=1024
     volume:
-      - "{{ host_folder }}/config:/config"
+      - "/opt/{{ app_name }}/config:/config"
 
 - name: Create {{ app_name }}-db container
   containers.podman.podman_container:
@@ -94,8 +94,8 @@
     #   MONGO_INITDB_ROOT_USERNAME=unifi
     #   MONGO_INITDB_ROOT_PASSWORD={{ lookup('hashi_vault', 'secret=secret/ssh/eingram:ssh_password') }}
     volumes:
-      - unifi-db-data:/data/db
-      - "{{ host_folder }}/init-mongo.js:/docker-entrypoint-initdb.d/init-mongo.js:ro"
+      - "{{ app_name }}-db-data:/data/db"
+      - "/opt/{{ app_name }}/init-mongo.js:/docker-entrypoint-initdb.d/init-mongo.js:ro"
 
 - name: Set XDG_RUNTIME_DIR env variable
   ansible.builtin.lineinfile:
@@ -134,4 +134,3 @@
     owner: "{{ user_account }}"
     group: "{{ user_account }}"
     mode: '0644'
-

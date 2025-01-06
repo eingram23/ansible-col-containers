@@ -1,29 +1,8 @@
-- name: Assert that user_account is 'defined'
-  ansible.builtin.assert:
-    that:
-      - user_account is defined
-    fail_msg: "user_account is not defined"
-    success_msg: "user_account is defined"
-
-- name: Set rootless vars
-  when: user_account != "root"
-  block:
-    - name: Get user info for {{ user_account }}
-      ansible.builtin.getent:
-        database: passwd
-        key: "{{ user_account }}"
-
-    - name: Obtain new port for accessing portainer agent
-      ansible.builtin.set_fact:
-        new_port: "{{ ((getent_passwd[user_account][1] | int) + 8000) | string }}"
-
-    - name: Set new ports for portainer agent
-      ansible.builtin.set_fact:
-        "{{ item.key }}": "{{ item.value }}"
-      loop:
-        - { key: 'fw_port', value: ["{{ new_port }}/tcp"] }
-
 - name: Uninstall {{ app_name }}
   ansible.builtin.include_role:
     name: eingram23.containers.common
     tasks_from: remove_all
+
+- name: Remove endpoint from portainer server
+  ansible.builtin.include_tasks:
+    file: remove_endpoint.yaml

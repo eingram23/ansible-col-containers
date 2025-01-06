@@ -2,12 +2,11 @@
 - name: Deploy snmp_exporter container
   hosts: "{{ hostvar | default([]) }}"
   gather_facts: false
-  become: true
-  become_method: sudo
-  become_user: poduser
+  become: false
 
   tasks:
 
     - name: Run snmp_exporter role
-      ansible.builtin.include_role:
+      ansible.builtin.import_role:
         name: eingram23.containers.snmp_exporter
+        tasks_from: "{{ task }}"

@@ -1,0 +1,12 @@
+---
+# NEEDED VARS: hostvar
+- name: Deploy promtail
+  hosts: "{{ hostvar | default([]) }}"
+  become: false
+
+  tasks:
+
+    - name: Deploy promtail_syslog container
+      ansible.builtin.import_role:
+        name: eingram23.containers.promtail_syslog
+        tasks_from: "{{ task }}"

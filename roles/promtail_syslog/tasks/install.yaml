@@ -9,14 +9,19 @@
   become_method: ansible.builtin.sudo
   become_user: "{{ user_account }}"
   block:
-    - name: Change user/owner of Plex files to {{ user_account }}
-      ansible.builtin.file:
-        path: /mnt/pool0/PlexMedia
-        state: directory
-        owner: "{{ user_account }}"
-        group: "{{ user_account }}"
-        mode: '0755'
-        recurse: true
+    - name: Check net.ipv4.ip_unprivileged_port_start value
+      ansible.builtin.command: grep -oP '^net.ipv4.ip_unprivileged_port_start=\K\d+' /etc/sysctl.conf
+      register: sysctl_conf
+      ignore_errors: true
+      changed_when: false
+
+    - name: Set net.ipv4.ip_unprivileged_port_start if needed
+      become: true
+      become_user: root
+      ansible.builtin.sysctl:
+        name: net.ipv4.ip_unprivileged_port_start
+        value: '514'
+      when: sysctl_conf.stdout == "" or (sysctl_conf.stdout | int) > 514
 
     - name: Prep for upgrade
       when: upgrade == "yes"
@@ -24,27 +29,16 @@
         name: eingram23.containers.common
         tasks_from: upgrade
 
-    - name: Create and run container - {{ app_name }}
+    - name: Create and run container for {{ app_name }}
       containers.podman.podman_container:
         name: "{{ app_name }}"
         image: "{{ image }}:{{ ver }}"
         state: stopped
         restart_policy: always
+        publish: "{{ publish_port }}"
         env:
-          PUID=0
-          PGID=0
-          VERSION=docker
-          TZ=America/Los_Angeles
-        network_mode: host
-        # device: "/dev/dri:/dev/dri"
-        volume:
-          - /mnt/pool0/PlexMedia/config:/config:Z
-          - /mnt/pool0/PlexMedia/Movies:/movies:Z
-          - /mnt/pool0/PlexMedia/3DMovies:/3dmovies:Z
-          - /mnt/pool0/PlexMedia/AnimMovies:/animmovies:Z
-          - /mnt/pool0/PlexMedia/TVShows:/tvshows:Z
-          - /mnt/pool0/PlexMedia/AnimTVShows:/animtvshows:Z
-          - /mnt/pool0/PlexMedia/Videos:/videos:Z
+          # CLIENT_URL: http://loki.local.lan:3100
+          CLIENT_URL: http://host.containers.internal:3100 # If rootless and loki container on same host
         generate_systemd:
           path: "{{ '/home/' + user_account + '/.config/systemd/user' if user_account != 'root' else '/etc/systemd/system' }}"
           restart_policy: always
