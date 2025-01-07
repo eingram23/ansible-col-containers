@@ -1,9 +1,9 @@
 ---
-app_name: "influxdb"
+app_suffix: "influxdb"
 image: "docker.io/influxdb"
 upgrade: "no"
 user_account: "poduser"
-fw_port:
-  - "8086/tcp"
-publish_port:
-  - "8086:8086"
+# fw_port:
+#   - "8086/tcp"
+# publish_port:
+#   - "8086:8086"

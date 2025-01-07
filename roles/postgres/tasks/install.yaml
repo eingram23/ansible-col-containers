@@ -1,16 +1,21 @@
 ---
-- name: Assert that needed vars are set
+- name: Assert that app and bucket are set
   ansible.builtin.assert:
     that:
-      - app_name is defined
-      - pg_port is defined
+      - app is defined
+      - port is defined
+    fail_msg: "app and port (5432+) are required"
+
+- name: Set app_name
+  ansible.builtin.set_fact:
+    app_name: "{{ app }}-{{ app_suffix }}"
 
 - name: Set fw_port
   ansible.builtin.set_fact:
     fw_port:
-      - "{{ pg_port }}/tcp"
+      - "{{ port }}/tcp"
     publish_port:
-      - "{{ pg_port }}:5432"
+      - "{{ port }}:5432"
 
 - name: Install env for {{ app_name }}
   ansible.builtin.include_role:

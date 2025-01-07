@@ -1,4 +1,23 @@
 ---
+- name: Assert that app and bucket are set
+  ansible.builtin.assert:
+    that:
+      - app is defined
+      - bucket is defined
+      - port is defined
+    fail_msg: "app, bucket and port (8086+) are required"
+
+- name: Set app_name
+  ansible.builtin.set_fact:
+    app_name: "{{ app }}-{{ app_suffix }}"
+
+- name: Set fw_port
+  ansible.builtin.set_fact:
+    fw_port:
+      - "{{ port }}/tcp"
+    publish_port:
+      - "{{ port }}:8086"
+
 - name: Install env for {{ app_name }}
   ansible.builtin.include_role:
     name: eingram23.containers.common
@@ -30,7 +49,7 @@
           DOCKER_INFLUXDB_INIT_USERNAME=admin
           DOCKER_INFLUXDB_INIT_PASSWORD={{ lookup('hashi_vault', 'secret=secret/ssh/eingram:ssh_password') }}
           DOCKER_INFLUXDB_INIT_ORG=Homelab
-          DOCKER_INFLUXDB_INIT_BUCKET=HA
+          DOCKER_INFLUXDB_INIT_BUCKET={{ bucket }}
         publish: "{{ publish_port }}"
         volumes:
           - "{{ app_name}}-data:/var/lib/influxdb2"
