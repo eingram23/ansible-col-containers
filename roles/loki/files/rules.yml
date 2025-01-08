@@ -10,15 +10,6 @@ groups:
     annotations:
       summary: Rainforest integration down on (hostname {{ $labels.hostname }})
       description: "Rainforest integration down on (hostname {{ $labels.hostname }})"
-  # - alert: MyQIntegrationDown
-  #   expr: |
-  #     sum(rate({container_name="homeassistant"} |= "[pymyq.api] Authentication failed" [5m] )) > 0
-  #   for: 0m
-  #   labels:
-  #     severity: critical
-  #   annotations:
-  #     summary: MyQ integration down on (hostname {{ $labels.hostname }})
-  #     description: "MyQ integration down on (hostname {{ $labels.hostname }})"
   - alert: TigerBridgeCapExceeded
     expr: |
       sum(rate({channel="Tiger Bridge"} |= "Cannot upload files, storage cap exceeded" [5m] )) > 0
@@ -39,7 +30,7 @@ groups:
       description: "Tiger Bridge No Such File Error"
   - alert: IOError
     expr: |
-      sum(rate({env="prod"} |= "uncorrectable I/O failure" != "level=info" [5m] )) > 0
+      sum(rate({env="prod",level!="info"} |= "uncorrectable I/O failure" [5m] )) > 0
     for: 0m
     labels:
       severity: critical
@@ -55,3 +46,12 @@ groups:
     annotations:
       summary: Test log extraaction
       message: '{{ $labels.hostname }} {{`"{{ slice $labels.message 0 500 }}"`}}'
+  - alert: BackupFailure
+    expr: |
+      sum(rate({job="systemd-journal", level="error"} |= "Backup failed" [5m] )) > 0
+    for: 0m
+    labels:
+      severity: critical
+    annotations:
+      summary: Backup failure detected on (hostname {{ $labels.hostname }})
+      description: "A backup failure has been detected on (hostname {{ $labels.hostname }})"
