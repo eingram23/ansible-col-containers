@@ -29,7 +29,7 @@
         state: absent
 
     - name: Register rules file names
-      ansible.builtin.find: 
+      ansible.builtin.find:
         paths: /var/tmp/configs/prometheus/rules
         recurse: false
         patterns: "*.rules"
