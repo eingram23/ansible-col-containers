@@ -32,6 +32,15 @@
       args:
         creates: /var/lib/systemd/linger/{{ user_account }}
 
+    - name: Set default logging driver to journald if rootless
+      ansible.builtin.copy:
+        src: containers.conf
+        dest: "{{ ansible_env.HOME }}/.config/containers/containers.conf"
+        owner: "{{ user_account }}"
+        group: "{{ user_account }}"
+        mode: '0644'
+      when: user_account != "root"
+
     - name: Open firewall port
       when: fw_port is defined
       ansible.builtin.include_role:
