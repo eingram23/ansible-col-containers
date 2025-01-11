@@ -1,3 +1,21 @@
+- name: Assert that app and bucket are set
+  ansible.builtin.assert:
+    that:
+      - app is defined
+      - port is defined
+    fail_msg: "app and port (5432+) are required"
+
+- name: Set app_name
+  ansible.builtin.set_fact:
+    app_name: "{{ app }}-{{ app_suffix }}"
+
+- name: Set fw_port
+  ansible.builtin.set_fact:
+    fw_port:
+      - "{{ port }}/tcp"
+    publish_port:
+      - "{{ port }}:5432"
+
 - name: Uninstall {{ app_name }}
   ansible.builtin.include_role:
     name: eingram23.containers.common
