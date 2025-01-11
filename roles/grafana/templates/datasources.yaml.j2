@@ -14,7 +14,7 @@ datasources:
     url: http://homenas.local.lan:8086
     access: proxy
     secureJsonData:
-      token: {{ lookup('hashi_vault', 'secret=secret/influxdb:token') }}
+      token: {{ lookup('hashi_vault', 'secret=secret/influxdb:ha-token') }}
     jsonData:
       version: Flux
       organization: Homelab
