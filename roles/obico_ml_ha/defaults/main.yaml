@@ -1,0 +1,9 @@
+---
+app_name: "obico_ml_ha"
+upgrade: "no"
+user_account: "poduser"
+image: "docker.io/nberk/ha_bambu_lab_p1_spaghetti_detection_standalone"
+fw_port:
+  - "3333/tcp"
+publish_port:
+  - "3333:3333"

@@ -1,0 +1,92 @@
+---
+- name: Install env for {{ app_name }}
+  ansible.builtin.include_role:
+    name: eingram23.containers.common
+    tasks_from: create_env
+
+- name: Run tasks as {{ user_account }}
+  become: true
+  become_method: ansible.builtin.sudo
+  become_user: "{{ user_account }}"
+  block:
+    - name: Copy vault config files to remote server
+      ansible.builtin.copy:
+        src: "{{ item }}"
+        dest: "/opt/{{ app_name }}/"
+        mode: '0644'
+      with_fileglob: "*"
+
+    - name: Check if vault container already exists
+      ansible.builtin.podman_container_info:
+        name: "{{ app_name }}"
+      register: vault_info
+
+    - name: End play if vault exists
+      when: '"Error: no such container vault" not in vault_info.stderr'
+      ansible.builtin.meta: end_play
+
+    - name: Create vault container
+      containers.podman.podman_container:
+        name: "{{ app_name }}"
+        image: "{{ image }}:{{ ver }}"
+        state: stopped
+        restart_policy: always
+        publish: "{{ publish_port }}"
+        env:
+          VAULT_ADDR: "http://127.0.0.1:8200"
+        volumes:
+          - "{{ app_name }}-data:/vault/file:z"
+          - "/opt/{{ app_name }}:/vault/config"
+        cap_add:
+          - IPC_LOCK
+        command: vault server -config=/vault/config/vault.hcl
+        generate_systemd:
+          path: "{{ '/home/' + user_account + '/.config/systemd/user' if user_account != 'root' else '/etc/systemd/system' }}"
+          restart_policy: always
+
+    - name: Enable service for {{ app_name }}
+      ansible.builtin.include_role:
+        name: eingram23.containers.common
+        tasks_from: enable_sysd
+
+    - name: Pause 10 seconds to allow vault to start up
+      ansible.builtin.pause:
+        seconds: 10
+
+    - name: Init Vault
+      containers.podman.podman_container_exec:
+        name: "{{ app_name }}"
+        command: sh /vault/config/init.sh
+
+    - name: Read init-keys.json
+      ansible.builtin.slurp:
+        src: "/opt/{{ app_name }}/init-keys.json"
+      register: init_keys_encoded
+
+    - name: Decode init-keys
+      ansible.builtin.set_fact:
+        init_keys: "{{ init_keys_encoded['content'] | b64decode }}"
+
+    - name: Create scripts
+      ansible.builtin.template:
+        src: "{{ item }}.j2"
+        dest: "/opt/{{ app_name }}/{{ item }}"
+        owner: "{{ user_account }}"
+        group: "{{ user_account }}"
+        mode: '0644'
+      loop:
+        - unseal.sh
+        - policies.sh
+      become: true
+      become_method: sudo
+      become_user: root
+
+    - name: Unseal Vault
+      containers.podman.podman_container_exec:
+        name: "{{ app_name }}"
+        command: sh /vault/config/unseal.sh
+
+    - name: Run policies
+      containers.podman.podman_container_exec:
+        name: "{{ app_name }}"
+        command: sh /vault/config/policies.sh

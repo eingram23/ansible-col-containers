@@ -34,15 +34,15 @@
             state: stopped
             scope: "{{ 'user' if user_account != 'root' else 'system' }}"
 
-        - name: Remove pod - {{ app_name }}
-          containers.podman.podman_pod:
-            name: "{{ app_name }}"
-            state: absent
-
         - name: Find all containers in the unifi pod
           containers.podman.podman_container_info:
             pod: "{{ app_name }}"
           register: container_info
+
+        - name: Remove pod - {{ app_name }}
+          containers.podman.podman_pod:
+            name: "{{ app_name }}"
+            state: absent
 
         - name: Delete all volumes for {{ app_name }}
           when: container_info.containers | length > 0
