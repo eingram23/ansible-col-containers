@@ -1,11 +1,12 @@
 ---
-- name: Deploy unifi-controller
+- name: Deploy obico_ml container
   hosts: "{{ hostvar | default('homenas.local.lan') }}"
   gather_facts: false
   become: false
+
   tasks:
 
-    - name: Run unifi controller role
+    - name: Run obico_ml role
       ansible.builtin.import_role:
-        name: eingram23.containers.unifi
+        name: eingram23.containers.obico_ml_ha
         tasks_from: "{{ task }}"

@@ -2,9 +2,7 @@
 - name: Deploy grafana container
   hosts: "{{ hostvar | default([]) }}"
   gather_facts: false
-  become: true
-  become_method: sudo
-  become_user: poduser
+  become: false
 
   tasks:
 

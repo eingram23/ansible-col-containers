@@ -2,12 +2,11 @@
 - name: Deploy vault container
   hosts: "{{ hostvar | default([]) }}"
   gather_facts: false
-  become: true
-  become_method: sudo
-  become_user: poduser
+  become: false
 
   tasks:
 
     - name: Deploy vault container
       ansible.builtin.import_role:
         name: eingram23.containers.vault
+        tasks_from: "{{ task }}"
