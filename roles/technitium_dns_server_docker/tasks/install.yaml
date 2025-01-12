@@ -1,14 +1,23 @@
 ---
 - name: Make sure docker env is installed
-  ansible.builtin.package:
-    name: "{{ docker_items }}"
-    state: present
-    update_cache: true
-  loop_control:
-    loop_var: docker_items
-  loop:
-    - docker
-    - docker-compose
+  when: "'dietpi' not in group_names"
+  block:
+    - name: Install docker and docker-compose
+      ansible.builtin.package:
+        name: "{{ docker_items }}"
+        state: present
+        update_cache: true
+      loop_control:
+        loop_var: docker_items
+      loop:
+        - docker
+        - docker-compose
+
+    - name: Enable and start docker service
+      ansible.builtin.systemd:
+        name: docker
+        state: started
+        enabled: true
 
 - name: Install python modules
   ansible.builtin.pip:
@@ -23,12 +32,6 @@
   ansible.builtin.apt:
     name: openssh-client
     state: present
-
-- name: Enable and start docker service
-  ansible.builtin.systemd:
-    name: docker
-    state: started
-    enabled: true
 
 - name: Prep for upgrade
   when: upgrade == "yes"
