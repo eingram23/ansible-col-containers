@@ -13,7 +13,7 @@
       register: auth_response
       ignore_errors: true
 
-    - name: Get environment ID for {{ inventory_hostname }} - {{ user_account }}
+    - name: Get environment ID for {{ inventory_hostname }}
       ansible.builtin.uri:
         url: "{{ portainer_url }}/api/endpoints"
         method: GET
@@ -27,7 +27,7 @@
       ansible.builtin.set_fact:
         agent_environment_id: "{{ item.Id }}"
       loop: "{{ environment_list.json }}"
-      when: item.Name == inventory_hostname + ' - ' + user_account
+      when: item.Name == inventory_hostname
 
     - name: Remove Podman Agent environment
       when: agent_environment_id is defined

@@ -20,14 +20,14 @@
 
     - name: Obtain new port for accessing portainer agent
       ansible.builtin.set_fact:
-        new_port: "{{ ((uid | int) + 8000) | string }}"
+        agent_port: "{{ ((uid | int) + 8000) | string }}"
 
     - name: Set new ports for portainer agent
       ansible.builtin.set_fact:
         "{{ item.key }}": "{{ item.value }}"
       loop:
-        - { key: 'fw_port', value: ["{{ new_port }}/tcp"] }
-        - { key: 'publish_port', value: ["{{ new_port }}:9001"] }
+        - { key: 'fw_port', value: ["{{ agent_port }}/tcp"] }
+        - { key: 'publish_port', value: ["{{ agent_port }}:9001"] }
 
 - name: Install env for {{ app_name }}
   ansible.builtin.include_role:
@@ -60,6 +60,8 @@
         restart_policy: always
         privileged: true
         publish: "{{ publish_port }}"
+        env:
+          AGENT_SECRET={{ lookup('hashi_vault', 'secret=secret/ssh/ansible:ssh_password') }}
         volume:
           - >-
             {{ '/run/podman/podman.sock:/var/run/docker.sock'
@@ -81,7 +83,7 @@
 
     - name: Set agent endpoint
       ansible.builtin.set_fact:
-        agent_endpoint: "http://{{ inventory_hostname }}:{{ new_port }}"
+        agent_endpoint: "http://{{ inventory_hostname }}:{{ agent_port }}"
 
     - name: Add endpoint to portainer server
       ansible.builtin.include_tasks:

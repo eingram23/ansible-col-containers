@@ -29,6 +29,8 @@
         restart_policy: always
         privileged: true
         publish: "{{ publish_port }}"
+        env:
+          AGENT_SECRET={{ lookup('hashi_vault', 'secret=secret/ssh/ansible:ssh_password') }}
         volume:
           - /run/podman/podman.sock:/var/run/docker.sock
           - "{{ app_name }}-data:/data"

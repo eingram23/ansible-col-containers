@@ -12,7 +12,7 @@
         status_code: 200
       register: auth_response
 
-    - name: Add Podman Agent environment
+    - name: Add agent environment
       ansible.builtin.uri:
         url: "{{ portainer_url }}/api/endpoints"
         method: POST
@@ -20,9 +20,9 @@
           Authorization: "Bearer {{ auth_response.json.jwt }}"
         body_format: form-urlencoded
         body:
-          Name: "{{ inventory_hostname }} - {{ user_account }}"
+          Name: "{{ inventory_hostname }}"
           EndpointCreationType: 2
-          URL: "{{ agent_endpoint }}"
+          URL: "http://{{ inventory_hostname }}:9001"
           TLS: "true"
           TLSSkipVerify: "true"
           TLSSkipClientVerify: "true"
@@ -30,5 +30,5 @@
       # register: environment_response
 
     # - name: Store agent environment ID
-    #   set_fact:
+    #   ansible.builtin.set_fact:
     #     agent_environment_id: "{{ environment_response.json.Id }}"
