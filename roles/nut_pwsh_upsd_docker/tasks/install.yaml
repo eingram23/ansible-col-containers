@@ -1,0 +1,59 @@
+---
+- name: Install env for {{ app_name }}
+  ansible.builtin.include_role:
+    name: eingram23.containers.common
+    tasks_from: create_env_docker
+
+- name: Prep for upgrade
+  when: upgrade == "yes"
+  ansible.builtin.include_role:
+    name: eingram23.containers.common
+    tasks_from: upgrade_docker
+
+- name: Create shutdown script on host
+  ansible.builtin.template:
+    src: nut_shutdown.ps1.j2
+    dest: /opt/{{ app_name }}/nut_shutdown.ps1
+    mode: '0644'
+
+- name: Copy upssched-cmd to host
+  ansible.builtin.copy:
+    src: upssched-cmd
+    dest: /opt/{{ app_name }}/upssched-cmd
+    mode: '0644'
+
+- name: Check if nut-pwsh-upsd image exists
+  community.docker.docker_image_info:
+    name: "{{ app_name }}:{{ nut_pwsh_upsd_ver }}"
+  register: image_info
+
+- name: Build nut-pwsh-upsd image
+  when: image_info.images | length == 0
+  ansible.builtin.include_role:
+    name: eingram23.containers.nut_pwsh_upsd_docker
+    tasks_from: build
+
+- name: Start nut-pwsh-upsd container
+  community.docker.docker_container:
+    name: "{{ app_name }}"
+    image: "{{ app_name }}:{{ nut_pwsh_upsd_ver }}"
+    env:
+      API_PASSWORD: "{{ lookup('hashi_vault', 'secret=secret/ssh/eingram:ssh_password') }}"
+    ports:
+      - "3493:3493/tcp"
+    volumes:
+      - /opt/{{ app_name }}/upssched-cmd:/usr/bin/upssched-cmd
+      - /opt/{{ app_name }}/nut_shutdown.ps1:/etc/nut/nut_shutdown.ps1
+    privileged: true
+    restart_policy: always
+
+- name: Start nut-exporter container
+  community.docker.docker_container:
+    name: nut-exporter
+    image: docker.io/druggeri/nut_exporter:{{ nut_exporter_ver }}
+    env:
+      NUT_EXPORTER_SERVER: "{{ inventory_hostname }}"
+      NUT_EXPORTER_VARIABLES: "{{ nut_exporter_vars | join(',') }}"
+    ports:
+      - "9199:9199/tcp"
+    restart_policy: always

@@ -1,5 +1,5 @@
 ---
-app: "nut-pwsh-upsd"
+app_name: "nut-pwsh-upsd"
 root: '/home/eingram/'
 builddir: '/home/eingram/build/'
 repo: 'https://github.com/eingram23/'
