@@ -1,0 +1,12 @@
+- name: Deploy nut-upsd
+  hosts: "{{ hostvar | default([]) }}"
+  gather_facts: false
+  become: true
+  become_method: sudo
+
+  tasks:
+
+    - name: Run nut_pwsh_upsd_docker role
+      ansible.builtin.import_role:
+        name: eingram23.containers.nut_pwsh_upsd_docker
+        tasks_from: "{{ task }}"
