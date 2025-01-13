@@ -1,0 +1,34 @@
+- name: Remove folder for {{ app_name }}
+  ansible.builtin.file:
+    path: /opt/{{ app_name }}
+    state: absent
+
+- name: Get container info for {{ app_name }}
+  community.docker.docker_container_info:
+    name: "{{ app_name }}"
+  register: app_info
+  ignore_errors: true
+
+- name: Remove container if found - {{ app_name }}
+  when: app_info.exists
+  block:
+    - name: Stop container - {{ app_name }}
+      community.docker.docker_container:
+        name: "{{ app_name }}"
+        state: stopped
+      ignore_errors: true
+
+    - name: Remove container - {{ app_name }}
+      community.docker.docker_container:
+        name: "{{ app_name }}"
+        state: absent
+        force_kill: true
+
+    - name: Delete all volumes for {{ app_name }}
+      when: app_info.container.Mounts is defined
+      community.docker.docker_volume:
+        name: "{{ vol_item.Name }}"
+        state: absent
+      loop: "{{ app_info.container.Mounts | selectattr('Name', 'defined') | list }}"
+      loop_control:
+        loop_var: vol_item

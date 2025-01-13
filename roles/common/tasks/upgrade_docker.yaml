@@ -1,0 +1,14 @@
+- name: Stop container for {{ app_name }}
+  community.docker.docker_container:
+    name: "{{ app_name }}"
+    state: stopped
+
+- name: Remove container for {{ app_name }}
+  community.docker.docker_container:
+    name: "{{ app_name }}"
+    state: absent
+
+# - name: Cleanup old image
+#   containers.podman.podman_image:
+#     name: "{{ image }}:{{ old_ver }}"
+#     state: absent

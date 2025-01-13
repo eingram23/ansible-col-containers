@@ -1,0 +1,46 @@
+- name: Make sure docker env is installed
+  when: "'dietpi' not in group_names"
+  block:
+    - name: Install prereq packages
+      ansible.builtin.package:
+        name: "{{ docker_items }}"
+        state: present
+        update_cache: true
+      loop_control:
+        loop_var: docker_items
+      loop:
+        - docker
+        - docker-compose
+
+    - name: Enable and start docker service
+      ansible.builtin.systemd:
+        name: docker
+        state: started
+        enabled: true
+
+- name: Install python modules
+  ansible.builtin.pip:
+    name: "{{ pip_items }}"
+  loop_control:
+    loop_var: pip_items
+  loop:
+    - requests
+    - docker
+
+- name: Install additional packages
+  ansible.builtin.apt:
+    name: "{{ apt_items }}"
+    state: present
+  loop_control:
+    loop_var: apt_items
+  loop:
+    - openssh-client
+    - git
+    - python3-systemd
+
+- name: Create folder for {{ app_name }}
+  ansible.builtin.file:
+    path: /opt/{{ app_name }}
+    state: directory
+    mode: '0755'
+
