@@ -1,18 +1,20 @@
 ---
-# NEEDED VARS: hostvar
 - name: Deploy grafana_alloy container
   hosts: "{{ hostvar | default([]) }}"
   become: false
 
   tasks:
 
-    # - name: Migrate from node-exporter/promtail
-    #   when: migrate == "yes"
-    #   ansible.builtin.import_role:
-    #     name: eingram23.containers.grafana_alloy
-    #     tasks_from: migrate
+    - name: Deploy grafana alloy - {{ task }}
+      when: ansible_distribution in ['Debian', 'Ubuntu']
+      become: true
+      become_method: sudo
+      ansible.builtin.import_role:
+        name: eingram23.containers.grafana_alloy_docker
+        tasks_from: "{{ task }}"
 
-    - name: Deploy grafana_alloy container
+    - name: Deploy grafana alloy - {{ task }}
+      when: ansible_distribution in ['Redhat', 'Rocky']
       ansible.builtin.import_role:
         name: eingram23.containers.grafana_alloy
         tasks_from: "{{ task }}"
