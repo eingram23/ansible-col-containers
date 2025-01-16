@@ -9,6 +9,11 @@
   become_method: ansible.builtin.sudo
   become_user: "{{ user_account }}"
   block:
+    - name: Clear dashboards folder
+      ansible.builtin.file:
+        path: /opt/{{ app_name }}/dashboards
+        state: absent
+
     - name: Create folders for {{ app_name }}
       ansible.builtin.file:
         path: "{{ folder_item }}"
@@ -38,20 +43,50 @@
         path: /var/tmp/ssh-key-git.key
         state: absent
 
-    - name: Register dashboard file names
+    - name: Register kubernetes dashboard file names
       ansible.builtin.find:
-        paths: /var/tmp/configs/grafana/dashboards
+        paths: /var/tmp/configs/grafana/dashboards/kubernetes
         recurse: false
         patterns: "*.json"
-      register: files_to_copy
+      register: kubernetes_files_to_copy
 
-    - name: Copy grafana dashboard json files to remote server
+    - name: Register servers dashboard file names
+      ansible.builtin.find:
+        paths: /var/tmp/configs/grafana/dashboards/servers
+        recurse: false
+        patterns: "*.json"
+      register: servers_files_to_copy
+
+    - name: Register infrastructure dashboard file names
+      ansible.builtin.find:
+        paths: /var/tmp/configs/grafana/dashboards/infrastructure
+        recurse: false
+        patterns: "*.json"
+      register: infrastructure_files_to_copy
+
+    - name: Copy kubernetes dashboard json files to remote server
       ansible.builtin.copy:
         src: "{{ item.path }}"
-        dest: /opt/{{ app_name }}/dashboards/
+        dest: /opt/{{ app_name }}/dashboards/kubernetes/
         mode: '0644'
         remote_src: true
-      with_items: "{{ files_to_copy.files }}"
+      with_items: "{{ kubernetes_files_to_copy.files }}"
+
+    - name: Copy servers dashboard json files to remote server
+      ansible.builtin.copy:
+        src: "{{ item.path }}"
+        dest: /opt/{{ app_name }}/dashboards/servers/
+        mode: '0644'
+        remote_src: true
+      with_items: "{{ servers_files_to_copy.files }}"
+
+    - name: Copy infrastructure dashboard json files to remote server
+      ansible.builtin.copy:
+        src: "{{ item.path }}"
+        dest: /opt/{{ app_name }}/dashboards/infrastructure/
+        mode: '0644'
+        remote_src: true
+      with_items: "{{ infrastructure_files_to_copy.files }}"
 
     - name: Remove configs repo
       ansible.builtin.file:
@@ -87,6 +122,8 @@
         network: host
         env:
           GF_INSTALL_PLUGINS: "grafana-clock-panel, flant-statusmap-panel, marcusolsson-treemap-panel"
+          # GF_SECURITY_ADMIN_USER: "admin"
+          # GF_SECURITY_ADMIN_PASSWORD: "{{ lookup('hashi_vault', 'secret/ssh/ansible:ssh_password') }}"
         volume:
           - /opt/{{ app_name }}/dashboards:/etc/grafana/provisioning/dashboards
           - /opt/{{ app_name }}/datasources:/etc/grafana/provisioning/datasources

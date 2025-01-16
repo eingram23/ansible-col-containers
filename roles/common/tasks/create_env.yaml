@@ -39,7 +39,6 @@
           ansible.builtin.file:
             path: "/home/{{ user_account }}/.config/containers"
             state: directory
-            recurse: true
             owner: "{{ user_account }}"
             group: "{{ user_account }}"
             mode: '0755'
