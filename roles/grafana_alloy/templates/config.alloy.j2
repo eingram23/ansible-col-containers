@@ -88,7 +88,7 @@ discovery.relabel "integrations_node_exporter" {
 	}
 	rule {
 		target_label = "instance"
-		replacement  = "{{ inventory_hostname}}"
+		replacement  = "{{ inventory_hostname }}"
 	}
 }
 
