@@ -6,6 +6,6 @@ fw_port:
   - "9001/tcp"
 mode: "rootful"
 portainer_url: "http://portainer.local.lan:9000"
-agent_port: "9001"
+app_port: "9001"
 publish_port:
   - "9001:9001"

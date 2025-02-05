@@ -1,0 +1,8 @@
+- name: Uninstall {{ app_name }}
+  ansible.builtin.include_role:
+    name: eingram23.containers.common
+    tasks_from: remove_all_docker
+
+- name: Remove endpoint from portainer server
+  ansible.builtin.include_tasks:
+    file: remove_endpoint.yaml

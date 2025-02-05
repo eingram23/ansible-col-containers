@@ -22,13 +22,13 @@
         body:
           Name: "{{ inventory_hostname }} - {{ user_account }}"
           EndpointCreationType: 2
-          URL: "{{ agent_endpoint }}"
+          URL: "{{ app_endpoint }}"
           TLS: "true"
           TLSSkipVerify: "true"
           TLSSkipClientVerify: "true"
         status_code: 200
       # register: environment_response
 
-    # - name: Store agent environment ID
+    # - name: Store app environment ID
     #   set_fact:
-    #     agent_environment_id: "{{ environment_response.json.Id }}"
+    #     app_environment_id: "{{ environment_response.json.Id }}"

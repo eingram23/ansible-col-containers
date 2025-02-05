@@ -1,13 +1,12 @@
 ---
-app_name: "portainer_agent"
+app_name: "{{ 'portainer_agent-' + user_account}}"
 image: "docker.io/portainer/agent"
 upgrade: "no"
 fw_port:
   - "9001/tcp"
-mode: "rootful"
 portainer_url: "http://portainer.local.lan:9000"
-# agent_endpoint: "tcp://podhost-dev.local.lan:9002"
+# app_endpoint: "tcp://podhost-dev.local.lan:9002"
 publish_port:
   - "9001:9001"
-user_account: "root"
-agent_port: "9001"
+# user_account: "root"
+app_port: "9001"

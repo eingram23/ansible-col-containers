@@ -1,0 +1,10 @@
+---
+app_name: "{{ 'cadvisor-' + user_account }}"
+# app_name: "cadvisor"
+image: "gcr.io/cadvisor/cadvisor"
+upgrade: "no"
+fw_port:
+  - "8080/tcp"
+app_port: "8080"
+publish_port:
+  - "8080:8080"

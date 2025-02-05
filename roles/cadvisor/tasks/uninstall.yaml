@@ -1,3 +1,4 @@
+---
 - name: Set rootless vars
   when: user_account != "root"
   block:
@@ -12,7 +13,7 @@
 
     - name: Obtain new port for accessing app
       ansible.builtin.set_fact:
-        app_port: "{{ ((uid | int) + 8000) | string }}"
+        app_port: "{{ ((uid | int) + 7080) | string }}"
 
     - name: Set new ports for app
       ansible.builtin.set_fact:
@@ -24,7 +25,3 @@
   ansible.builtin.include_role:
     name: eingram23.containers.common
     tasks_from: remove_all
-
-- name: Remove endpoint from portainer server
-  ansible.builtin.include_tasks:
-    file: remove_endpoint.yaml
