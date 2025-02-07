@@ -3,10 +3,16 @@
   become_method: ansible.builtin.sudo
   become_user: "{{ user_account }}"
   block:
+    - name: Clear dashboards folder
+      ansible.builtin.file:
+        path: /opt/{{ app_name }}/dashboards
+        state: absent
+
     - name: Create folders for {{ app_name }}
       ansible.builtin.file:
         path: "{{ folder_item }}"
         state: directory
+        mode: '0755'
       loop:
         - /opt/{{ app_name }}/dashboards
         - /opt/{{ app_name }}/datasources
@@ -32,20 +38,12 @@
         path: /var/tmp/ssh-key-git.key
         state: absent
 
-    - name: Register dashboard file names
-      ansible.builtin.find:
-        paths: /var/tmp/configs/grafana/dashboards
-        recurse: false
-        patterns: "*.json"
-      register: files_to_copy
-
-    - name: Copy grafana dashboard json files to remote server
+    - name: Copy kubernetes dashboard json files to app folder
       ansible.builtin.copy:
-        src: "{{ item.path }}"
+        src: /var/tmp/configs/grafana/dashboards/
         dest: /opt/{{ app_name }}/dashboards/
         mode: '0644'
         remote_src: true
-      with_items: "{{ files_to_copy.files }}"
 
     - name: Remove configs repo
       ansible.builtin.file:
