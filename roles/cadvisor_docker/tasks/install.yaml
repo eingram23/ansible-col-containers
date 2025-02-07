@@ -10,20 +10,7 @@
     name: eingram23.containers.common
     tasks_from: upgrade_docker
 
-- name: Run container for {{ app_name }}
-  community.docker.docker_container:
-    name: "{{ app_name }}"
-    image: "{{ image }}:{{ ver }}"
-    state: started
-    restart_policy: always
-    privileged: true
-    published_ports: "{{ publish_port }}"
-    env:
-      AGENT_SECRET={{ lookup('hashi_vault', 'secret=secret/ssh/ansible:ssh_password') }}
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
-      - /var/lib/docker:/var/lib/docker/volumes
-
-- name: Add endpoint to portainer server
-  ansible.builtin.include_tasks:
-    file: add_endpoint.yaml
+- name: Create container for {{ app_name }}
+  ansible.builtin.include_role:
+    name: eingram23.containers.common
+    tasks_from: create_container_docker

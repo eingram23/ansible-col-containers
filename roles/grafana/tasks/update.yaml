@@ -42,7 +42,6 @@
       ansible.builtin.copy:
         src: /var/tmp/configs/grafana/dashboards/
         dest: /opt/{{ app_name }}/dashboards/
-        mode: '0644'
         remote_src: true
 
     - name: Remove configs repo

@@ -1,0 +1,13 @@
+- name: Run container for {{ app_name }}
+  community.docker.docker_container:
+    name: "{{ app_name }}"
+    image: "{{ image }}:{{ ver }}"
+    state: started
+    restart_policy: always
+    privileged: "{{ privileged }}"
+    published_ports: "{{ publish_port }}"
+    env:
+      "{{ cont_env | default(omit) }}"
+    volumes: "{{ volumes | default(omit) }}"
+    devices: "{{ devices | default(omit) }}"
+    command: "{{ container_command | default(omit) }}"

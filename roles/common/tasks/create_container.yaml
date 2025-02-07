@@ -1,5 +1,3 @@
-- debug: var=volumes
-
 - name: Create and run container - {{ app_name }}
   containers.podman.podman_container:
     name: "{{ app_name }}"
@@ -8,6 +6,8 @@
     restart_policy: always
     privileged: "{{ privileged }}"
     publish: "{{ publish_port }}"
+    env:
+      "{{ cont_env | default(omit) }}"
     volume: "{{ volumes | default(omit) }}"
     device: "{{ devices | default(omit) }}"
     command: "{{ container_command | default(omit) }}"

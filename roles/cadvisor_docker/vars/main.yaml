@@ -1,3 +1,16 @@
 ---
-old_ver: "v0.47.2"
-ver: "v0.47.2"
+# old_ver: "v0.49.1"
+ver: "v0.49.2"
+container_command:
+  - --store_container_labels=true
+  - --docker_only=true
+  - --disable_root_cgroup_stats=true
+volumes:
+  - /:/rootfs:ro
+  - /dev/disk/:/dev/disk:ro
+  - /sys:/sys:ro
+  - /var/run:/var/run:ro
+  - /var/lib/docker/:/var/lib/docker:ro
+privileged: true
+devices:
+  - /dev/kmsg

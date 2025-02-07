@@ -1,5 +1,5 @@
 ---
-- name: Deploy cAvisor container
+- name: Deploy cAdvisor container
   hosts: "{{ hostvar | default([]) }}"
   become: false
   gather_facts: true

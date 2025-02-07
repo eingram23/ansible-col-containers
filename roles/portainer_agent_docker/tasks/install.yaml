@@ -19,7 +19,7 @@
     privileged: true
     published_ports: "{{ publish_port }}"
     env:
-      AGENT_SECRET={{ lookup('hashi_vault', 'secret=secret/ssh/ansible:ssh_password') }}
+      AGENT_SECRET: "{{ lookup('hashi_vault', 'secret=secret/ssh/ansible:ssh_password') }}"
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - /var/lib/docker:/var/lib/docker/volumes
