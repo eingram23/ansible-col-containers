@@ -1,0 +1,14 @@
+---
+# old_ver: "v2.10.2"
+ver: "v2.10.2"
+# container_command:
+#   - --podman=unix:///var/run/podman/podman.sock
+#   - --docker=unix://
+#   - --store_container_labels=true
+#   - --docker_only=true
+#   - --disable_root_cgroup_stats=true
+volumes:
+  - "{{ app_name }}-data:/var/lib/rancher"
+privileged: true
+# devices:
+#   - /dev/kmsg
