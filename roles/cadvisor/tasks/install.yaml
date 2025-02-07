@@ -20,7 +20,7 @@
 
     - name: Obtain new port for accessing cadvisor
       ansible.builtin.set_fact:
-        app_port: "{{ ((uid | int) + 7080) | string }}"
+        app_port: "{{ ((uid | int) + 7085) | string }}"
 
     - name: Set new ports for cadvisor
       ansible.builtin.set_fact:
@@ -54,3 +54,7 @@
       ansible.builtin.include_role:
         name: eingram23.containers.common
         tasks_from: enable_sysd
+
+    - name: Display app port
+      ansible.builtin.debug:
+        msg: "Access {{ app_name }} at http://{{ ansible_fqdn }}:{{ app_port }}"
