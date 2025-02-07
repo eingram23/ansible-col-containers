@@ -1,35 +1,34 @@
 apiVersion: 1
 
 providers:
-  - name: 'infrastructure-dashboards'
+  - name: 'dashboards'
     orgId: 1
-    folder: 'Infrastructure'
     type: file
     disableDeletion: false
     updateIntervalSeconds: 10
     allowUiUpdates: false
     options:
-      path: /etc/grafana/provisioning/dashboards/infrastructure
-      foldersFromFilesStructure: false
+      path: /etc/grafana/provisioning/dashboards/
+      foldersFromFilesStructure: true
 
-  - name: 'servers-dashboards'
-    orgId: 1
-    folder: 'Servers'
-    type: file
-    disableDeletion: false
-    updateIntervalSeconds: 10
-    allowUiUpdates: false
-    options:
-      path: /etc/grafana/provisioning/dashboards/servers
-      foldersFromFilesStructure: false
+  # - name: 'servers-dashboards'
+  #   orgId: 1
+  #   type: file
+  #   folder: ''
+  #   disableDeletion: false
+  #   updateIntervalSeconds: 10
+  #   allowUiUpdates: false
+  #   options:
+  #     path: /etc/grafana/provisioning/dashboards/compute
+  #     foldersFromFilesStructure: true
 
-  - name: 'kubernetes-dashboards'
-    orgId: 1
-    folder: 'Kubernetes'
-    type: file
-    disableDeletion: false
-    updateIntervalSeconds: 10
-    allowUiUpdates: false
-    options:
-      path: /etc/grafana/provisioning/dashboards/kubernetes
-      foldersFromFilesStructure: false
+  # - name: 'kubernetes-dashboards'
+  #   orgId: 1
+  #   type: file
+  #   folder: ''
+  #   disableDeletion: false
+  #   updateIntervalSeconds: 10
+  #   allowUiUpdates: false
+  #   options:
+  #     path: /etc/grafana/provisioning/dashboards/kubernetes
+  #     foldersFromFilesStructure: true
