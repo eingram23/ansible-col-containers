@@ -18,6 +18,7 @@
       ansible.builtin.file:
         path: "{{ folder_item }}"
         state: directory
+        mode: '0755'
       loop:
         - /opt/{{ app_name }}/dashboards
         - /opt/{{ app_name }}/datasources
@@ -43,50 +44,11 @@
         path: /var/tmp/ssh-key-git.key
         state: absent
 
-    - name: Register kubernetes dashboard file names
-      ansible.builtin.find:
-        paths: /var/tmp/configs/grafana/dashboards/kubernetes
-        recurse: false
-        patterns: "*.json"
-      register: kubernetes_files_to_copy
-
-    - name: Register servers dashboard file names
-      ansible.builtin.find:
-        paths: /var/tmp/configs/grafana/dashboards/servers
-        recurse: false
-        patterns: "*.json"
-      register: servers_files_to_copy
-
-    - name: Register infrastructure dashboard file names
-      ansible.builtin.find:
-        paths: /var/tmp/configs/grafana/dashboards/infrastructure
-        recurse: false
-        patterns: "*.json"
-      register: infrastructure_files_to_copy
-
-    - name: Copy kubernetes dashboard json files to remote server
+    - name: Copy kubernetes dashboard json files to app folder
       ansible.builtin.copy:
-        src: "{{ item.path }}"
-        dest: /opt/{{ app_name }}/dashboards/kubernetes/
-        mode: '0644'
+        src: /var/tmp/configs/grafana/dashboards/
+        dest: /opt/{{ app_name }}/dashboards/
         remote_src: true
-      with_items: "{{ kubernetes_files_to_copy.files }}"
-
-    - name: Copy servers dashboard json files to remote server
-      ansible.builtin.copy:
-        src: "{{ item.path }}"
-        dest: /opt/{{ app_name }}/dashboards/servers/
-        mode: '0644'
-        remote_src: true
-      with_items: "{{ servers_files_to_copy.files }}"
-
-    - name: Copy infrastructure dashboard json files to remote server
-      ansible.builtin.copy:
-        src: "{{ item.path }}"
-        dest: /opt/{{ app_name }}/dashboards/infrastructure/
-        mode: '0644'
-        remote_src: true
-      with_items: "{{ infrastructure_files_to_copy.files }}"
 
     - name: Remove configs repo
       ansible.builtin.file:
