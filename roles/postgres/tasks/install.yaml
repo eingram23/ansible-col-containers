@@ -33,20 +33,25 @@
         name: eingram23.containers.common
         tasks_from: upgrade
 
-    - name: Run container - {{ app_name }}
-      containers.podman.podman_container:
-        name: "{{ app_name }}"
-        image: "{{ image }}:{{ ver }}"
-        env:
-          POSTGRES_PASSWORD: "{{ lookup('hashi_vault', 'secret=secret/ssh/eingram:ssh_password') }}"
-        volume:
-          - "{{ app_name }}-data:/var/lib/postgresql/data"
-        state: stopped
-        restart_policy: always
-        publish: "{{ publish_port }}"
-        generate_systemd:
-          path: "{{ '/home/' + user_account + '/.config/systemd/user' if user_account != 'root' else '/etc/systemd/system' }}"
-          restart_policy: always
+    # - name: Run container - {{ app_name }}
+    #   containers.podman.podman_container:
+    #     name: "{{ app_name }}"
+    #     image: "{{ image }}:{{ ver }}"
+    #     env:
+    #       POSTGRES_PASSWORD: "{{ lookup('hashi_vault', 'secret=secret/ssh/eingram:ssh_password') }}"
+    #     volume:
+    #       - "{{ app_name }}-data:/var/lib/postgresql/data"
+    #     state: stopped
+    #     restart_policy: always
+    #     publish: "{{ publish_port }}"
+    #     generate_systemd:
+    #       path: "{{ '/home/' + user_account + '/.config/systemd/user' if user_account != 'root' else '/etc/systemd/system' }}"
+    #       restart_policy: always
+
+    - name: Create container for {{ app_name }}
+      ansible.builtin.include_role:
+        name: eingram23.containers.common
+        tasks_from: create_container
 
     - name: Enable service for {{ app_name }}
       ansible.builtin.include_role:
