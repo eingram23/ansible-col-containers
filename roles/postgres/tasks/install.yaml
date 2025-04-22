@@ -1,10 +1,19 @@
 ---
-- name: Assert that app and bucket are set
+- name: Check that port is not in use
+  when: task == "install"
+  ansible.builtin.shell: |
+    ss -tuln | grep ':{{ port }}'
+  register: fw_port_check
+  changed_when: false
+  ignore_errors: true
+
+- name: Assert that app and port are defined and port is open
   ansible.builtin.assert:
     that:
       - app is defined
       - port is defined
-    fail_msg: "app and port (5432+) are required"
+      - fw_port_check.rc | default(1) == 1
+    fail_msg: "app and port (5432+) are required and port must be open"
 
 - name: Set app_name
   ansible.builtin.set_fact:
