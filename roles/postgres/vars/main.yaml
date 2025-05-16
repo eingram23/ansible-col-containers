@@ -5,3 +5,4 @@ volumes:
   - "{{ app_name }}-data:/var/lib/postgresql/data"
 cont_env:
   POSTGRES_PASSWORD: "{{ lookup('hashi_vault', 'secret=secret/ssh/eingram:ssh_password') }}"
+  POSTGRES_INITDB_ARGS: "--auth-host=scram-sha-256 --auth-local=scram-sha-256"
