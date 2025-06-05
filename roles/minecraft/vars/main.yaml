@@ -1,2 +1,14 @@
 old_ver: "java21"
-ver: "java21"
+ver: "latest"
+env:
+  - EULA=TRUE
+  - TYPE=PAPER
+  - VERSION={{ ver }}
+  - MOTD="Paper Minecraft Server powered by Podman"
+  - SERVER_PORT=25565
+  - ENABLE_RCON=TRUE
+  - RCON_PASSWORD={{ lookup('hashi_vault', 'secret=secret/ssh/eingram:ssh_password') }}
+tty: true
+interactive: true
+volumes:
+  - /opt/{{ app_name }}:/data:z

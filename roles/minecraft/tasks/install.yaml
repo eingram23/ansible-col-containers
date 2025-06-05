@@ -16,10 +16,10 @@
         state: directory
         mode: '0755'
 
-    - name: Download multiverse-core
-      ansible.builtin.get_url:
-        url: https://dev.bukkit.org/projects/multiverse-core/files/5901717/download
-        dest: /opt/{{ app_name }}/plugins/MultiVerse-Core-4.3.14.jar
+    - name: Copy multiverse-core plugin to {{ app_name }} plugins folder
+      ansible.builtin.copy:
+        src: multiverse-core-5.0.1.jar
+        dest: /opt/{{ app_name }}/plugins/multiverse-core-5.0.1.jar
         mode: '0644'
 
     - name: Prep for upgrade
@@ -28,28 +28,32 @@
         name: eingram23.containers.common
         tasks_from: upgrade
 
+    # - name: Create and run container for {{ app_name }}
+    #   containers.podman.podman_container:
+    #     name: "{{ app_name }}"
+    #     image: "{{ image }}:{{ ver }}"
+    #     restart_policy: always
+    #     env:
+    #       EULA=TRUE
+    #       TYPE=PAPER
+    #       VERSION={{ ver }}
+    #       MOTD="Paper Minecraft Server powered by Podman"
+    #       SERVER_PORT=25565
+    #       ENABLE_RCON=TRUE
+    #       RCON_PASSWORD={{ lookup('hashi_vault', 'secret=secret/ssh/eingram:ssh_password') }}
+    #     tty: true
+    #     interactive: true
+    #     publish: "{{ publish_port }}"
+    #     volume:
+    #       - /opt/{{ app_name }}:/data:z
+    #     state: stopped
+    #     generate_systemd:
+    #       path: "{{ '/home/' + user_account + '/.config/systemd/user' if user_account != 'root' else '/etc/systemd/system' }}"
+    #       restart_policy: always
     - name: Create and run container for {{ app_name }}
-      containers.podman.podman_container:
-        name: "{{ app_name }}"
-        image: "{{ image }}:{{ ver }}"
-        restart_policy: always
-        env:
-          EULA=TRUE
-          TYPE=PAPER
-          VERSION={{ ver }}
-          MOTD="Paper Minecraft Server powered by Podman"
-          SERVER_PORT=25565
-          ENABLE_RCON=TRUE
-          RCON_PASSWORD={{ lookup('hashi_vault', 'secret=secret/ssh/eingram:ssh_password') }}
-        tty: true
-        interactive: true
-        publish: "{{ publish_port }}"
-        volume:
-          - /opt/{{ app_name }}:/data:z
-        state: stopped
-        generate_systemd:
-          path: "{{ '/home/' + user_account + '/.config/systemd/user' if user_account != 'root' else '/etc/systemd/system' }}"
-          restart_policy: always
+      ansible.builtin.include_role:
+        name: eingram23.containers.common
+        tasks_from: create_container
 
     - name: Enable service for {{ app_name }}
       ansible.builtin.include_role:

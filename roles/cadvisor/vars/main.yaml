@@ -1,7 +1,7 @@
 ---
 # old_ver: "v0.49.1"
 ver: "v0.49.2"
-container_command:
+cont_command:
   - --podman=unix:///var/run/podman/podman.sock
   - --docker=unix://
   - --store_container_labels=true

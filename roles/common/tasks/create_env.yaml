@@ -3,16 +3,14 @@
   become_method: ansible.builtin.sudo
   become_user: root
   block:
-    - name: Check if user_account exists
-      ansible.builtin.getent:
-        database: passwd
-        key: "{{ user_account }}"
-      register: user_exists
-
-    - name: Fail if user_account does not exist
-      ansible.builtin.fail:
-        msg: "The user_account {{ user_account }} does not exist on this system."
-      when: user_exists is not defined
+    - name: Create user if needed
+      ansible.builtin.include_role:
+        name: eingram23.linux.user_mgmt
+        tasks_from: add_user
+      vars:
+        user_id: "{{ user_account }}"
+        user_password: "{{ lookup('hashi_vault', 'secret=secret/ssh/ansible:ssh_password') }}"
+        admin_user: "no"
 
     - name: Ensure podman is installed
       ansible.builtin.package:

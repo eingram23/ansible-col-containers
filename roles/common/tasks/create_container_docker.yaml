@@ -10,4 +10,4 @@
       "{{ cont_env | default(omit) }}"
     volumes: "{{ volumes | default(omit) }}"
     devices: "{{ devices | default(omit) }}"
-    command: "{{ container_command | default(omit) }}"
+    command: "{{ cont_command | default(omit) }}"

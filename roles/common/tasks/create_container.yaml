@@ -8,9 +8,11 @@
     publish: "{{ publish_port }}"
     env:
       "{{ cont_env | default(omit) }}"
+    tty: "{{ tty | default(omit) }}"
+    interactive: "{{ interactive | default(omit) }}"
     volume: "{{ volumes | default(omit) }}"
     device: "{{ devices | default(omit) }}"
-    command: "{{ container_command | default(omit) }}"
+    command: "{{ cont_command | default(omit) }}"
     generate_systemd:
       path: "{{ '/home/' + user_account + '/.config/systemd/user' if user_account != 'root' else '/etc/systemd/system' }}"
       restart_policy: always
