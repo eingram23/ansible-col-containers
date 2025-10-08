@@ -8,6 +8,15 @@
 
   tasks:
 
+    - name: Assert task and user_account are defined
+      ansible.builtin.assert:
+        that:
+          - task is defined
+          - task in ['install', 'uninstall']
+          - user_account is defined
+        fail_msg: "The 'task' variable must be defined and set to either 'install' or 'uninstall'."
+        success_msg: "The 'task' variable is defined and valid."
+        
     - name: Create dbeaver container
       ansible.builtin.include_role:
         name: eingram23.containers.dbeaver

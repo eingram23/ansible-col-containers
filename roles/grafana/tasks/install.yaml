@@ -79,16 +79,16 @@
         image: "{{ image }}:{{ ver }}"
         state: stopped
         restart_policy: always
-        user: 472
+        user: 1002
         # publish: "{{ publish_port }}"
         network: host
         env:
-          GF_INSTALL_PLUGINS: "grafana-clock-panel, flant-statusmap-panel, marcusolsson-treemap-panel"
+          GF_INSTALL_PLUGINS: "grafana-clock-panel, marcusolsson-treemap-panel"
           # GF_SECURITY_ADMIN_USER: "admin"
           # GF_SECURITY_ADMIN_PASSWORD: "{{ lookup('hashi_vault', 'secret/ssh/ansible:ssh_password') }}"
         volume:
-          - /opt/{{ app_name }}/dashboards:/etc/grafana/provisioning/dashboards
-          - /opt/{{ app_name }}/datasources:/etc/grafana/provisioning/datasources
+          - /opt/{{ app_name }}/dashboards:/etc/grafana/provisioning/dashboards:Z
+          - /opt/{{ app_name }}/datasources:/etc/grafana/provisioning/datasources:Z
           - "{{ app_name }}-data:/var/lib/grafana"
         generate_systemd:
           path: "{{ '/home/' + user_account + '/.config/systemd/user' if user_account != 'root' else '/etc/systemd/system' }}"

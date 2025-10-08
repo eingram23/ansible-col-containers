@@ -1,0 +1,21 @@
+---
+- name: Setup podman env for new user
+  hosts: "{{ hostvar | default([]) }}"
+  gather_facts: true
+  become: true
+  become_method: sudo
+
+  tasks:
+
+    - name: Assert user_account and password are defined
+      ansible.builtin.assert:
+        that:
+          - user_account is defined
+          - user_password is defined
+        fail_msg: "The 'user_account' and 'user_password' variables must be defined."
+        success_msg: "The 'user_account' and 'user_password' variables are defined."
+
+    - name: Include create_env_newbuild role
+      ansible.builtin.include_role:
+        name: eingram23.containers.common
+        tasks_from: create_env_newbuild

@@ -45,6 +45,12 @@
         name: eingram23.containers.common
         tasks_from: upgrade
 
+    - name: Find podman storage location for non root user
+      when: user_account != "root"
+      ansible.builtin.command: podman info --format '{{ "{{.Store.GraphRoot}}" }}'
+      register: podman_storage
+      changed_when: false
+      
     - name: Create container for {{ app_name }}
       ansible.builtin.include_role:
         name: eingram23.containers.common

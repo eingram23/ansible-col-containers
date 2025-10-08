@@ -84,7 +84,7 @@
           MEM_LIMIT=1024
           MEM_STARTUP=1024
         volume:
-          - "/opt/{{ app_name }}/config:/config"
+          - "/opt/{{ app_name }}/config:/config:Z"
 
     - name: Create {{ app_name }}-db container
       containers.podman.podman_container:

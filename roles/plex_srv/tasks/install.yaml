@@ -36,7 +36,7 @@
           VERSION=docker
           TZ=America/Los_Angeles
         network_mode: host
-        # device: "/dev/dri:/dev/dri"
+        device: "/dev/dri:/dev/dri"
         volume:
           - /mnt/pool0/PlexMedia/config:/config:Z
           - /mnt/pool0/PlexMedia/Movies:/movies:Z

@@ -52,6 +52,12 @@
         name: eingram23.containers.common
         tasks_from: upgrade
 
+    - name: Find podman storage location for non root user
+      when: user_account != "root"
+      ansible.builtin.command: podman info --format '{{ "{{.Store.GraphRoot}}" }}'
+      register: podman_storage
+      changed_when: false
+    
     - name: Run container for {{ app_name }}
       containers.podman.podman_container:
         name: "{{ app_name }}"
@@ -70,7 +76,7 @@
           - >-
             {{ '/var/lib/containers/storage:/var/lib/docker/volumes'
               if user_account == 'root'
-              else '/home/' + user_account + '/.local/share/containers/storage:/var/lib/docker/volumes'
+              else podman_storage.stdout | default('') + ':/var/lib/docker/volumes'
             }}
         generate_systemd:
           path: "{{ '/home/' + user_account + '/.config/systemd/user' if user_account != 'root' else '/etc/systemd/system' }}"

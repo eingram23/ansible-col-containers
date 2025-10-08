@@ -1,0 +1,43 @@
+---
+- name: Create {{ user_account }} account
+  ansible.builtin.include_role:
+    name: eingram23.linux.user_mgmt
+    tasks_from: add_user
+  vars:
+    user_account: "{{ user_account }}"
+    user_password: "{{ user_password }}"
+    admin_user: "no"
+  no_log: true
+
+- name: Ensure podman is installed
+  ansible.builtin.package:
+    name: "{{ podman_items }}"
+    state: present
+  loop:
+    - podman
+    - podman-compose
+    - podman-plugins
+    - podman-remote
+  loop_control:
+    loop_var: podman_items
+
+- name: Enable linger for user {{ user_account }}
+  ansible.builtin.command: loginctl enable-linger {{ user_account }}
+  args:
+    creates: /var/lib/systemd/linger/{{ user_account }}
+
+- name: Set default logging driver to journald
+  ansible.builtin.file:
+    path: "/home/{{ user_account }}/.config/containers"
+    state: directory
+    owner: "{{ user_account }}"
+    group: "{{ user_account }}"
+    mode: '0755'
+
+- name: Copy containers.conf
+  ansible.builtin.copy:
+    src: containers.conf
+    dest: "/home/{{ user_account }}/.config/containers/containers.conf"
+    owner: "{{ user_account }}"
+    group: "{{ user_account }}"
+    mode: '0644'

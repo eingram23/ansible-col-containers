@@ -1,11 +1,21 @@
 ---
-- name: Deploy porainter_srv container
+- name: Deploy portainer_srv container
   hosts: "{{ hostvar | default([]) }}"
   become: true
   become_method: sudo
   gather_facts: false
 
   tasks:
+
+    - name: Assert task and user_account are defined
+      ansible.builtin.assert:
+        that:
+          - task is defined
+          - task in ['install', 'uninstall']
+          - user_account is defined
+          - user_account == 'root'
+        fail_msg: "The 'task' variable must be defined and set to either 'install' or 'uninstall'."
+        success_msg: "The 'task' variable is defined and valid."
 
     - name: Portainer service - {{ task }}
       ansible.builtin.import_role:

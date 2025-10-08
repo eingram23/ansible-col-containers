@@ -4,7 +4,17 @@
   become: false
   gather_facts: true
 
-  tasks:   
+  tasks:
+
+    - name: Assert task and user_account are defined
+      ansible.builtin.assert:
+        that:
+          - task is defined
+          - task in ['install', 'uninstall']
+          - user_account is defined
+        fail_msg: "The 'task' variable must be defined and set to either 'install' or 'uninstall'."
+        success_msg: "The 'task' variable is defined and valid."
+
     - name: Deploy portainer agent for Redhat/Rocky
       when: ansible_distribution in ['Redhat', 'Rocky']
       ansible.builtin.import_role:

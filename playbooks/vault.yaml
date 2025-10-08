@@ -6,6 +6,14 @@
 
   tasks:
 
+    - name: Assert task variable is defined
+      ansible.builtin.assert:
+        that:
+          - task is defined
+          - task in ['install', 'uninstall']
+        fail_msg: "The 'task' variable must be defined and set to either 'install' or 'uninstall'."
+        success_msg: "The 'task' variable is defined and valid."
+
     - name: Deploy vault container
       ansible.builtin.import_role:
         name: eingram23.containers.vault
