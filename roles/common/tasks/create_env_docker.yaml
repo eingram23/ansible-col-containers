@@ -18,6 +18,13 @@
         state: started
         enabled: true
 
+- name: Install python3-packaing for dietpi hosts
+  when: "'dietpi' in group_names"
+  ansible.builtin.package:
+    name: python3-packaging
+    state: present
+    update_cache: true
+
 - name: Install python modules
   ansible.builtin.pip:
     name: "{{ pip_items }}"
