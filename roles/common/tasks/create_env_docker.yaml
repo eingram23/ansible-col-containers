@@ -18,7 +18,7 @@
         state: started
         enabled: true
 
-- name: Install python3-packaing for dietpi hosts
+- name: Install python3-packaging for dietpi hosts
   when: "'dietpi' in group_names"
   ansible.builtin.package:
     name: python3-packaging
