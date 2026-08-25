@@ -1,0 +1,54 @@
+---
+- name: Initialize vault
+  containers.podman.podman_container_exec:
+    name: "{{ app_name }}"
+    command: "/bin/sh -c 'export VAULT_SKIP_VERIFY=true && vault operator init -format=json'"
+  register: vault_init
+  retries: 10
+  delay: 10
+  until: vault_init.rc == 0
+
+- name: debug vault_init
+  ansible.builtin.debug:
+    var: vault_init.stdout_lines
+
+- name: Set facts for vault init keys and root token
+  ansible.builtin.set_fact:
+    root_token: "{{ vault_init.stdout | from_json | json_query('root_token') }}"
+    init_keys: "{{ vault_init.stdout | from_json | json_query('keys') }}"
+
+- name: Set default Azure AD OIDC settings
+  ansible.builtin.set_fact:
+    vault_oidc_discovery_url: "{{ vault_oidc_discovery_url | default('https://login.microsoftonline.com/' ~ azure_tenant_id ~ '/v2.0') }}"
+    vault_oidc_default_role: "{{ vault_oidc_default_role | default('default') }}"
+    vault_oidc_ui_redirect_uri: "{{ vault_oidc_ui_redirect_uri | default('https://vault.ycdisp.net:8200/ui/vault/auth/oidc/oidc/callback') }}"
+    vault_oidc_cli_redirect_uri: "{{ vault_oidc_cli_redirect_uri | default('http://localhost:8250/oidc/callback') }}"
+
+- name: Create policies
+  containers.podman.podman_container_exec:
+    name: "{{ app_name }}"
+    command: |
+      vault login {{ root_token }}
+      /bin/sh -c "`cat {{ lookup('file', 'secrets-policy.sh') }}`"
+      /bin/sh -c "`cat {{ lookup('file', 'admins-policy.sh') }}`"
+      vault secrets enable -path=secret kv-v2
+      vault auth enable approle
+      vault write auth/approle/role/secrets \
+                                      token_num_uses=0 \
+                                      token_ttl=0m \
+                                      secret_id_num_uses=0 \
+                                      token_no_default_policy=false \
+                                      token_policies="secrets"
+      vault auth enable oidc
+      vault write auth/oidc/config \
+                                      oidc_discovery_url="{{ vault_oidc_discovery_url }}" \
+                                      oidc_client_id="{{ azure_client_id }}" \
+                                      oidc_client_secret="{{ azure_client_secret }}" \
+                                      default_role="{{ vault_oidc_default_role }}"
+      vault write auth/oidc/role/{{ vault_oidc_default_role }} \
+                                      user_claim="email" \
+                                      groups_claim="groups" \
+                                      oidc_scopes="openid,profile,email" \
+                                      allowed_redirect_uris="{{ vault_oidc_ui_redirect_uri }}" \
+                                      allowed_redirect_uris="{{ vault_oidc_cli_redirect_uri }}" \
+                                      token_policies="admins"
