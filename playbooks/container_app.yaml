@@ -1,4 +1,6 @@
 ---
+# Usage: ansible-playbook container_app.yaml -e "hostvar=host app_name=app task=install user_account=user"
+
 - name: Deploy container app
   hosts: "{{ hostvar | default([]) }}"
   become: false

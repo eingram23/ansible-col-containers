@@ -1,0 +1,10 @@
+---
+app_name: "vlmcsd"
+user_account: "poduser"
+image_name: "vlmcsd"
+image_repo: "docker.io/mikolatero"
+ver: "latest"
+fw_port:
+  - 1688/tcp
+publish_port:
+  - 1688:1688

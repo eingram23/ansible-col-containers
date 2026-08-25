@@ -10,9 +10,9 @@
 - name: Set default vault.hcl template variables
   when: azure_client_id is not defined
   ansible.builtin.set_fact:
-    azure_client_id: "{{ lookup('hashi_vault', 'secret=secret/azure/app/hl-vault1:id') }}"
-    azure_client_secret: "{{ lookup('hashi_vault', 'secret=secret/azure/app/hl-vault1:secret') }}"
-    azure_tenant_id: "{{ lookup('hashi_vault', 'secret=secret/azure/tenant:id') }}"
+    azure_client_id: "{{ azure_client_id | default(lookup('hashi_vault', 'secret=secret/azure/app/hl-vault1:id')) }}"
+    azure_client_secret: "{{ azure_client_secret | default(lookup('hashi_vault', 'secret=secret/azure/app/hl-vault1:secret')) }}"
+    azure_tenant_id: "{{ azure_tenant_id | default(lookup('hashi_vault', 'secret=secret/azure/tenant:id')) }}"
     azure_vault_name: "kv-hl-vault1"
     azure_key_name: "vault-unseal-key"
 
